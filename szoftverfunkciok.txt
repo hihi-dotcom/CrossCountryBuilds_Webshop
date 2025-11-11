@@ -1,0 +1,22 @@
+
+
+-	Továbbá, egy-egy esemény után a Szerelő szerepkörű felhasználó, újra beállítja egy adott kerékpár állapotát, majd lehetőség van „szervizelésre váró” státuszba állítani. Aminek értelmében várólistára kerül a szervizelésre. A várólistán pedig felvehetjük, hogy melyik alkatrészek kerülnek cserére és melyek kerülnek szervizelésre.
+
+
+
+-	Ezeken felül az ügyintéző képes hozzáadni egy eseményhez szükséges felszereléseket, amelyek az eseményre elutazó személyek számára szerepkörhöz kötötten megjelennek.
+
+-	A fő funkciók mellett a csapat felszereléseiből(ruházat, kerékpár alkatrészek, kerékpáros kiegészítők) kiárusítást hirdet a dolgozók számára, amelyet az ügyintéző tud meghirdetni és e-mailes értesítésként megjelenik a dolgozók levelezésében.
+
+
+
+
+Nyilvántartás:
+      - A csapat tulajdonában álló kerékpárok nyilvántartása, amelyeket előre kell hozzáadni és felvinni. Továbbá a kerékpárokhoz tartozó alkatrészek típusa és státusza. A kerékpár főbb 	alkatrészeinek(első teleszkóp, váz, különböző szenzoros rendszerek) állapota meghatározza a bicikli státuszát.
+
+      - Alkatrészek nyilvántartása, amelyekből válogatni tudunk kategórikusan lebontva egy-egy kerékpárnál, ha éppen cserére szorulnak. Továbbá leírások egy-egy alkatrész családhoz pdf 	formátumban
+
+	-A szoftver képes lesz nyilvántartani az éppen aktív dolgozókat, több különböző munkakörben is. 
+
+Eseményszervezés:
+	- Ha pedig közeledik az esemény a csapat ügyintéző munkatársa, az emberek státusza alapján, válogatja össze az elutazó csapatot a versenyre.
