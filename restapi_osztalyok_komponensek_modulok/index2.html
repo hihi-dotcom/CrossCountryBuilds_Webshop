@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>Webshop REST API dokumentáció</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f5f7fa;
+            color: #222;
+        }
+
+        header {
+            background: #20232a;
+            color: #fff;
+            padding: 24px 40px;
+            border-bottom: 4px solid #61affe;
+        }
+
+        header h1 {
+            margin: 0 0 4px 0;
+            font-size: 26px;
+        }
+
+        header p {
+            margin: 0;
+            opacity: 0.85;
+        }
+
+        main {
+            padding: 24px 40px 40px 40px;
+            max-width: 1200px;
+        }
+
+        h2 {
+            border-bottom: 2px solid #e0e4ea;
+            padding-bottom: 4px;
+            margin-top: 32px;
+        }
+
+        h3 {
+            margin-top: 24px;
+        }
+
+        .tag-group {
+            margin-top: 24px;
+        }
+
+        .tag-title {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #e8f0fe;
+            color: #1a4fb8;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .endpoint {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+            margin-bottom: 16px;
+            border-left: 4px solid #d0d7e2;
+        }
+
+        .endpoint-header {
+            padding: 10px 16px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .method {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        .method.get { background: #61affe; }
+        .method.post { background: #49cc90; }
+        .method.put { background: #fca130; }
+        .method.patch { background: #50e3c2; color: #073b4c; }
+        .method.delete { background: #f93e3e; }
+
+        .path {
+            font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 13px;
+        }
+
+        .summary {
+            font-size: 14px;
+            font-weight: 500;
+            margin-left: auto;
+            color: #555;
+        }
+
+        .endpoint-body {
+            padding: 12px 16px 16px 16px;
+            font-size: 14px;
+        }
+
+        .endpoint-body p {
+            margin: 4px 0 8px 0;
+        }
+
+        .section-title {
+            font-weight: 600;
+            margin-top: 8px;
+            margin-bottom: 4px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        th, td {
+            border: 1px solid #e0e4ea;
+            padding: 4px 8px;
+            vertical-align: top;
+        }
+
+        th {
+            background: #f0f3f8;
+            text-align: left;
+        }
+
+        code {
+            font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 12px;
+        }
+
+        pre {
+            background: #0b1120;
+            color: #e5e7eb;
+            padding: 8px 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 6px 0 10px 0;
+        }
+
+        .schema-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 12px;
+            margin-bottom: 4px;
+        }
+
+        @media print {
+            header {
+                border-bottom: 1px solid #000;
+            }
+            .endpoint {
+                box-shadow: none;
+                border-radius: 0;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Webshop REST API</h1>
+    <p>Swagger-stílusú, statikus dokumentáció (backend &amp; admin végpontok)</p>
+</header>
+
+<main>
+    <section id="overview">
+        <h2>Áttekintés</h2>
+        <p>
+            Ez a dokumentum a webshophoz tartozó REST API végpontjait írja le.
+            A mezőnevek, útvonalak és objektumok nevei angolul szerepelnek,
+            a leírások magyarul, röviden és érthetően fogalmazva.
+        </p>
+        <p>
+            Válaszok formátuma: alapértelmezetten JSON.
+            Hibák esetén általában egy <code>state</code> mezőt tartalmazó objektum érkezik
+            (<code>"ok"</code> vagy <code>"err"</code>, illetve egyéb leíró üzenetek).
+        </p>
+    </section>
+
+    <!-- NYILVÁNOS / FELHASZNÁLÓI VÉGPONTOK -->
+    <section id="public-api">
+        <h2>Nyilvános és felhasználói végpontok</h2>
+
+        <div class="tag-group">
+            <div class="tag-title">Termékek</div>
+
+            <!-- GET /api/products -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/products?from=0&amp;to=13</span>
+                    <span class="summary">Termékek listázása (főoldal)</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        Az endpoint pagináltan listázza a webshop termékeit.
+                        A <code>from</code> és <code>to</code> query paraméterek a visszaadott
+                        termékek sorszámtartományát határozzák meg (0-tól indexelve, mindkettő
+                        beleértve).
+                    </p>
+
+                    <div class="section-title">Query paraméterek</div>
+                    <table>
+                        <tr>
+                            <th>Név</th><th>Típus</th><th>Kötelező</th><th>Leírás</th>
+                        </tr>
+                        <tr>
+                            <td><code>from</code></td>
+                            <td>integer</td>
+                            <td>igen</td>
+                            <td>Kezdő index (0-tól), ettől a sorszámú terméktől kezdjük a listázást.</td>
+                        </tr>
+                        <tr>
+                            <td><code>to</code></td>
+                            <td>integer</td>
+                            <td>igen</td>
+                            <td>Záró index, eddig a sorszámig listázzuk a termékeket (beleértve).</td>
+                        </tr>
+                    </table>
+
+                    <div class="section-title">Válasz (200 – OK)</div>
+                    <p>Egy JSON tömb, amely termékobjektumokat tartalmaz.</p>
+                    <pre><code>{
+  "products": [
+    {
+      "name": "string",
+      "category": "string",
+      "manufacturer": "string",
+      "description": "string",
+      "picture": "string",
+      "price": 0
+    }
+  ]
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- GET /api/products (szűrt) -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/products</span>
+                    <span class="summary">Termékek szűrése</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        Szűrt terméklista lekérése a megadott feltételek alapján.
+                        A backenden csak azok a termékek kerülnek visszaadásra, amelyek
+                        tulajdonságai megfelelnek a query paramétereknek.
+                    </p>
+
+                    <div class="section-title">Példa kérésre</div>
+                    <pre><code>GET /api/products?name=productname&amp;category=category</code></pre>
+
+                    <div class="section-title">Lehetséges query paraméterek</div>
+                    <table>
+                        <tr>
+                            <th>Név</th><th>Típus</th><th>Kötelező</th><th>Leírás</th>
+                        </tr>
+                        <tr>
+                            <td><code>name</code></td>
+                            <td>string</td>
+                            <td>nem</td>
+                            <td>Termék neve (részleges egyezés is lehet).</td>
+                        </tr>
+                        <tr>
+                            <td><code>category</code></td>
+                            <td>string</td>
+                            <td>nem</td>
+                            <td>Termékkategória szűrő.</td>
+                        </tr>
+                    </table>
+
+                    <div class="section-title">Válasz (200 – OK)</div>
+                    <p>Ugyanaz a struktúra, mint a sima terméklista esetén.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- RENDELÉS / KOSÁR -->
+        <div class="tag-group">
+            <div class="tag-title">Rendelés / Kosár</div>
+
+            <!-- PUT /api/order -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method put">PUT</span>
+                    <span class="path">/api/order</span>
+                    <span class="summary">Rendelés leadása a kosár tartalmából</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        A végponttal a kosár tartalmából rendelés hozható létre.
+                        A frontenden a „Rendelés befejezése” gombra kattintva egy JSON
+                        objektum kerül elküldésre a rendelés tételeivel, valamint a
+                        kiválasztott szállítási és fizetési móddal.
+                    </p>
+
+                    <div class="section-title">Kérés törzse (Request body)</div>
+                    <pre><code>{
+  "products": [
+    {
+      "product_name": "string",
+      "product_number": 1
+    },
+    {
+      "product_name": "string",
+      "product_number": 2
+    }
+  ],
+  "shipping_method": "string",
+  "payment_method": "string"
+}</code></pre>
+
+                    <div class="section-title">Válasz (200 – OK)</div>
+                    <p>
+                        A backend visszajelzést ad a rendelés sikerességéről.
+                        Ha egyes termékek időközben elfogytak, azokat külön listában adja vissza,
+                        hogy a felhasználó módosíthassa a kosarat.
+                    </p>
+                    <pre><code>{
+  "state": "ok" | "err",
+  "out_of_stock": [
+    "product_name_1",
+    "product_name_2"
+  ]
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- AUTH: LOGIN, REGISZTRÁCIÓ, USER, RECOVERY -->
+        <div class="tag-group">
+            <div class="tag-title">Felhasználói fiók és hitelesítés</div>
+
+            <!-- POST /api/login -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="path">/api/login</span>
+                    <span class="summary">Bejelentkezés</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        Bejelentkezés a felhasználói fiókkal.
+                        A frontend a bejelentkezési űrlap adataiból JSON objektumot épít,
+                        és elküldi a backendnek.
+                    </p>
+
+                    <div class="section-title">Kérés törzse</div>
+                    <pre><code>{
+  "email": "string",
+  "password": "string"
+}</code></pre>
+
+                    <div class="section-title">Válasz (200 – OK)</div>
+                    <pre><code>{
+  "state": "ok" | "err"
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- PUT /api/registration -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method put">PUT</span>
+                    <span class="path">/api/registration</span>
+                    <span class="summary">Regisztráció</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        Új felhasználói fiók regisztrációja.
+                        A frontend a regisztrációs űrlap mezőit JSON objektumba tömöríti, és elküldi a backendnek.
+                    </p>
+
+                    <div class="section-title">Kérés törzse</div>
+                    <pre><code>{
+  "email": "string",
+  "name": "string",
+  "password": "string"
+}</code></pre>
+
+                    <div class="section-title">Válasz (200 – OK)</div>
+                    <p>A válasz egy állapotot leíró szöveg a <code>state</code> mezőben.</p>
+                    <pre><code>{
+  "state": "username is already in use"
+          | "there is an account registered from this email"
+          | "ok"
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- GET /api/user -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/user</span>
+                    <span class="summary">Saját felhasználói adatok lekérése</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        A bejelentkezett felhasználóhoz tartozó adatok lekérése.
+                        A végpont egy JSON objektumot ad vissza a felhasználó törzsadataival
+                        és címinformációival.
+                    </p>
+
+                    <div class="section-title">Válasz (200 – OK)</div>
+                    <pre><code>{
+  "username": "string",
+  "email": "string",
+  "delivery_address": "string",
+  "billing_address": "string"
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- PATCH user adatok -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method patch">PATCH</span>
+                    <span class="path">/api/username, /api/email, /api/delivery_address, /api/billing_address, /api/password</span>
+                    <span class="summary">Saját adatok módosítása</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        A végpontok segítségével egyenként módosíthatók a felhasználó adatai.
+                        A frontend a „Módosítások mentése” gombra kattintva küld PATCH kérést,
+                        a módosított értékkel.
+                    </p>
+
+                    <div class="section-title">Kérés törzse</div>
+                    <pre><code>{
+  "data": "string"
+}</code></pre>
+
+                    <div class="section-title">Válasz (200 – OK)</div>
+                    <pre><code>{
+  "state": "ok" | "err"
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- GET /api/appointments -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/appointments</span>
+                    <span class="summary">Szerviz időpontok lekérése</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        A végpont a szabad szerviz/behozatali időpontokat adja vissza JSON formátumban.
+                        A frontend ezeket jeleníti meg a felhasználó számára, aki innen választhat időpontot.
+                    </p>
+
+                    <div class="section-title">Válasz (200 – OK)</div>
+                    <p>A pontos struktúra implementációfüggő; tipikusan id + dátum/idő mezők.</p>
+                </div>
+            </div>
+
+            <!-- PATCH /api/appointment -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method patch">PATCH</span>
+                    <span class="path">/api/appointment</span>
+                    <span class="summary">Időpontfoglalás létrehozása</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        Miután a felhasználó kiválasztott egy időpontot és leírta a problémát,
+                        a frontend ezen a végponton keresztül küldi el az időpontfoglalás adatait a backendnek.
+                    </p>
+
+                    <div class="section-title">Kérés törzse</div>
+                    <pre><code>{
+  "date": "string",
+  "description": "string"
+}</code></pre>
+
+                    <div class="section-title">Válasz (200 – OK)</div>
+                    <p>Visszaadja az időpontfoglalás állapotát.</p>
+                    <pre><code>{
+  "state": "ok" | "err"
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- POST /api/recovery -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="path">/api/recovery</span>
+                    <span class="summary">Jelszó visszaállítás kezdeményezése</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        Jelszó-visszaállítás indítása.
+                        A felhasználó e-mail címe alapján a rendszer elindítja a visszaállítási folyamatot
+                        (pl. e-mail küldése egy linkkel).
+                    </p>
+
+                    <div class="section-title">Kérés törzse</div>
+                    <pre><code>{
+  "email": "string"
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- PATCH /api/recovery -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method patch">PATCH</span>
+                    <span class="path">/api/recovery</span>
+                    <span class="summary">Új jelszó beállítása</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        A jelszó-visszaállítás folyamatának második lépése.
+                        A felhasználó új jelszavát küldi el a backendnek, amely aktualizálja az adott fiók jelszavát.
+                    </p>
+
+                    <div class="section-title">Kérés törzse</div>
+                    <pre><code>{
+  "password": "string"
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- POST /api/authentication -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="path">/api/authentication</span>
+                    <span class="summary">Hitelesítés (User vagy error)</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        Általános hitelesítési végpont.
+                        Siker esetén a felhasználó adatait tartalmazó objektumot ad vissza,
+                        hiba esetén error-t.
+                    </p>
+
+                    <div class="section-title">Kérés törzse</div>
+                    <pre><code>{
+  "email": "string",
+  "password": "string"
+}</code></pre>
+
+                    <div class="section-title">Válasz (200 – OK)</div>
+                    <pre><code>{
+  "user": {
+    "id": 1,
+    "name": "string",
+    "delivery_address": "string",
+    "billing_address": "string",
+    "email": "string"
+  }
+  // vagy hiba esetén error objektum
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ADMIN VÉGPONTOK -->
+    <section id="admin-api">
+        <h2>Admin végpontok</h2>
+
+        <!-- ADMIN: TERMÉKEK -->
+        <div class="tag-group">
+            <div class="tag-title">Admin – Termékek</div>
+
+            <!-- GET /api/products (admin, paginált) -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/products?from=0&amp;to=13</span>
+                    <span class="summary">Termékek listázása admin felületen</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        Ugyanaz a logika, mint a nyilvános listázásnál,
+                        de admin nézetben a termékek szerkeszthetők, törölhetők.
+                    </p>
+                </div>
+            </div>
+
+            <!-- PATCH /api/admin/product -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method patch">PATCH</span>
+                    <span class="path">/api/admin/product</span>
+                    <span class="summary">Termék módosítása</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        Egy meglévő termék módosítása a termékazonosító alapján.
+                        A kérés törzsének kötelező része a termék azonosítója, a további mezők
+                        a módosítandó értékek.
+                    </p>
+
+                    <div class="section-title">Kérés törzse</div>
+                    <pre><code>{
+  "id": 1,
+  "name": "string",
+  "category": "string",
+  "manufacturer": "string",
+  "description": "string",
+  "picture": "string",
+  "price": 0
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- POST /api/admin/product -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="path">/api/admin/product</span>
+                    <span class="summary">Új termék létrehozása</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        Új termék létrehozása az adatbázisban.
+                        Az eredeti leírás szerint a termék üres értékekkel jön létre, amelyet
+                        később a módosító végponttal lehet kitölteni.
+                    </p>
+                </div>
+            </div>
+
+            <!-- DELETE /api/admin/product -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method delete">DELETE</span>
+                    <span class="path">/api/admin/product</span>
+                    <span class="summary">Termék törlése</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        Egy megadott termék törlése az adatbázisból.
+                        A kérés törzsében a törlendő termék nevét kell megadni.
+                    </p>
+
+                    <div class="section-title">Kérés törzse</div>
+                    <pre><code>{
+  "product_name": "string"
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMIN: FELHASZNÁLÓK -->
+        <div class="tag-group">
+            <div class="tag-title">Admin – Felhasználók</div>
+
+            <!-- GET /api/admin/users -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/admin/users?from=0&amp;to=12</span>
+                    <span class="summary">Felhasználók listázása</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        Az adott sorszámtartományba eső felhasználók adatainak lekérése.
+                    </p>
+
+                    <div class="section-title">Válasz (200 – OK)</div>
+                    <pre><code>[
+  {
+    "id": 1,
+    "name": "string",
+    "delivery_address": "string",
+    "billing_address": "string",
+    "email": "string"
+  }
+]</code></pre>
+                </div>
+            </div>
+
+            <!-- DELETE /api/admin/users -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method delete">DELETE</span>
+                    <span class="path">/api/admin/users</span>
+                    <span class="summary">Felhasználó törlése</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        Egy felhasználó törlése a látogatók/ felhasználók táblából
+                        azonosító alapján.
+                    </p>
+
+                    <div class="section-title">Kérés törzse</div>
+                    <pre><code>{
+  "id": 1
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMIN: MEGRENDELÉSEK -->
+        <div class="tag-group">
+            <div class="tag-title">Admin – Megrendelések</div>
+
+            <!-- GET /api/admin/orders -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/admin/orders?from=0&amp;to=12</span>
+                    <span class="summary">Megrendelések listázása</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        A paraméterben megadott sorszámtartományba eső megrendelések
+                        lekérése JSON tömb formájában.
+                    </p>
+
+                    <div class="section-title">Válasz (200 – OK)</div>
+                    <pre><code>[
+  {
+    "id": 1,
+    "user": {
+      "id": 1,
+      "name": "string",
+      "delivery_address": "string",
+      "billing_address": "string",
+      "email": "string"
+    },
+    "state": "string",
+    "items": [
+      {
+        "name": "string",
+        "category": "string",
+        "manufacturer": "string",
+        "description": "string",
+        "picture": "string",
+        "price": 0,
+        "quantity": 1
+      }
+    ],
+    "shipping_method": "string",
+    "payment_method": "string"
+  }
+]</code></pre>
+                </div>
+            </div>
+
+            <!-- PATCH /api/admin/orders -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method patch">PATCH</span>
+                    <span class="path">/api/admin/orders</span>
+                    <span class="summary">Megrendelés állapotának módosítása</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        Egy megrendelés állapotának frissítése (pl. „függőben”, „feldolgozás alatt”,
+                        „teljesítve” stb.). A módosítandó megrendelést azonosító alapján választjuk ki.
+                    </p>
+
+                    <div class="section-title">Kérés törzse</div>
+                    <pre><code>{
+  "id": 1,
+  "state": "string"
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- DELETE /api/admin/orders -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method delete">DELETE</span>
+                    <span class="path">/api/admin/orders</span>
+                    <span class="summary">Régi megrendelés törlése</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        Egy már régi vagy archiválandó megrendelés törlése az adatbázisból,
+                        megrendelés azonosító alapján.
+                    </p>
+
+                    <div class="section-title">Kérés törzse</div>
+                    <pre><code>{
+  "id": 1
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMIN: IDŐPONTFOGLALÁSOK -->
+        <div class="tag-group">
+            <div class="tag-title">Admin – Időpontfoglalások (Szerviz)</div>
+
+            <!-- GET /api/admin/appointment -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="path">/api/admin/appointment?from=0&amp;to=12</span>
+                    <span class="summary">Időpontfoglalások listázása</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        Beérkezett időpontfoglalások lekérése JSON tömb formájában.
+                        Az URL-ben lévő <code>from</code> és <code>to</code> sorszám paraméterek
+                        határozzák meg, hogy mely foglalások kerüljenek visszaadásra.
+                    </p>
+
+                    <div class="section-title">Válasz (200 – OK)</div>
+                    <pre><code>[
+  {
+    "id": 1,
+    "username": "string",
+    "user_email": "string",
+    "name": "string",
+    "dropoff_time": "string",
+    "pickup_time": "string",
+    "description": "string"
+  }
+]</code></pre>
+                </div>
+            </div>
+
+            <!-- PATCH /api/admin/appointment -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method patch">PATCH</span>
+                    <span class="path">/api/admin/appointment</span>
+                    <span class="summary">Időpontfoglalás módosítása</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        Egy meglévő szerviz időpontfoglalás adatainak módosítása.
+                        A törzsben az azonosítón kívül minden szükséges mező megadható.
+                    </p>
+
+                    <div class="section-title">Kérés törzse</div>
+                    <pre><code>{
+  "id": 1,
+  "username": "string",
+  "user_email": "string",
+  "name": "string",
+  "dropoff_time": "string",
+  "pickup_time": "string",
+  "description": "string"
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- DELETE /api/admin/appointment -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method delete">DELETE</span>
+                    <span class="path">/api/admin/appointment</span>
+                    <span class="summary">Időpont törlése</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>
+                        Egy már megtörtént vagy törlendő időpontfoglalás eltávolítása.
+                        A törléshez csak az időpont azonosítója szükséges.
+                    </p>
+
+                    <div class="section-title">Kérés törzse</div>
+                    <pre><code>{
+  "id": 1
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SÉMÁK ÖSSZEFOGLALVA -->
+    <section id="schemas">
+        <h2>Főbb objektumsémák összefoglalva</h2>
+
+        <div class="schema-name">Product</div>
+        <pre><code>{
+  "id": 1,              // opcionális
+  "name": "string",
+  "category": "string",
+  "manufacturer": "string",
+  "description": "string",
+  "picture": "string",
+  "price": 0
+}</code></pre>
+
+        <div class="schema-name">User</div>
+        <pre><code>{
+  "id": 1,
+  "name": "string",
+  "username": "string",      // opcionális, ha külön van
+  "email": "string",
+  "delivery_address": "string",
+  "billing_address": "string"
+}</code></pre>
+
+        <div class="schema-name">Order</div>
+        <pre><code>{
+  "id": 1,
+  "user": { /* User */ },
+  "state": "string",
+  "items": [
+    {
+      "name": "string",
+      "category": "string",
+      "manufacturer": "string",
+      "description": "string",
+      "picture": "string",
+      "price": 0,
+      "quantity": 1
+    }
+  ],
+  "shipping_method": "string",
+  "payment_method": "string"
+}</code></pre>
+
+        <div class="schema-name">Appointment</div>
+        <pre><code>{
+  "id": 1,
+  "username": "string",
+  "user_email": "string",
+  "name": "string",
+  "dropoff_time": "string",
+  "pickup_time": "string",
+  "description": "string"
+}</code></pre>
+    </section>
+</main>
+</body>
+</html>

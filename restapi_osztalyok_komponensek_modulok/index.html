@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>API katalógus — REST végpontok</title>
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --muted:#94a3b8;
+      --accent:#60a5fa;
+      --mono: "Courier New", monospace;
+      color-scheme: dark;
+    }
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg,#061025 0%, #071226 60%);
+      color:#e6eef8;
+      padding:28px;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+    .container{
+      max-width:1100px;
+      margin:0 auto;
+    }
+    header{
+      display:flex;
+      align-items:center;
+      gap:18px;
+      margin-bottom:22px;
+    }
+    header h1{
+      margin:0;
+      font-size:22px;
+    }
+    header p{margin:0;color:var(--muted);font-size:13px}
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 320px;
+      gap:20px;
+      align-items:start;
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03);
+      border-radius:12px;
+      padding:18px;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+    }
+    .sidebar .card{position:sticky; top:28px;}
+    h2{margin:0 0 8px 0;font-size:16px}
+    h3{margin:0 0 6px 0;font-size:14px;color:var(--accent)}
+    p.lead{color:var(--muted);margin:0 0 12px 0}
+    .endpoint{
+      border-radius:8px;
+      padding:12px;
+      background:rgba(255,255,255,0.02);
+      margin-bottom:12px;
+      border:1px solid rgba(255,255,255,0.015);
+    }
+    .meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+    .method{
+      font-weight:700;
+      padding:4px 8px;
+      border-radius:6px;
+      font-size:12px;
+      background:rgba(255,255,255,0.03);
+      color:var(--accent);
+      border:1px solid rgba(96,165,250,0.12);
+    }
+    .url{font-family:var(--mono); font-size:13px; color:#cfe9ff}
+    pre {
+      background:#071126;
+      border-radius:8px;
+      padding:12px;
+      overflow:auto;
+      font-family: var(--mono);
+      font-size:13px;
+      color:#dff4ff;
+      margin:8px 0 0 0;
+      white-space:pre-wrap;
+    }
+    small.muted{color:var(--muted);display:block;margin-top:6px;font-size:12px}
+    footer{margin-top:20px;color:var(--muted);font-size:13px;text-align:center}
+    /* responsive */
+    @media (max-width:980px){
+      .grid{grid-template-columns:1fr; padding-bottom:40px}
+      .sidebar .card{position:relative; top:0}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>API katalógus — REST végpontok</h1>
+        <p>Az alábbi katalógus a feltöltött dokumentumban található végpontok és példák struktúrált megjelenítése. A dokumentum szövegét változtatás nélkül tettem be példaként <small class="muted">(eredeti példák <code>&lt;pre&gt;</code> blokkokban)</small>.</p>
+      </div>
+    </header>
+
+    <div class="grid">
+      <main>
+        <!-- Főoldal -->
+        <section class="card">
+          <h2>Főoldal</h2>
+          <p class="lead">Termékek lekérése a backendről — a webshop főoldal számára.</p>
+
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">GET</div>
+              <div class="url">/api/termekek?from=0&to=13</div>
+            </div>
+
+            <p>Leírás: Az URL-ben megjelölt két szám között található termékeket fogja visszaküldeni JSON tömb formátumban. Ezeket a frontenden tömbbe rakjuk és a webshop főoldalán jelenítjük meg.</p>
+
+            <h3>Visszaküldött termék objektum formátuma (JSON):</h3>
+            <pre>
+[{ 
+név: string
+
+kategória: string 
+
+gyártó: string 
+
+leírás: string 
+
+kép: string 
+
+ár: number 
+}
+]
+            </pre>
+          </div>
+
+          <div class="endpoint">
+            <h3>Szűrés eredményei a backendről</h3>
+            <p>Ugyanúgy, mint a termékek elkérésénél, egyesével kérjük el a termékeket, ahol a szűrés feltételei megfelelnek a termék tulajdonságainak.</p>
+
+            <h4>Példa a szűrés feltétel alapú kéréshez:</h4>
+            <pre>
+„/api/products/1?name=atermékneve&kategória=kategória”
+            </pre>
+            <small class="muted">Megjegyzés: a fenti URL a dokumentumban szereplő pontos példa.</small>
+          </div>
+        </section>
+
+        <!-- Kosár / Rendelés -->
+        <section class="card" style="margin-top:14px">
+          <h2>Kosár — Rendelés</h2>
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">PUT</div>
+              <div class="url">/api/order</div>
+            </div>
+
+            <p>A frontendről a rendelés elküldésekor a fetch kérés body-jában egy JSON objektumot kell küldeni.</p>
+
+            <h3>Példa (küldött törzs):</h3>
+            <pre>
+{ 
+
+products: [{product name: string, product number: number}, {product name: string, product_number: number} ], 
+
+szállítási mód: string 
+
+fizetési mód: string 
+
+}
+            </pre>
+
+            <h3>Válasz (példa):</h3>
+            <pre>
+{
+state: ok || err, 
+
+elfogyott: []string
+
+}
+            </pre>
+
+            <small class="muted">Ha <code>state</code> = <code>ok</code>, átirányítás a köszönő oldalra. Ha egy termék elfogyott, a válasz tartalmazza az <code>elfogyott</code> listaelemeit.</small>
+          </div>
+        </section>
+
+        <!-- Bejelentkezés -->
+        <section class="card" style="margin-top:14px">
+          <h2>Bejelentkezés</h2>
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">POST</div>
+              <div class="url">/api/login</div>
+            </div>
+
+            <p>A frontenden a belépéshez használt adatokból készítünk egy rövid JSON objektumot, melyet elküldünk a backendre. A backend visszaad egy JSON objektumot, amely a bejelentkezés sikerességét mutatja.</p>
+
+            <h3>Példa válasz objektum:</h3>
+            <pre>
+{ state: ok || err, }
+            </pre>
+          </div>
+        </section>
+
+        <!-- Regisztráció -->
+        <section class="card" style="margin-top:14px">
+          <h2>Regisztráció</h2>
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">PUT</div>
+              <div class="url">/api/registration</div>
+            </div>
+
+            <p>A regisztrációs adatok egy JSON objektumba tömörítve kerülnek elküldésre.</p>
+
+            <h3>Példa regisztrációs objektum:</h3>
+            <pre>
+{ 
+
+email: string 
+
+name: string
+
+password: string 
+
+}
+            </pre>
+
+            <h3>Példa visszaküldött state-t tartalmazó objektum:</h3>
+            <pre>
+{
+ state: username is already in use || there is an account registered from this email | | ok, 
+}
+            </pre>
+          </div>
+        </section>
+
+        <!-- Saját adataim -->
+        <section class="card" style="margin-top:14px">
+          <h2>Saját adataim</h2>
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">GET</div>
+              <div class="url">/api/user</div>
+            </div>
+
+            <p>A GET kérésre a backend egy JSON objektumot ad vissza a felhasználó adataival.</p>
+
+            <h3>Példa a backendről kapott adatokra:</h3>
+            <pre>
+{ 
+
+username: string 
+
+email: string 
+
+delivery address: string
+
+billing address: string 
+
+}
+            </pre>
+
+            <h3>Módosítások (PATCH végpontok)</h3>
+            <pre>
+PATCH /api/username 
+PATCH /api/email 
+PATCH /api/delivery_address 
+PATCH /api/billing_address 
+PATCH /api/password 
+
+Küldendő body (példa):
+{ 
+data: string 
+} 
+
+Válasz (példa):
+{
+ state: ok || err 
+}
+            </pre>
+          </div>
+        </section>
+
+        <!-- Időpontfoglalás -->
+        <section class="card" style="margin-top:14px">
+          <h2>Időpontfoglalás</h2>
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">GET</div>
+              <div class="url">/api/appointments</div>
+            </div>
+
+            <p>A GET kérésre a backend elküldi a behozatali időpontokat JSON objektumban.</p>
+
+            <h3>Időpont kiválasztása és beküldése</h3>
+            <p>Miután kiválasztottuk az időpontot és leírtuk a problémát, egy PATCH kérés küldendő az alábbi URL-re:</p>
+            <div class="meta" style="margin-top:6px">
+              <div class="method">PATCH</div>
+              <div class="url">/api/appointment</div>
+            </div>
+
+            <h3>Példa küldött objektum:</h3>
+            <pre>
+{
+date: string,
+ description: string 
+}
+            </pre>
+
+            <h3>Példa válasz:</h3>
+            <pre>
+{
+state: ok || err
+}
+            </pre>
+          </div>
+        </section>
+
+        <!-- Jelszó visszaállítás -->
+        <section class="card" style="margin-top:14px">
+          <h2>Jelszó visszaállítás / Új jelszó</h2>
+
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">POST</div>
+              <div class="url">/api/recovery</div>
+            </div>
+
+            <p>A POST kérés törzsében szerepel az email.</p>
+            <pre>
+{ 
+email: string 
+}
+            </pre>
+          </div>
+
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">PATCH</div>
+              <div class="url">/api/recovery</div>
+            </div>
+
+            <p>Új jelszó létrehozása a PATCH kérés törzsében.</p>
+            <pre>
+{
+ password: string 
+}
+            </pre>
+          </div>
+        </section>
+
+        <!-- Admin: termékek -->
+        <section class="card" style="margin-top:14px">
+          <h2>Admin — Termékekkel kapcsolatos műveletek</h2>
+
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">GET</div>
+              <div class="url">/api/termekek?from=0&to=13</div>
+            </div>
+
+            <p>Ugyanaz mint a felhasználói GET: listázza a megadott tartomány termékeit.</p>
+            <pre>
+A backendről visszaküldött termék objektum formátuma(JSON):
+
+[
+{ 
+
+név: string 
+
+kategória: string 
+
+gyártó: string 
+
+leírás: string 
+
+kép: string 
+
+ár: number 
+
+}
+]
+            </pre>
+          </div>
+
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">PATCH</div>
+              <div class="url">/api/admin/termek</div>
+            </div>
+
+            <p>A kérés body-ja: Kötelező elem a termék azonosítója. A többi mező megváltoztatja a termékadatokat.</p>
+
+            <h3>Példa törzs:</h3>
+            <pre>
+{ 
+
+name: string 
+
+category: string 
+
+manufacturar: string 
+
+description: string 
+
+picture: string 
+
+price: number 
+
+}
+            </pre>
+          </div>
+
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">POST</div>
+              <div class="url">/api/admin/termek</div>
+            </div>
+
+            <p>Hatás: új termék jön létre az adatbázisban (értékek nélkül).</p>
+          </div>
+
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">DELETE</div>
+              <div class="url">/api/admin/termek</div>
+            </div>
+
+            <p>Törléshez a kérés törzsében a termék nevét adjuk meg.</p>
+            <pre>
+{
+	termek_neve: „termék neve”
+}
+            </pre>
+          </div>
+        </section>
+
+        <!-- Admin: felhasználók -->
+        <section class="card" style="margin-top:14px">
+          <h2>Admin — Felhasználókkal kapcsolatos műveletek</h2>
+
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">GET</div>
+              <div class="url">/api/admin/users?from=0&to=12</div>
+            </div>
+
+            <h3>Példa válasz:</h3>
+            <pre>
+[
+{ 
+
+id: number 
+
+name: string 
+
+szállítási cím: string 
+
+számlázási cím: string 
+
+email: string 
+
+}
+]
+            </pre>
+          </div>
+
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">DELETE</div>
+              <div class="url">/api/admin/users</div>
+            </div>
+
+            <p>Törléshez a body-ban küldjük a törlendő felhasználó azonosítóját:</p>
+            <pre>
+{ id: number }
+            </pre>
+          </div>
+        </section>
+
+        <!-- Admin: megrendelések -->
+        <section class="card" style="margin-top:14px">
+          <h2>Admin — Megrendelésekkel kapcsolatos műveletek</h2>
+
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">GET</div>
+              <div class="url">/api/admin/orders?from=0&to=12</div>
+            </div>
+
+            <p>Példa válasz (részlet a dokumentumból):</p>
+            <pre>
+[
+{ user: 
+
+{ id: number 
+
+name: string 
+
+szállítási cím: sztring 
+
+számlázási cím: string 
+
+email: string 
+
+} 
+
+state: string 
+
+items: [ 
+
+{ name: string 
+
+category: string 
+
+manufacturar: string
+
+ description: string 
+
+picture: string 
+
+price: number 
+
+darabszam: number 
+
+} 
+
+szállítási mód: string 
+
+fizetési mód: string 
+
+] }] 
+            </pre>
+          </div>
+
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">PATCH</div>
+              <div class="url">/api/admin/orders</div>
+            </div>
+
+            <p>Megrendelés állapotának módosítása. A kérés törzsében szerepel az azonosító és az új állapot.</p>
+            <pre>
+{
+id:number
+state: string
+}
+            </pre>
+          </div>
+
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">DELETE</div>
+              <div class="url">/api/admin/orders</div>
+            </div>
+
+            <p>Régi rendelés törlése, a törlendő rendelés azonosítóját kell megadni:</p>
+            <pre>
+{ 
+   id:number 
+}
+            </pre>
+          </div>
+        </section>
+
+        <!-- Admin: időpontfoglalás -->
+        <section class="card" style="margin-top:14px; margin-bottom:8px">
+          <h2>Admin — Időpontfoglalással (szerviz) kapcsolatos műveletek</h2>
+
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">GET</div>
+              <div class="url">/api/admin/appointment?from=0&to=12</div>
+            </div>
+
+            <p>Példa válaszul kapott tömb:</p>
+            <pre>
+[
+{ 
+
+id: number 
+
+username: string 
+
+user_email: string 
+
+name: string 
+
+behozatali időpont: string 
+
+átvételi időpont: string 
+
+description: string 
+
+}
+]
+            </pre>
+          </div>
+
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">PATCH</div>
+              <div class="url">/api/admin/appointment</div>
+            </div>
+
+            <p>Módosítás: a kérés törzsében a módosítandó tulajdonságok szerepelnek JSON objektumban.</p>
+            <pre>
+{ 
+id: number 
+username: string 
+user_email: string 
+name: string 
+behozatali időpont: string 
+átvételi időpont: string 
+description: string 
+}
+            </pre>
+          </div>
+
+          <div class="endpoint">
+            <div class="meta">
+              <div class="method">DELETE</div>
+              <div class="url">/api/admin/apointment</div>
+            </div>
+
+            <p>Törléshez a kérés törzsében kötelező megadni az időpont azonosítóját:</p>
+            <pre>
+{ 
+id: number 
+}
+            </pre>
+          </div>
+        </section>
+      </main>
+
+      <aside class="sidebar">
+        <div class="card">
+          <h3>Gyors navigáció</h3>
+          <p class="lead">Kattints a következőkre (másold a URL-t), hogy gyorsan elérd az adott végpontot a kódban vagy dokumentációban.</p>
+          <ul style="padding-left:18px;color:var(--muted);line-height:1.7">
+            <li>/api/termekek?from=0&to=13</li>
+            <li>/api/products/1?name=...</li>
+            <li>/api/order <small style="color:var(--muted)">PUT</small></li>
+            <li>/api/login <small style="color:var(--muted)">POST</small></li>
+            <li>/api/registration <small style="color:var(--muted)">PUT</small></li>
+            <li>/api/user <small style="color:var(--muted)">GET</small></li>
+            <li>/api/appointments <small style="color:var(--muted)">GET</small></li>
+            <li>/api/recovery <small style="color:var(--muted)">POST / PATCH</small></li>
+            <li>/api/admin/termek <small style="color:var(--muted)">PATCH/POST/DELETE</small></li>
+            <li>/api/admin/users <small style="color:var(--muted)">GET/DELETE</small></li>
+            <li>/api/admin/orders <small style="color:var(--muted)">GET/PATCH/DELETE</small></li>
+            <li>/api/admin/appointment <small style="color:var(--muted)">GET/PATCH/DELETE</small></li>
+          </ul>
+
+          <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0">
+
+          <h3>Megjegyzések</h3>
+          <p class="muted" style="font-size:13px">
+            A fenti HTML dokumentumban a dokumentumban szereplő példák teljes egészében be vannak illesztve <code>&lt;pre&gt;</code> blokkokba — így a forrás pontosan tükrözi az eredeti fájl tartalmát.
+          </p>
+        </div>
+      </aside>
+    </div>
+
+    <footer>
+      <div>Generálva a feltöltött dokumentum alapján — ha szeretnéd, elkészítem ugyanennek a dokumentumnak a letölthető PDF vagy Markdown változatát is.</div>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,221 @@
+sequenceDiagram
+    actor User
+    participant Navbar
+    participant HomePage
+    participant ProductList
+    participant ProductCard
+    participant ProductDetail
+    participant FilterPanel
+    participant SearchBar
+    participant Cart
+    participant CartItem
+    participant Checkout
+    participant Footer
+
+    Note over User,Footer: 1. Oldal betöltése és navigáció
+    User->>Navbar: Oldal megnyitása
+    activate Navbar
+    Navbar->>HomePage: Betöltés
+    activate HomePage
+    HomePage->>ProductList: Termékek megjelenítése
+    activate ProductList
+    ProductList->>ProductCard: Termék kártyák renderelése
+    activate ProductCard
+    ProductCard-->>ProductList: Termékek megjelenítve
+    deactivate ProductCard
+    ProductList-->>HomePage: Lista kész
+    deactivate ProductList
+    HomePage-->>Navbar: Főoldal betöltve
+    deactivate HomePage
+    Navbar-->>User: Oldal megjelenítve
+    deactivate Navbar
+
+    Note over User,Footer: 2. Keresés funkcionalitás
+    User->>SearchBar: Keresés indítása (szöveg beírása)
+    activate SearchBar
+    SearchBar->>ProductList: Szűrés keresési kritérium alapján
+    activate ProductList
+    ProductList->>ProductCard: Szűrt termékek renderelése
+    activate ProductCard
+    ProductCard-->>ProductList: Szűrt eredmények
+    deactivate ProductCard
+    ProductList-->>SearchBar: Találatok frissítve
+    deactivate ProductList
+    SearchBar-->>User: Keresési eredmények
+    deactivate SearchBar
+
+    Note over User,Footer: 3. Szűrés és filterezés
+    User->>FilterPanel: Szűrő kiválasztása (kategória, ár, stb.)
+    activate FilterPanel
+    FilterPanel->>ProductList: Szűrési feltételek alkalmazása
+    activate ProductList
+    ProductList->>ProductCard: Szűrt termékek renderelése
+    activate ProductCard
+    ProductCard-->>ProductList: Szűrt lista
+    deactivate ProductCard
+    ProductList-->>FilterPanel: Lista frissítve
+    deactivate ProductList
+    FilterPanel-->>User: Szűrt termékek megjelenítve
+    deactivate FilterPanel
+
+    Note over User,Footer: 4. Termék részletek megtekintése
+    User->>ProductCard: Kattintás termékre
+    activate ProductCard
+    ProductCard->>ProductDetail: Termék részletek betöltése
+    activate ProductDetail
+    ProductDetail-->>ProductCard: Részletek megjelenítve
+    deactivate ProductDetail
+    ProductCard-->>User: Termék részletek láthatóak
+    deactivate ProductCard
+
+    Note over User,Footer: 5. Kosárba helyezés
+    User->>ProductDetail: "Kosárba" gomb kattintás
+    activate ProductDetail
+    ProductDetail->>Cart: Termék hozzáadása (productId, quantity)
+    activate Cart
+    Cart->>CartItem: Új tétel létrehozása
+    activate CartItem
+    CartItem-->>Cart: Tétel hozzáadva
+    deactivate CartItem
+    Cart-->>ProductDetail: Kosár frissítve
+    Cart-->>Navbar: Kosár számláló frissítése
+    activate Navbar
+    Navbar-->>User: Kosár badge frissült
+    deactivate Navbar
+    ProductDetail-->>User: Megerősítés üzenet
+    deactivate ProductDetail
+    deactivate Cart
+
+    Note over User,Footer: 6. Navigáció kategóriák között
+    User->>Navbar: Kategória menü kattintás
+    activate Navbar
+    Navbar->>ProductList: Kategória szerinti szűrés
+    activate ProductList
+    ProductList->>ProductCard: Kategóriának megfelelő termékek
+    activate ProductCard
+    ProductCard-->>ProductList: Termékek renderelve
+    deactivate ProductCard
+    ProductList-->>Navbar: Navigáció befejezve
+    deactivate ProductList
+    Navbar-->>User: Új oldal megjelenítve
+    deactivate Navbar
+
+    Note over User,Footer: 7. Kosár megtekintése
+    User->>Navbar: Kosár ikon kattintás
+    activate Navbar
+    Navbar->>Cart: Kosár megnyitása
+    activate Cart
+    Cart->>CartItem: Kosár tételek megjelenítése
+    activate CartItem
+    CartItem-->>Cart: Tételek listája
+    deactivate CartItem
+    Cart-->>Navbar: Kosár tartalom megjelenítve
+    deactivate Cart
+    Navbar-->>User: Kosár modal/oldal
+    deactivate Navbar
+
+    Note over User,Footer: 8. Kosár módosítása
+    User->>Cart: Mennyiség módosítása
+    activate Cart
+    Cart->>CartItem: Mennyiség frissítése
+    activate CartItem
+    CartItem-->>Cart: Tétel frissítve
+    deactivate CartItem
+    Cart->>Cart: Végösszeg újraszámolása
+    Cart-->>User: Frissített kosár
+    deactivate Cart
+
+    User->>Cart: Termék törlése kosárból
+    activate Cart
+    Cart->>CartItem: Tétel eltávolítása
+    activate CartItem
+    CartItem-->>Cart: Tétel törölve
+    deactivate CartItem
+    Cart->>Navbar: Kosár számláló frissítése
+    activate Navbar
+    Navbar-->>User: Badge frissült
+    deactivate Navbar
+    Cart-->>User: Kosár frissítve
+    deactivate Cart
+
+    Note over User,Footer: 9. Pénztár folyamat
+    User->>Cart: "Pénztár" gomb kattintás
+    activate Cart
+    Cart->>Checkout: Átirányítás checkout oldalra
+    activate Checkout
+    Checkout-->>Cart: Checkout form betöltve
+    deactivate Cart
+    Checkout-->>User: Fizetési adatok bekérése
+    deactivate Checkout
+
+    User->>Checkout: Szállítási adatok kitöltése
+    activate Checkout
+    Checkout->>Checkout: Validálás
+    Checkout-->>User: Form állapot visszajelzés
+    deactivate Checkout
+
+    User->>Checkout: Fizetési mód kiválasztása
+    activate Checkout
+    Checkout-->>User: Választott módszer megjelenítése
+    deactivate Checkout
+
+    User->>Checkout: "Megrendelés véglegesítése" gomb
+    activate Checkout
+    Checkout->>Checkout: Végső validálás
+    Checkout->>Cart: Kosár ürítése
+    activate Cart
+    Cart->>CartItem: Összes tétel törlése
+    activate CartItem
+    CartItem-->>Cart: Kosár kiürítve
+    deactivate CartItem
+    Cart-->>Navbar: Kosár számláló nullázása
+    activate Navbar
+    Navbar-->>User: Badge eltűnt/nullázva
+    deactivate Navbar
+    Cart-->>Checkout: Kosár ürítve
+    deactivate Cart
+    Checkout-->>User: Sikeres megrendelés visszajelzés
+    deactivate Checkout
+
+    Note over User,Footer: 10. Footer navigáció
+    User->>Footer: Link kattintás (ÁSZF, kapcsolat, stb.)
+    activate Footer
+    Footer->>HomePage: Navigáció megfelelő oldalra
+    activate HomePage
+    HomePage-->>Footer: Oldal betöltve
+    deactivate HomePage
+    Footer-->>User: Tartalom megjelenítve
+    deactivate Footer
+
+    Note over User,Footer: 11. Termék szűrő kombinálása
+    User->>FilterPanel: Többszörös szűrő beállítása
+    activate FilterPanel
+    FilterPanel->>FilterPanel: Szűrők összegyűjtése
+    FilterPanel->>ProductList: Kombinált szűrés alkalmazása
+    activate ProductList
+    ProductList->>ProductCard: Többszörösen szűrt termékek
+    activate ProductCard
+    ProductCard-->>ProductList: Végeredmény
+    deactivate ProductCard
+    ProductList-->>FilterPanel: Lista frissítve
+    deactivate ProductList
+    FilterPanel-->>User: Szűrt termékek láthatóak
+    deactivate FilterPanel
+
+    Note over User,Footer: 12. Visszanavigálás
+    User->>Navbar: Logo vagy "Főoldal" kattintás
+    activate Navbar
+    Navbar->>HomePage: Visszatérés főoldalra
+    activate HomePage
+    HomePage->>ProductList: Összes termék betöltése
+    activate ProductList
+    ProductList->>ProductCard: Alap termék lista
+    activate ProductCard
+    ProductCard-->>ProductList: Termékek megjelenítve
+    deactivate ProductCard
+    ProductList-->>HomePage: Főoldal kész
+    deactivate ProductList
+    HomePage-->>Navbar: Navigáció befejezve
+    deactivate HomePage
+    Navbar-->>User: Főoldal megjelenítve
+    deactivate Navbar
