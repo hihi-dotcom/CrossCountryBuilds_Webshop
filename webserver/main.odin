@@ -11,6 +11,7 @@ import "core:strings"
 import vmem "core:mem/virtual"
 import "core:mem"
 import "./header"
+import "./server"
 
 
 main :: proc() {
@@ -30,8 +31,7 @@ main :: proc() {
         }
     }
 
-    file, err := load_file("./root/hehe.html")
-    fmt.println(string(file), err)
+    
     
     
     

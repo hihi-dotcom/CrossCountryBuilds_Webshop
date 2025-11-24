@@ -1,12 +1,12 @@
 package server
 
 import "core:fmt"
-
 import "core:os"
 import "core:net"
-import "../header"
+import "./header"
 import "core:thread"
 import "core:sync/chan"
+
 
 Server :: struct($Permissions: typeid) {
     root: string,
@@ -79,34 +79,6 @@ delete : Setter : proc(s: ^Server, path: string, settings: Settings(typeid), toR
         toRun = toRun,
         settings = settings
     }
-}
-
-Work :: struct($Permission: typeid) {
-    socket: os.TCP_Socket,
-    handler: Handler(Permission)
-}
-
-Worker_Thread_Data :: struct($Permission: typeid) {
-    channel: chan.Chan(Work(Permission), .Recv),
-}
-
-Worker_Porc :: proc(t: ^thread.Thread, $Permissions: typeid) {
-    data := cast(^Worker_Thread_Data(Permissions))t.data
-    work: Work(Permissions)
-
-    for {
-        if w, recvErr := chan.recv(data.channel) ; recvErr {
-            work = w
-        } else { break }
-
-        net.recv_tcp()
-
-
-
-
-
-    }
-    
 }
 
 run :: proc(port: u16) {

@@ -1,5 +1,6 @@
 package header
 
+import "base:runtime"
 import vmem "core:mem/virtual"
 import "core:strings"
 
@@ -8,16 +9,19 @@ PAGE_SIZE : uint : 4096
 
 
 Parse_Error :: enum {
-    Error
+    Partial,
+    Broken
 }
 
-Header_Error :: union {
+Header_Parse_Error :: union {
     vmem.Allocator_Error,
     Parse_Error
 }
 
 Header :: struct {
-    Top: string,
+    Method: string,
+    Path: string,
+    Protocol: string,
     Host: string,
     User_Agent: string,
     Accept: string,
@@ -43,41 +47,66 @@ Options :: struct {
     arena: vmem.Arena
 }
 
-Header_parser :: proc (message: string) -> (header: Header, body_start: int, err: Header_Error) {
-    h: Header
-    vmem.arena_init_static(&h.arena, MAX_HEADER_SIZE, PAGE_SIZE) or_return
-    arena_allocator := vmem.arena_allocator(&h.arena)
-    h.rest = make(map[string]string, arena_allocator)
+Buffer :: struct {
+    data: [1024]u8,
+    end: u16
+}
 
-    start := 0
-    key := "Top"
-    for char, n in message {
-        switch char {
-            case '\n':
-                if key != "" {
-                    value := strings.clone(strip(message[start:n-1]), arena_allocator) or_return
+LineBreak :: struct {
+    n1: bool,
+    r1: bool,
+    n2: bool,
+    r2: bool
+}
 
-                    Header_inserter(&h, strip(key), value)
+FirstLine :: struct {
+    method: bool,
+    path: bool,
+    potocol: bool,
+}
 
-                    key = ""
-                    start = n+1
-                } else {
-                    return h, n+3, nil
-                }
-            case ':':
-                if key == "" {
-                    key = message[start:n]
-                    start = n+1
-                }
+Header_parser_state :: struct {
+    header: ^Header,
+    cursor: u16,
+
+    key_buffer: Buffer,
+    value_buffer: Buffer,
+
+    line_break: LineBreak,
+
+    first_line: FirstLine
+}
+
+Header_parser :: proc (message: []u8, s: ^Header_parser_state) -> (state: ^Header_parser_state, body_start: int, err: Header_Parse_Error) {
+    arena_allocator: runtime.Allocator
+    if s == nil {
+        s = new(Header_parser_state)
+        s.header = new(Header)
+        vmem.arena_init_static(&s.header.arena, MAX_HEADER_SIZE, PAGE_SIZE) or_return
+        arena_allocator = vmem.arena_allocator(&s.header.arena)
+        s.header.rest = make(map[string]string, arena_allocator)
+    }
+    if arena_allocator.procedure == nil {
+        arena_allocator = vmem.arena_allocator(&s.header.arena)
+    }
+
+    if !s.first_line.method {
+        for i := s.cursor ; i < 10 ; i += 1 {
+
         }
     }
-    return h, 0, Parse_Error.Error
+
+    
 }
 
 Header_inserter :: proc (header: ^Header, key: string, value: string) {
     switch key {
-        case "Top":
-            header.Top = value
+        case "Method":
+            header.Method = value
+        case "Path":
+            header.Path = value
+        case "Protocol":
+            header.Protocol = value
         case "Host":
             header.Host = value
         case "User-Agent":
