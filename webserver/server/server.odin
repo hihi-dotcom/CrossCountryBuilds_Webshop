@@ -1,21 +1,23 @@
 package server
 
+import "core:fmt"
+
 import "core:os"
 import "core:net"
 import "../header"
 import "core:thread"
 import "core:sync/chan"
 
-Server :: struct {
+Server :: struct($Permissions: typeid) {
     root: string,
-    endpoints: map[Endpoint]Handler,
+    endpoints: map[Endpoint]Handler(Permissions),
     workers: u8,
-
-
+    permissions: Permissions,
+    permissions_handler: proc(Request) -> Permissions
 }
 
 Body :: string
-Params :: string
+Params :: map[string]string
 
 Request :: struct {
     Params,
@@ -23,11 +25,18 @@ Request :: struct {
     Body
 }
 
-Settings :: struct {
-
+Settings :: struct($Permission: typeid) {
+    acceptable_permissions: []Permission,
+    acceptable_MIMEtypes: []string,
 }
 
-Handler :: proc(Request, Response)
+
+Handler :: struct($Permission: typeid) {
+    toRun: Handler_proc,
+    settings: Settings(Permission)
+}
+
+Handler_proc :: proc(Request, Response)
 
 Response :: struct {
     status: u16,
@@ -39,22 +48,69 @@ Endpoint :: struct {
     path: string
 }
 
-get :: proc(s: ^Server, path: string, toRun: Handler) {
-    s.endpoints[{"GET", path}] = toRun
+Setter :: proc(s: ^Server, path: string, settings: Settings(typeid), toRun: Handler_proc)
+
+get : Setter : proc(s: ^Server, path: string, settings: Settings(typeid), toRun: Handler_proc) {
+    s.endpoints[{"POST", path}] = {
+        toRun = toRun,
+        settings = settings
+    }
 }
-post :: proc(s: ^Server, path: string, toRun: Handler) {
-    s.endpoints[{"POST", path}] = toRun
+post : Setter : proc(s: ^Server, path: string, settings: Settings(typeid), toRun: Handler_proc) {
+    s.endpoints[{"POST", path}] = {
+        toRun = toRun,
+        settings = settings
+    }
 }
-put :: proc(s: ^Server, path: string, toRun: Handler) {
-    s.endpoints[{"PUT", path}] = toRun
+put : Setter : proc(s: ^Server, path: string, settings: Settings(typeid), toRun: Handler_proc) {
+    s.endpoints[{"PUT", path}] = {
+        toRun = toRun,
+        settings = settings
+    }
 }
-patch :: proc(s: ^Server, path: string, toRun: Handler) {
-    s.endpoints[{"PATCH", path}] = toRun
+patch : Setter : proc(s: ^Server, path: string, settings: Settings(typeid), toRun: Handler_proc) {
+    s.endpoints[{"PATCH", path}] = {
+        toRun = toRun,
+        settings = settings
+    }
 }
-delete :: proc(s: ^Server, path: string, toRun: Handler) {
-    s.endpoints[{"DELETE", path}] = toRun
+delete : Setter : proc(s: ^Server, path: string, settings: Settings(typeid), toRun: Handler_proc) {
+    s.endpoints[{"DELETE", path}] = {
+        toRun = toRun,
+        settings = settings
+    }
 }
 
-run :: proc() {
+Work :: struct($Permission: typeid) {
+    socket: os.TCP_Socket,
+    handler: Handler(Permission)
+}
+
+Worker_Thread_Data :: struct($Permission: typeid) {
+    channel: chan.Chan(Work(Permission), .Recv),
+}
+
+Worker_Porc :: proc(t: ^thread.Thread, $Permissions: typeid) {
+    data := cast(^Worker_Thread_Data(Permissions))t.data
+    work: Work(Permissions)
+
+    for {
+        if w, recvErr := chan.recv(data.channel) ; recvErr {
+            work = w
+        } else { break }
+
+        net.recv_tcp()
+
+
+
+
+
+    }
+    
+}
+
+run :: proc(port: u16) {
+
+
 
 }
