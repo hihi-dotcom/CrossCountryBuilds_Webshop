@@ -4,27 +4,18 @@ import "core:mem"
 import "base:runtime"
 import "core:fmt"
 import vmem "core:mem/virtual"
-
-TEST :: proc() 
+import "../server/header"
 
 main :: proc () {
-    test := "asdf"
-    fmt.println(test[:len(test)])
+    test := "GET /index.html HTTP/1.1\r\nHost: example.com\r\nUser-Agent: TestClient/1.0\r\nAccept: */*\r\nAccept-Language: en-US,en;q=0.9\r\nAccept-Encoding: gzip, deflate\r\nConnection: keep-alive\r\n\r\n"
+    octets := transmute([]u8)test
+    
+    state, b, err := header.Header_parser(octets, nil)
+
+    fmt.printfln("%#v", state)
+    fmt.printfln("%#v", state.header)
+    fmt.println(b, len(octets))
+    fmt.println(err)
 }
 
-strip :: proc (s: string) -> string {
-    slice_start := 0
-    slice_end := len(s)
-    for c in s {
-        if c == 'a' {
-            slice_start += 1
-        } else { break }
-    }
-    #reverse for c in s {
-        if c == 'a' {
-            slice_end -= 1
-        } else { break }
-    }
-    if slice_start > slice_end do return ""
-    return s[slice_start:slice_end]
-}
+
