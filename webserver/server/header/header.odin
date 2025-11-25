@@ -49,7 +49,8 @@ Options :: struct {
 
 Buffer :: struct {
     data: [1024]u8,
-    end: u16
+    end: u16,
+    copied: bool
 }
 
 LineBreak :: struct {
@@ -62,12 +63,12 @@ LineBreak :: struct {
 FirstLine :: struct {
     method: bool,
     path: bool,
-    potocol: bool,
+    protocol: bool,
 }
 
 Header_parser_state :: struct {
     header: ^Header,
-    cursor: u16,
+    cursor: int,
 
     key_buffer: Buffer,
     value_buffer: Buffer,
@@ -79,24 +80,105 @@ Header_parser_state :: struct {
 
 Header_parser :: proc (message: []u8, s: ^Header_parser_state) -> (state: ^Header_parser_state, body_start: int, err: Header_Parse_Error) {
     arena_allocator: runtime.Allocator
-    if s == nil {
-        s = new(Header_parser_state)
-        s.header = new(Header)
-        vmem.arena_init_static(&s.header.arena, MAX_HEADER_SIZE, PAGE_SIZE) or_return
-        arena_allocator = vmem.arena_allocator(&s.header.arena)
-        s.header.rest = make(map[string]string, arena_allocator)
+    state = s
+    if state == nil {
+        state = new(Header_parser_state)
+        state.header = new(Header)
+        vmem.arena_init_static(&state.header.arena, MAX_HEADER_SIZE, PAGE_SIZE) or_return
+        arena_allocator = vmem.arena_allocator(&state.header.arena)
+        state.header.rest = make(map[string]string, arena_allocator)
     }
     if arena_allocator.procedure == nil {
-        arena_allocator = vmem.arena_allocator(&s.header.arena)
+        arena_allocator = vmem.arena_allocator(&state.header.arena)
     }
 
-    if !s.first_line.method {
-        for i := s.cursor ; i < 10 ; i += 1 {
+    state.cursor = 0
 
+    if !state.first_line.method {
+        first_line_chopper(message, "Method", state, arena_allocator) or_return
+    }
+    if !state.first_line.path {
+        first_line_chopper(message, "Path", state, arena_allocator) or_return
+    }
+    if !state.first_line.protocol {
+        first_line_chopper(message, "Protocol", state, arena_allocator) or_return
+    }
+
+    for i := state.cursor ; i < len(message) ; i += 1 {
+        switch message[i] {
+            case ' ', '\r', '\n', ':':
+                switch {
+                    case state.key_buffer.end == 0 : continue
+                    case state.key_buffer.copied && state.value_buffer.end == 0 : continue 
+                    case state.value_buffer.copied && state.key_buffer.copied: 
+                    // reset 
+                    break
+                    case state.value_buffer.end == 0 && !state.key_buffer.copied:
+                        //copy key
+                    case !state.value_buffer.copied && state.key_buffer.copied:
+                        //copy value
+                    case: panic("how did I get here?")  
+                }
+            case:
+                switch {
+                    case state.key_buffer.end <= 1022 || state.value_buffer.end <= 1022:
+                        switch {
+                            case !state.key_buffer.copied:
+                                state.key_buffer.data[state.key_buffer.end] = message[i]
+                                state.key_buffer.end += 1
+                            case !state.value_buffer.copied:
+                                state.value_buffer.data[state.value_buffer.end] = message[i]
+                                state.value_buffer.end += 1
+                            case: panic("how did I get here?")
+                        }
+                    case: 
+                        err = Parse_Error.Broken
+                        delete_header_state_and_header(state)
+                        return 
+                }
         }
     }
+}
 
-    
+first_line_chopper :: proc(message: []u8, part: string, state: ^Header_parser_state, allocator: runtime.Allocator) -> (err: Header_Parse_Error) {
+    for i := state.cursor ; i < len(message) ; i += 1 {
+        if message[i] == ' ' || message[i] == '\r' || message[i] == '\n' {
+            if state.value_buffer.end != 0 {
+                state.cursor += 1
+                value := strings.clone_from_bytes(strip(state.value_buffer.data[:state.value_buffer.end + 1]), allocator) or_return
+                Header_inserter(state.header, part, value)
+                switch part {
+                    case "Method":
+                        state.first_line.method = true
+                    case "Path":
+                        state.first_line.path = true
+                    case "Protocol":
+                        state.first_line.protocol = true
+                    case: panic("nonexistent case given!")
+                }
+                state.value_buffer.end = 0
+                return nil
+            } else { continue }
+        } else {
+            state.value_buffer.data[state.value_buffer.end] = message[i]
+            state.value_buffer.end += 1
+        }
+    }
+    return Parse_Error.Partial
+}
+
+delete_header :: proc(h: ^Header) {
+    vmem.arena_destroy(&h.arena)
+    free(h)
+}
+
+delete_header_state :: proc(s: ^Header_parser_state) {
+    free(s)
+}
+
+delete_header_state_and_header :: proc(s: ^Header_parser_state) {
+    delete_header(s.header)
+    delete_header_state(s)
 }
 
 Header_inserter :: proc (header: ^Header, key: string, value: string) {
@@ -132,7 +214,7 @@ Header_inserter :: proc (header: ^Header, key: string, value: string) {
     }
 }
 
-strip :: proc (s: string) -> string {
+strip :: proc (s: []u8) -> []u8 {
     slice_start := 0
     slice_end := len(s)
     for c in s {
@@ -145,6 +227,6 @@ strip :: proc (s: string) -> string {
             slice_end -= 1
         } else { break }
     }
-    if slice_start > slice_end do return ""
+    if slice_start > slice_end do return s[0:0]
     return s[slice_start:slice_end]
 }

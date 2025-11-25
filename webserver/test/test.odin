@@ -9,15 +9,7 @@ TEST :: proc()
 
 main :: proc () {
     test := "asdf"
-    n := 0
-    for i := 0 ; i < 2 ; i += 1 {
-        fmt.println(rune(test[i]), n)
-        n += 1
-    }
-    for i := n ; i < len(test) ; i += 1 {
-        fmt.println(rune(test[i]), n)
-        n += 1
-    }
+    fmt.println(test[:len(test)])
 }
 
 strip :: proc (s: string) -> string {
