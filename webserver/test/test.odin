@@ -1,24 +1,23 @@
 package test
 
-import "core:mem"
-import "base:runtime"
+import "core:mem" 
 import "core:fmt"
 import vmem "core:mem/virtual"
 import "core:strings"
 import "../server/header"
 
 main :: proc() {
-    test := "GET /index.html HTTP/1.1\r\nHost: example.com\r\nUser-Agent: TestClient/1.0\r\nAccept: */*\r\nAc"
-    test2 := "cept-Language: en-US,en;q=0.9\r\nAccept-Encoding: gzip, deflate\r\nConnection: keep-alive\r\n\r\n"
+    test := "GET /index.html HTTP/1.1\r\nHost: example.com\r\nUser-Agent: TestClient/1.0\r\nAccept: */*\r\ncept-Language: en-US,en;q=0.9\r\nAccept-Encoding: gzip, deflate\r\nConnection: keep-alive\r\n\r\n"
     octets := transmute([]u8)test
-    octets2 := transmute([]u8)test2
-    hps, _ := header.header_parser_state_maker()
+    hps := header.parser_state_maker()
     copyer(hps.header.header_data.data[:], octets)
-    header.Header_parser(hps)
-    copyer(hps.header.header_data.data[hps.header.header_data.end:], octets2)
-    header.Header_parser(hps)
-    fmt.println(hps.header.header_data.end , len(octets))
-    fmt.println(hps.header.header_data.data[hps.header.header_data.end])
+    header.Parser(hps)
+    fmt.printfln("%v", hps.header)
+}
+
+tttest :: proc() {
+    test := "GET /index.html HTTP/1.1\r\nHost: example.com\r\nUser-Agent: TestClient/1.0\r\nAccept: */*\r\ncept-Language: en-US,en;q=0.9\r\nAccept-Encoding: gzip, deflate\r\nConnection: keep-alive\r\n\r\n"
+    octets := transmute([]u8)test
 }
 
 copyer :: proc(to: []u8, from: []u8) {
