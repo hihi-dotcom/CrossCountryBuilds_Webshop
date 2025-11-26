@@ -11,20 +11,19 @@ Guard_Data :: struct {
 }
 
 Guard_Work :: union {
-    Guard_Socket,
+    Guard_Header,
 }
 
-Guard_Socket :: struct {
-    buffer: Buffer,
-    socket: net.TCP_Socket,
+Guard_Record :: struct {
     lastHeard: time.Time,
     priority: Priority
 }
 
-Buffer :: struct {
-    data: []u8,
-    start: u64
-} 
+Guard_Header :: struct {
+    //???
+    socket: net.TCP_Socket,
+    record: Guard_Record
+}
 
 Guard_Proc :: proc(t: ^thread.Thread) {
     data := cast(^Guard_Data)t.data

@@ -7,12 +7,29 @@ import "core:strings"
 import "../server/header"
 
 main :: proc() {
+    track: mem.Tracking_Allocator
+    mem.tracking_allocator_init(&track, context.allocator)
+    context.allocator = mem.tracking_allocator(&track)
+
+    defer {
+        if len(track.allocation_map) > 0 {
+            for _, entry in track.allocation_map {
+                fmt.eprintf("%v leaked %v bytes\n", entry.location, entry.size)
+            }
+        }
+        mem.tracking_allocator_destroy(&track)
+    }
+
+
     test := "GET /index.html HTTP/1.1\r\nHost: example.com\r\nUser-Agent: TestClient/1.0\r\nAccept: */*\r\ncept-Language: en-US,en;q=0.9\r\nAccept-Encoding: gzip, deflate\r\nConnection: keep-alive\r\n\r\n"
     octets := transmute([]u8)test
     hps := header.parser_state_maker()
     copyer(hps.header.header_data.data[:], octets)
     header.Parser(hps)
     fmt.printfln("%v", hps.header)
+
+
+    header.parser_state_free(hps)
 }
 
 tttest :: proc() {

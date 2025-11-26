@@ -1,14 +1,19 @@
 // kell majd talán -- tárolni a többször mejelenő fejléceket külön, kis berű - nagy betű, üres fejlécek
 
-package header
+package header_parser
 
+@(private)
 HEADER_BUFFER_SIZE : uint : 1024 * 8 
 
 Parse_Error :: enum {
     None,
     Partial,
-    TooLong,
-    Broken
+    TooLong
+}
+
+Maybe_Header :: union {
+    ^Parser_State,
+    ^Header,
 }
 
 Header :: struct {
@@ -53,7 +58,7 @@ Parser_State :: struct {
     line_break: u8,
 }
 
-Parser :: proc(state: ^Parser_State) -> (err: Parse_Error) {
+Parse :: proc(state: ^Parser_State) -> (err: Parse_Error) {
     if state == nil {
         panic("No Header_parser_state provided!")
     }
@@ -69,11 +74,13 @@ Parser :: proc(state: ^Parser_State) -> (err: Parse_Error) {
     return
 }
 
+@(private)
 k_or_v :: enum {
     Key,
     Value
 }
 
+@(private)
 spans :: struct {
     key_start: int,
     value_start: int,
@@ -81,11 +88,12 @@ spans :: struct {
     value_end: int
 }
 
+@(private)
 not_the_first_line :: proc(state: ^Parser_State) {
     which: k_or_v = .Key
     hit := false
     spanss: spans
-    for i := state.cursor ; i < state.header.header_data.end ; i += 1 {
+    for i := state.cursor ; i < state.header.header_data.end - 1 ; i += 1 {
         switch which {
             case .Key:
                 switch state.header.header_data.data[i] {
@@ -121,10 +129,11 @@ not_the_first_line :: proc(state: ^Parser_State) {
     }
 }
 
+@(private)
 first_line :: proc(state: ^Parser_State, key: string) {
     start := state.cursor
     hit := false
-    for i := state.cursor ; i < state.header.header_data.end ; i += 1 {
+    for i := state.cursor ; i < state.header.header_data.end - 1 ; i += 1 {
         switch state.header.header_data.data[i] {
             case ' ',  '\r', '\n', '\t':
                 if hit {
@@ -141,20 +150,20 @@ first_line :: proc(state: ^Parser_State, key: string) {
     }
 }
 
+@(private)
 is_header_data_whole :: proc(state: ^Parser_State) -> (err: Parse_Error) {
-    if state.header.header_data.end != 0 do state.header.header_data.end += 1
     for i := state.header.header_data.end ; i < len(state.header.header_data.data) ; i += 1 {
         switch state.header.header_data.data[i] {
             case '\r', '\n':
                 state.line_break += 1
             case 0:
-                state.header.header_data.end = i - 1
+                state.header.header_data.end = i
                 return .Partial 
             case: 
                 state.line_break = 0
         }
         if state.line_break == 4 {
-            state.header.header_data.end = i
+            state.header.header_data.end = i + 1
             return .None
         }
     }
@@ -181,6 +190,7 @@ parser_state_and_contents_free :: proc(h: ^Parser_State) {
     parser_state_free(h)
 }
 
+@(private)
 inserter :: proc (header: ^Header, key: string, value: string) {
     switch key {
         case "Method":

@@ -9,7 +9,14 @@ Priority :: enum u8 {
     Low
 }
 
-Get_Work :: proc(wtd: ^Worker_Thread_Data($P)) -> Work(P) {
+Work_Chans :: struct($P: typeid) {
+    high: ^chan.Chan(Work(P), chan.Direction.Recv),
+    medium: ^chan.Chan(Work(P), chan.Direction.Recv),
+    low: ^chan.Chan(Work(P), chan.Direction.Recv),
+    sema: ^sync.Sema,
+}
+
+Get_Work :: proc(wtd: ^Work_Chans($P)) -> Work(P) {
     for {
         sync.sema_wait(wtd.sema)
         if w, ok := chan.try_recv(wtd.high) ; ok {
