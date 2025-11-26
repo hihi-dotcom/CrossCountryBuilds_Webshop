@@ -3,9 +3,12 @@ package header
 import "base:runtime"
 import vmem "core:mem/virtual"
 import "core:strings"
+import "core:fmt"
 
-MAX_HEADER_SIZE : uint : 8192
+MAX_HEADER_ARENA_SIZE : uint : 8192
 PAGE_SIZE : uint : 4096
+HEADER_BUFFER_SIZE : uint : 8192
+
 
 
 Parse_Error :: enum {
@@ -33,10 +36,11 @@ Header :: struct {
     Connection: string,
     Authorization: string,
 
+    header_data: Buffer,
     rest: map[string]string,
-    arena: vmem.Arena
 }
 
+/* Talán kell valmi ilyen majd
 Options :: struct {
     Top: string,
     Origin: string,
@@ -46,187 +50,67 @@ Options :: struct {
     rest: map[string]string,
     arena: vmem.Arena
 }
+*/
 
 Buffer :: struct {
-    data: [1024]u8,
-    end: u16,
-    copied: bool
-}
-
-LineBreak :: struct {
-    n1: bool,
-    r1: bool,
-    n2: bool,
-    r2: bool
+    data: [HEADER_BUFFER_SIZE]u8,
+    end: int,
+    done: bool
 }
 
 FirstLine :: struct {
     method: bool,
     path: bool,
-    protocol: bool,
+    protocol: bool
 }
 
 Header_parser_state :: struct {
     header: ^Header,
+
     cursor: int,
 
-    key_buffer: Buffer,
-    value_buffer: Buffer,
-
-    line_break: LineBreak,
-
+    line_break: int,
     first_line: FirstLine
 }
 
-Header_parser :: proc (message: []u8, s: ^Header_parser_state) -> (state: ^Header_parser_state, body_start: int, err: Header_Parse_Error) {
-    arena_allocator: runtime.Allocator
-    state = s
+Header_parser :: proc(in_state: ^Header_parser_state) -> (state: ^Header_parser_state, err: Header_Parse_Error) {
+    state = in_state
     if state == nil {
-        state = new(Header_parser_state)
-        state.header = new(Header)
-        vmem.arena_init_static(&state.header.arena, MAX_HEADER_SIZE, PAGE_SIZE) or_return
-        arena_allocator = vmem.arena_allocator(&state.header.arena)
-        state.header.rest = make(map[string]string, arena_allocator)
-    }
-    if arena_allocator.procedure == nil {
-        arena_allocator = vmem.arena_allocator(&state.header.arena)
+        panic("No Header_parser_state provided!")
     }
 
     state.cursor = 0
 
-    if !state.first_line.method {
-        first_line_chopper(message, "Method", state, arena_allocator) or_return
-    }
-    if !state.first_line.path {
-        first_line_chopper(message, "Path", state, arena_allocator) or_return
-    }
-    if !state.first_line.protocol {
-        first_line_chopper(message, "Protocol", state, arena_allocator) or_return
-    }
-
-    for i := state.cursor ; i < len(message) ; i += 1 {
-        switch message[i] {
-            case ' ', '\r', '\n', ':':
-                switch {
-                    case state.key_buffer.end == 0 : continue
-                    case state.key_buffer.copied && state.value_buffer.end == 0 : continue 
-                    case state.value_buffer.copied && state.key_buffer.copied: 
-                    // reset 
-                    break
-                    case state.value_buffer.end == 0 && !state.key_buffer.copied:
-                        //copy key
-                    case !state.value_buffer.copied && state.key_buffer.copied:
-                        //copy value
-                    case: panic("how did I get here?")  
-                }
-            case:
-                switch {
-                    case state.key_buffer.end <= 1022 || state.value_buffer.end <= 1022:
-                        switch {
-                            case !state.key_buffer.copied:
-                                state.key_buffer.data[state.key_buffer.end] = message[i]
-                                state.key_buffer.end += 1
-                            case !state.value_buffer.copied:
-                                state.value_buffer.data[state.value_buffer.end] = message[i]
-                                state.value_buffer.end += 1
-                            case: panic("how did I get here?")
-                        }
-                    case: 
-                        err = Parse_Error.Broken
-                        delete_header_state_and_header(state)
-                        return 
-                }
+    if !state.header.header_data.done {
+        data_stepper: for i := state.header.header_data.end ; i < len(state.header.header_data.data) ; i += 1 {
+            switch state.header.header_data.data[i] {
+                case '\r', '\n':
+                    fmt.println("1")
+                    state.line_break += 1
+                case 0:
+                    fmt.println("2")
+                    state.header.header_data.end = i - 1
+                    // partial
+                    break data_stepper 
+                case: 
+                    fmt.println("3")
+                    state.line_break = 0
+            }
+            if state.line_break == 4 {
+                fmt.println("4")
+                state.header.header_data.done = true
+                state.header.header_data.end = i
+                break data_stepper
+            }
         }
+        // partial
     }
+    fmt.println("5")
+    return
 }
 
-first_line_chopper :: proc(message: []u8, part: string, state: ^Header_parser_state, allocator: runtime.Allocator) -> (err: Header_Parse_Error) {
-    for i := state.cursor ; i < len(message) ; i += 1 {
-        if message[i] == ' ' || message[i] == '\r' || message[i] == '\n' {
-            if state.value_buffer.end != 0 {
-                state.cursor += 1
-                value := strings.clone_from_bytes(strip(state.value_buffer.data[:state.value_buffer.end + 1]), allocator) or_return
-                Header_inserter(state.header, part, value)
-                switch part {
-                    case "Method":
-                        state.first_line.method = true
-                    case "Path":
-                        state.first_line.path = true
-                    case "Protocol":
-                        state.first_line.protocol = true
-                    case: panic("nonexistent case given!")
-                }
-                state.value_buffer.end = 0
-                return nil
-            } else { continue }
-        } else {
-            state.value_buffer.data[state.value_buffer.end] = message[i]
-            state.value_buffer.end += 1
-        }
-    }
-    return Parse_Error.Partial
-}
-
-delete_header :: proc(h: ^Header) {
-    vmem.arena_destroy(&h.arena)
-    free(h)
-}
-
-delete_header_state :: proc(s: ^Header_parser_state) {
-    free(s)
-}
-
-delete_header_state_and_header :: proc(s: ^Header_parser_state) {
-    delete_header(s.header)
-    delete_header_state(s)
-}
-
-Header_inserter :: proc (header: ^Header, key: string, value: string) {
-    switch key {
-        case "Method":
-            header.Method = value
-        case "Path":
-            header.Path = value
-        case "Protocol":
-            header.Protocol = value
-        case "Host":
-            header.Host = value
-        case "User-Agent":
-            header.User_Agent = value
-        case "Accept":
-            header.Accept = value
-        case "Accept-Language":
-            header.Accept_Language = value
-        case "Accept-Encoding":
-            header.Accept_Encoding = value
-        case "Connection":
-            header.Connection = value
-        case "Authorization":
-            header.Authorization = value
-        case "Content-Length":
-            header.Content_Length = value
-        case "Transfer-Encoding":
-            header.Transfer_Encoding = value
-        case "Content-Type":
-            header.Content_Type = value
-        case:
-            header.rest[key] = value
-    }
-}
-
-strip :: proc (s: []u8) -> []u8 {
-    slice_start := 0
-    slice_end := len(s)
-    for c in s {
-        if c == ' ' || c == '\n' || c == '\r' {
-            slice_start += 1
-        } else { break }
-    }
-    #reverse for c in s {
-        if c == ' ' || c == '\n' || c == '\r' {
-            slice_end -= 1
-        } else { break }
-    }
-    if slice_start > slice_end do return s[0:0]
-    return s[slice_start:slice_end]
+header_parser_state_maker :: proc() -> (state: ^Header_parser_state, err: runtime.Allocator_Error) {
+    state = new(Header_parser_state) or_return
+    state.header = new(Header) or_return
+    return 
 }
