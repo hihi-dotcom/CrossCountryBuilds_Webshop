@@ -50,14 +50,7 @@ Options :: struct {
 Buffer :: struct {
     data: [1024]u8,
     end: u16,
-    copied: bool
-}
-
-LineBreak :: struct {
-    n1: bool,
-    r1: bool,
-    n2: bool,
-    r2: bool
+    done: bool
 }
 
 FirstLine :: struct {
@@ -73,7 +66,7 @@ Header_parser_state :: struct {
     key_buffer: Buffer,
     value_buffer: Buffer,
 
-    line_break: LineBreak,
+    line_break: int,
 
     first_line: FirstLine
 }
@@ -104,47 +97,15 @@ Header_parser :: proc (message: []u8, s: ^Header_parser_state) -> (state: ^Heade
         first_line_chopper(message, "Protocol", state, arena_allocator) or_return
     }
 
-    for i := state.cursor ; i < len(message) ; i += 1 {
-        switch message[i] {
-            case ' ', '\r', '\n', ':':
-                switch {
-                    case state.key_buffer.end == 0 : continue
-                    case state.key_buffer.copied && state.value_buffer.end == 0 : continue 
-                    case state.value_buffer.copied && state.key_buffer.copied: 
-                    // reset 
-                    break
-                    case state.value_buffer.end == 0 && !state.key_buffer.copied:
-                        //copy key
-                    case !state.value_buffer.copied && state.key_buffer.copied:
-                        //copy value
-                    case: panic("how did I get here?")  
-                }
-            case:
-                switch {
-                    case state.key_buffer.end <= 1022 || state.value_buffer.end <= 1022:
-                        switch {
-                            case !state.key_buffer.copied:
-                                state.key_buffer.data[state.key_buffer.end] = message[i]
-                                state.key_buffer.end += 1
-                            case !state.value_buffer.copied:
-                                state.value_buffer.data[state.value_buffer.end] = message[i]
-                                state.value_buffer.end += 1
-                            case: panic("how did I get here?")
-                        }
-                    case: 
-                        err = Parse_Error.Broken
-                        delete_header_state_and_header(state)
-                        return 
-                }
-        }
-    }
+    body_start = chopper(message, state, arena_allocator) or_return
+    return
 }
 
 first_line_chopper :: proc(message: []u8, part: string, state: ^Header_parser_state, allocator: runtime.Allocator) -> (err: Header_Parse_Error) {
     for i := state.cursor ; i < len(message) ; i += 1 {
         if message[i] == ' ' || message[i] == '\r' || message[i] == '\n' {
             if state.value_buffer.end != 0 {
-                state.cursor += 1
+                state.cursor = i + 1
                 value := strings.clone_from_bytes(strip(state.value_buffer.data[:state.value_buffer.end + 1]), allocator) or_return
                 Header_inserter(state.header, part, value)
                 switch part {
@@ -165,6 +126,53 @@ first_line_chopper :: proc(message: []u8, part: string, state: ^Header_parser_st
         }
     }
     return Parse_Error.Partial
+}
+
+chopper :: proc(message: []u8, state: ^Header_parser_state, allocator: runtime.Allocator) -> (body_start: int, err: Header_Parse_Error) {
+    for i := state.cursor ; i < len(message) ; i += 1 {
+        switch message[i] {
+            case ' ', '\r', '\n', ':':
+                state.line_break += 1
+                if state.line_break == 4 {
+                    body_start = i + 1
+                    return 
+                }
+                switch {
+                    case state.value_buffer.end == 0 && !state.key_buffer.done && state.key_buffer.end != 0:
+                        state.key_buffer.done = true
+                    case !state.value_buffer.done && state.key_buffer.done && state.value_buffer.end != 0:
+                        value := strings.clone_from_bytes(strip(state.value_buffer.data[:state.value_buffer.end]), allocator)
+                        Header_inserter(state.header, string(strip(state.key_buffer.data[:state.key_buffer.end])),value)
+                        buffer_reset(&state.key_buffer)
+                        buffer_reset(&state.value_buffer)
+                    case: continue
+                }
+            case:
+                state.line_break = 0
+                switch {
+                    case state.key_buffer.end <= len(state.key_buffer.data) - 1 || state.value_buffer.end <= len(state.value_buffer.data) - 1:
+                        switch {
+                            case !state.key_buffer.done:
+                                state.key_buffer.data[state.key_buffer.end] = message[i]
+                                state.key_buffer.end += 1
+                            case !state.value_buffer.done:
+                                state.value_buffer.data[state.value_buffer.end] = message[i]
+                                state.value_buffer.end += 1
+                            case: panic("how did I get here?")
+                        }
+                    case: 
+                        err = Parse_Error.Broken
+                        delete_header_state_and_header(state)
+                        return 
+                }
+        }
+    }
+    return 0, .Partial
+}
+
+buffer_reset :: proc(b: ^Buffer) {
+    b.done = false
+    b.end = 0
 }
 
 delete_header :: proc(h: ^Header) {
