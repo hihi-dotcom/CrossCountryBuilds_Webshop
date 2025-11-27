@@ -4,7 +4,7 @@ import "core:mem"
 import "core:fmt"
 import vmem "core:mem/virtual"
 import "core:strings"
-import "../server/header"
+import "../server/header_parser"
 
 main :: proc() {
     track: mem.Tracking_Allocator
@@ -20,21 +20,35 @@ main :: proc() {
         mem.tracking_allocator_destroy(&track)
     }
 
+    t1: header_parser.Maybe_Header = header_parser.parser_state_maker()
+    t2: header_parser.Maybe_Header = t1.(^header_parser.Parser_State).header
+    t3: header_parser.Maybe_Header = nil
 
-    test := "GET /index.html HTTP/1.1\r\nHost: example.com\r\nUser-Agent: TestClient/1.0\r\nAccept: */*\r\ncept-Language: en-US,en;q=0.9\r\nAccept-Encoding: gzip, deflate\r\nConnection: keep-alive\r\n\r\n"
-    octets := transmute([]u8)test
-    hps := header.parser_state_maker()
-    copyer(hps.header.header_data.data[:], octets)
-    header.Parser(hps)
-    fmt.printfln("%v", hps.header)
+    asd := []header_parser.Maybe_Header{t1,t3,t2}
+
+    for i in asd {
+        switch v in i {
+            case ^header_parser.Parser_State:
+                fmt.println(typeid_of(type_of(v)))
+            case ^header_parser.Header:
+                fmt.println(typeid_of(type_of(v)))
+            case:
+                fmt.println(typeid_of(type_of(v)))
+        }
+    }
+
+   
 
 
-    header.parser_state_free(hps)
 }
 
 tttest :: proc() {
     test := "GET /index.html HTTP/1.1\r\nHost: example.com\r\nUser-Agent: TestClient/1.0\r\nAccept: */*\r\ncept-Language: en-US,en;q=0.9\r\nAccept-Encoding: gzip, deflate\r\nConnection: keep-alive\r\n\r\n"
     octets := transmute([]u8)test
+    hps := header_parser.parser_state_maker()
+    copyer(hps.header.header_data.data[:], octets)
+    header_parser.Parse(hps)
+    fmt.printfln("%v", hps.header)
 }
 
 copyer :: proc(to: []u8, from: []u8) {

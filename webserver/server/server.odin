@@ -3,7 +3,7 @@ package server
 import "core:fmt"
 import "core:os"
 import "core:net"
-import "./header"
+import "./header_parser"
 import "core:thread"
 import "core:sync/chan"
 
@@ -21,7 +21,7 @@ Params :: map[string]string
 
 Request :: struct {
     Params,
-    header.Header,
+    header_parser.Header,
     Body
 }
 
@@ -82,7 +82,9 @@ delete : Setter : proc(s: ^Server, path: string, settings: Settings(typeid), toR
 }
 
 run :: proc(port: u16) {
+    fmt.println(port)
 
+    
 
 
 }
