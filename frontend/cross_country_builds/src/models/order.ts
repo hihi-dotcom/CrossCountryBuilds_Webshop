@@ -1,4 +1,4 @@
-import Product from "./termek";
+import Product from "./product";
 
 class Order{
     order_id!: number;

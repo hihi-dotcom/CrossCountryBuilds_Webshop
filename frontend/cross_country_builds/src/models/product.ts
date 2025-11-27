@@ -5,7 +5,8 @@ export default class Product{
     maker: string;
     description: string;
     pic: string;
-    price: number
+    price: number;
+    num_of_products!: number
 
     public constructor(product_id: number, name: string, category: string, maker: string, description: string, pic: string, price: number){
         this.product_id = product_id;
