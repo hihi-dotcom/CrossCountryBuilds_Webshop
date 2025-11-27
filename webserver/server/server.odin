@@ -1,7 +1,10 @@
 package server
 
+import "core:sync"
 import "core:fmt"
 import "core:os"
+import "core:log"
+import "core:time"
 import "core:net"
 import "./header_parser"
 import "core:thread"
@@ -20,9 +23,9 @@ Body :: string
 Params :: map[string]string
 
 Request :: struct {
-    Params,
-    header_parser.Header,
-    Body
+    params: Params,
+    header: header_parser.Maybe_Header,
+    body: Body
 }
 
 Settings :: struct($Permission: typeid) {
@@ -81,10 +84,49 @@ delete : Setter : proc(s: ^Server, path: string, settings: Settings(typeid), toR
     }
 }
 
-run :: proc(port: u16) {
-    fmt.println(port)
+run :: proc(port: int, $P: typeid) {
+    context.logger = log.create_console_logger()
+    recv, send := make_Work_chans()
+    t1 := thread.create(Listener_Proc)
+    t1.init_context = context
+    t1.data = &Listener_Thread_Data {
+        port = port,
+        chans = send
+    }
+    thread.start(t1)
 
     
+    t2 := thread.create(Worker_Porc)
+    t2.init_context = context
+    t2.data = &Worker_Thread_Data {
+        chans = recv,
+    }
+    thread.start(t2)
+    
+    for { time.sleep(1000000000) }
+}
 
+make_Work_chans :: proc() -> (recv: Recv_Chans, send: Send_Chans) {
+    low, cerr1 := chan.create_buffered(chan.Chan(Work, .Both), 1024, context.allocator)
+    medium, cerr2 := chan.create_buffered(chan.Chan(Work, .Both), 1024, context.allocator)
+    high, cerr3 := chan.create_buffered(chan.Chan(Work, .Both), 1024,  context.allocator)
+    sema := new(sync.Sema)
 
+    assert(cerr1 == .None)
+    assert(cerr2 == .None)
+    assert(cerr3 == .None)
+    
+    recv = Recv_Chans {
+        high = chan.as_recv(high),
+        medium = chan.as_recv(medium),
+        low = chan.as_recv(low),
+        sema = sema
+    }
+    send = Send_Chans {
+        high = chan.as_send(high),
+        medium = chan.as_send(medium),
+        low = chan.as_send(low),
+        sema = sema
+    }
+    return
 }

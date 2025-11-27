@@ -1,34 +1,30 @@
 package server
 
-import "core:text/regex/virtual_machine"
 import "core:net"
 import "core:sync/chan"
 import "core:thread"
-import "core:time"
-import "core:sync"
 import "./header_parser"
 import "core:fmt"
+import "core:log"
 
-Work :: struct($P: typeid) {
+Work :: struct {
     socket: net.TCP_Socket,
-    handler: Handler(P),
-    header: header_parser.Maybe_Header,
-    body: ^[]u8
-
+    request: Request
 }
 
-Worker_Thread_Data :: struct($P: typeid) {
-    chans: Work_Chans(P),
-    guard: ^chan.Chan(Guard_Work, chan.Direction.Send)
+Worker_Thread_Data :: struct {
+    chans: Recv_Chans,
+    guard: chan.Chan(Guard_Work, chan.Direction.Send),
+    testingChans: Send_Chans // for testing
 }
 
-Worker_Porc :: proc(t: ^thread.Thread, $P: typeid) {
-    wtd := cast(^Worker_Thread_Data(P))t.data
+Worker_Porc :: proc(t: ^thread.Thread) {
+    wtd := cast(^Worker_Thread_Data)t.data
 
     for {
         work := Get_Work(wtd.chans)
 
-        if ok := try_header(wtd, work) ; !ok do continue
+        if ok := try_header(wtd, &work) ; !ok do continue
 
         fmt.println(work)
         
@@ -38,8 +34,8 @@ Worker_Porc :: proc(t: ^thread.Thread, $P: typeid) {
 }
 
 @(private="file")
-try_header :: proc(wtd: ^Worker_Thread_Data, w: Work($P)) -> (ok: bool) {
-    switch v in w.header {
+try_header :: proc(wtd: ^Worker_Thread_Data, w: ^Work) -> (ok: bool) {
+    switch v in w.request.header {
         case ^header_parser.Header:
             return true
         case ^header_parser.Parser_State:
@@ -53,10 +49,10 @@ try_header :: proc(wtd: ^Worker_Thread_Data, w: Work($P)) -> (ok: bool) {
                 if !try_recv(wtd, w) do return false
             }
         case:
-            w.header = header_parser.parser_state_maker()
+            w.request.header = header_parser.parser_state_maker()
             for {
                 if !try_recv(wtd, w) do return false
-                parse_err := header_parser.Parse(v)
+                parse_err := header_parser.Parse(w.request.header.(^header_parser.Parser_State))
                 if parse_err == .None {
                     return true
                 } else if parse_err == .TooLong {
@@ -64,31 +60,32 @@ try_header :: proc(wtd: ^Worker_Thread_Data, w: Work($P)) -> (ok: bool) {
                 }
             }
     }
-    panic("You shold not be here!")
-    return false
+    log.panic("You shold not be here!")
 }
 
 @(private="file")
-try_recv :: proc(wtd: ^Worker_Thread_Data, w: Work($P)) -> (ok: bool) {
-    if state, ok := w.header.(^header_parser.Parser_State) ; ok {
+try_recv :: proc(wtd: ^Worker_Thread_Data, w: ^Work) -> (ok: bool) {
+    if state, ok := w.request.header.(^header_parser.Parser_State) ; ok {
         n, recvErr := net.recv_tcp(w.socket, state.header.header_data.data[state.header.header_data.end:])
         if recvErr == .Would_Block {
-            return send_to_guard() 
+            return send_to_guard(wtd, w^) 
         } else if recvErr != nil {
             return clean_up(w)
         }
-    } else { panic("The header was done, so it should not be here.")}
+    } else { log.panic("The header was done, so it should not be here.")}
     return
 }
 
 @(private="file")
-clean_up :: proc(w: Work($P)) -> (ok: bool) {
-    header_parser.parser_state_and_contents_free(w.header.(^header_parser.Parser_State))
+clean_up :: proc(w: ^Work) -> (ok: bool) {
+    header_parser.parser_state_and_contents_free(w.request.header.(^header_parser.Parser_State))
     net.close(w.socket)
     return false
 }
 
 @(private="file")
-send_to_guard :: proc() -> (ok: bool) {
-    panic("To be implemented")
+send_to_guard :: proc(wtd: ^Worker_Thread_Data, w: Work) -> (ok: bool) {
+    //"To be implemented"
+    Set_Work(wtd.testingChans, w, .Medium)
+    return true
 }

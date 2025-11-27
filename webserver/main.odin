@@ -10,9 +10,12 @@ import "core:os"
 import "core:strings"
 import vmem "core:mem/virtual"
 import "core:mem"
-import "./header"
 import "./server"
 
+Permissions :: enum {
+    Admin,
+    User
+}
 
 main :: proc() {
     context.logger = log.create_console_logger()
@@ -32,9 +35,7 @@ main :: proc() {
     }
 
     
-    
-    
-    
+    server.run(30000, Permissions)   
 }
 
 load_file :: proc (path: string) -> (file: []u8, err: os.Error) {
@@ -48,7 +49,7 @@ load_file :: proc (path: string) -> (file: []u8, err: os.Error) {
     return buffer, nil
 }
 
-test :: proc() {
+/* test :: proc() {
     b: [4096]u8
     endp, _ := net.parse_endpoint("0.0.0.0:33322")
 
@@ -74,4 +75,4 @@ test :: proc() {
         if tcp_recv_err2 != nil do log.error("Recv error:", tcp_recv_err2)
         fmt.println(string(b[:n2]))
     }
-}
+} */
