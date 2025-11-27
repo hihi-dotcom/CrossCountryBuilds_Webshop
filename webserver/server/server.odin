@@ -100,6 +100,7 @@ run :: proc(port: int, $P: typeid) {
     t2.init_context = context
     t2.data = &Worker_Thread_Data {
         chans = recv,
+        testingChans = send
     }
     thread.start(t2)
     

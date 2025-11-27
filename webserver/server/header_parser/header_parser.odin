@@ -2,6 +2,7 @@
 
 package header_parser
 
+
 @(private)
 HEADER_BUFFER_SIZE : uint : 1024 * 8 
 
@@ -222,4 +223,22 @@ inserter :: proc (header: ^Header, key: string, value: string) {
         case:
             header.rest[key] = value
     }
+}
+
+
+strip :: proc (s: []u8) -> []u8 {
+    slice_start := 0
+    slice_end := len(s)
+    for c in s {
+        if c == ' ' {
+            slice_start += 1
+        } else { break }
+    }
+    #reverse for c in s {
+        if c == ' ' {
+            slice_end -= 1
+        } else { break }
+    }
+    if slice_start > slice_end do return s[0:0]
+    return s[slice_start:slice_end]
 }

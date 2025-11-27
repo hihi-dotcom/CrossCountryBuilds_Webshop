@@ -1,5 +1,6 @@
 package test
 
+import "core:terminal/ansi"
 import "core:mem" 
 import "core:fmt"
 import vmem "core:mem/virtual"
@@ -20,22 +21,7 @@ main :: proc() {
         mem.tracking_allocator_destroy(&track)
     }
 
-    t1: header_parser.Maybe_Header = header_parser.parser_state_maker()
-    t2: header_parser.Maybe_Header = t1.(^header_parser.Parser_State).header
-    t3: header_parser.Maybe_Header = nil
-
-    asd := []header_parser.Maybe_Header{t1,t3,t2}
-
-    for i in asd {
-        switch v in i {
-            case ^header_parser.Parser_State:
-                fmt.println(typeid_of(type_of(v)))
-            case ^header_parser.Header:
-                fmt.println(typeid_of(type_of(v)))
-            case:
-                fmt.println(typeid_of(type_of(v)))
-        }
-    }
+    tttest()
 
    
 
@@ -57,6 +43,22 @@ copyer :: proc(to: []u8, from: []u8) {
     }
 }
 
+strip :: proc (s: []u8) -> []u8 {
+    slice_start := 0
+    slice_end := len(s)
+    for c in s {
+        if c == ' ' {
+            slice_start += 1
+        } else { break }
+    }
+    #reverse for c in s {
+        if c == ' ' {
+            slice_end -= 1
+        } else { break }
+    }
+    if slice_start > slice_end do return s[0:0]
+    return s[slice_start:slice_end]
+}
 
 
 e := `
