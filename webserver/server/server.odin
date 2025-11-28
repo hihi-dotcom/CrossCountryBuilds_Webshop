@@ -10,6 +10,7 @@ import "./header_parser"
 import "core:thread"
 import "core:sync/chan"
 
+CHANNEL_BUFFER_SIZE :: 1024
 
 Server :: struct($Permissions: typeid) {
     root: string,
@@ -86,7 +87,8 @@ delete : Setter : proc(s: ^Server, path: string, settings: Settings(typeid), toR
 
 run :: proc(port: int, $P: typeid) {
     context.logger = log.create_console_logger()
-    recv, send := make_Work_chans()
+    recv, send, guard_send, guard_recv := make_Work_chans()
+    
     t1 := thread.create(Listener_Proc)
     t1.init_context = context
     t1.data = &Listener_Thread_Data {
@@ -95,27 +97,37 @@ run :: proc(port: int, $P: typeid) {
     }
     thread.start(t1)
 
-    
     t2 := thread.create(Worker_Porc)
     t2.init_context = context
     t2.data = &Worker_Thread_Data {
         chans = recv,
-        testingChans = send
+        guard = guard_send
     }
     thread.start(t2)
+
+    t3 := thread.create(Guard_Proc)
+    t3.init_context = context
+    t3.data = &Guard_Data {
+        send_chans = send,
+        guard_chan = guard_recv
+    }
+    thread.start(t3)
     
     for { time.sleep(1000000000) }
 }
 
-make_Work_chans :: proc() -> (recv: Recv_Chans, send: Send_Chans) {
-    low, cerr1 := chan.create_buffered(chan.Chan(Work, .Both), 1024, context.allocator)
-    medium, cerr2 := chan.create_buffered(chan.Chan(Work, .Both), 1024, context.allocator)
-    high, cerr3 := chan.create_buffered(chan.Chan(Work, .Both), 1024,  context.allocator)
+make_Work_chans :: proc() -> (recv: Recv_Chans, send: Send_Chans, guard_send: Send_Guard, guard_recv: Recv_Guard) {
+    low, cerr1 := chan.create_buffered(chan.Chan(Work, .Both), CHANNEL_BUFFER_SIZE, context.allocator)
+    medium, cerr2 := chan.create_buffered(chan.Chan(Work, .Both), CHANNEL_BUFFER_SIZE, context.allocator)
+    high, cerr3 := chan.create_buffered(chan.Chan(Work, .Both), CHANNEL_BUFFER_SIZE,  context.allocator)
+    guard, cerr4 := chan.create_buffered(chan.Chan(Guard_Order, .Both), CHANNEL_BUFFER_SIZE, context.allocator)
+    
     sema := new(sync.Sema)
 
     assert(cerr1 == .None)
     assert(cerr2 == .None)
     assert(cerr3 == .None)
+    assert(cerr4 == .None)
     
     recv = Recv_Chans {
         high = chan.as_recv(high),
@@ -129,5 +141,8 @@ make_Work_chans :: proc() -> (recv: Recv_Chans, send: Send_Chans) {
         low = chan.as_send(low),
         sema = sema
     }
+    guard_send = chan.as_send(guard)
+    guard_recv = chan.as_recv(guard)
+
     return
 }

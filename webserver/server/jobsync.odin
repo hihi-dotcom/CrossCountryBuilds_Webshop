@@ -42,15 +42,14 @@ Set_Work :: proc(chans: Send_Chans, w: Work, p: Priority) {
 
 Get_Work :: proc(chans: Recv_Chans) -> Work {
     sync.sema_wait(chans.sema)
-    for {
-        if w, ok := chan.try_recv(chans.high) ; ok {
-            return w
-        } else if w, ok := chan.try_recv(chans.medium) ; ok {
-            return w
-        } else if w, ok := chan.try_recv(chans.low) ; ok {
-            return w
-        }
+    if w, ok := chan.try_recv(chans.high) ; ok {
+        return w
+    } else if w, ok := chan.try_recv(chans.medium) ; ok {
+        return w
+    } else if w, ok := chan.try_recv(chans.low) ; ok {
+        return w
     }
+    log.panic("How can this be?")
 }
 
 

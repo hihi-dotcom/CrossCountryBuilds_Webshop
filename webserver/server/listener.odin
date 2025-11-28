@@ -21,9 +21,9 @@ Listener_Proc :: proc(t: ^thread.Thread) {
 
     for {
         client, _, accept_err := net.accept_tcp(soc)
-        if accept_err != nil { log.panic("TCP accept error!") }
+        if accept_err != nil do log.panic("TCP accept error!") 
         set_blocking_err := net.set_blocking(client, false)
-        if set_blocking_err != nil { log.panic("Failed to set blocking!") }
+        if set_blocking_err != nil do log.panic("Failed to set blocking!") 
         work := Work {
             socket = client
         }

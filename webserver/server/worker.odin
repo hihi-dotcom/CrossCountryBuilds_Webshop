@@ -1,6 +1,7 @@
 package server
 
 import "core:net"
+import "core:time"
 import "core:sync/chan"
 import "core:thread"
 import "./header_parser"
@@ -14,8 +15,7 @@ Work :: struct {
 
 Worker_Thread_Data :: struct {
     chans: Recv_Chans,
-    guard: chan.Chan(Guard_Work, chan.Direction.Send),
-    testingChans: Send_Chans // for testing
+    guard: Send_Guard
 }
 
 Worker_Porc :: proc(t: ^thread.Thread) {
@@ -29,7 +29,7 @@ Worker_Porc :: proc(t: ^thread.Thread) {
 
         if h, ok := work.request.header.(^header_parser.Header) ; ok {
             fmt.println(h.Method, h.Path, h.Protocol)
-        } else { panic("What???")}
+        } else { log.panic("What???")}
         
         
 
@@ -39,25 +39,27 @@ Worker_Porc :: proc(t: ^thread.Thread) {
 
 @(private="file")
 try_header :: proc(wtd: ^Worker_Thread_Data, w: ^Work) -> (ok: bool) {
+    if w.request.header == nil do w.request.header = header_parser.parser_state_maker()
     switch &v in w.request.header {
         case ^header_parser.Header:
             return true
         case ^header_parser.Parser_State:
             for {
                 parse_err := header_parser.Parse(v)
-                if parse_err == .None {
-                    w.request.header = v.header
-                    return true
-                } else if parse_err == .TooLong {
-                    return clean_up(w)
-                }
-                if !try_recv(wtd, w) do return false
+                switch parse_err {
+                    case .None:
+                        w.request.header = v.header
+                        return true
+                    case .TooLong:
+                        return clean_up(w)
+                    case .Partial:
+                        if !try_recv(wtd, w) do return false
+                }  
             }
         case:
-            w.request.header = header_parser.parser_state_maker()
-            return try_header(wtd, w)
+            log.panic("You definitaly should not be here!")
     }
-    log.panic("You shold not be here!")
+    log.panic("Neither here!")
 }
 
 @(private="file")
@@ -82,12 +84,12 @@ clean_up :: proc(w: ^Work) -> (ok: bool) {
 
 @(private="file")
 send_to_guard :: proc(wtd: ^Worker_Thread_Data, w: Work) -> (ok: bool) {
-    //"To be implemented"
-    if hpn, ok := w.request.header.(^header_parser.Parser_State) ; ok {
-        net.set_blocking(w.socket, true)
-        n, _ := net.recv_tcp(w.socket, hpn.header.header_data.data[hpn.header.header_data.end:])
-        Set_Work(wtd.testingChans, w, .Medium)
-        net.set_blocking(w.socket, false)
-    }
-    return true
+    if ok := chan.send(wtd.guard, Guard_Work {
+        work = w,
+        record = Guard_Record {
+            lastHeard = time.now(),
+            priority = .Medium
+        }
+    }) ; !ok do log.panic("Guard channel is closed!")
+    return false
 }
