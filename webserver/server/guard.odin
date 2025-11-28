@@ -8,7 +8,7 @@ import "core:thread"
 import "core:sync/chan"
 import "./header_parser"
 
-TIMEOUT :: 45 * time.Second
+TIMEOUT :: 5 * time.Second
 TICK :: time.Duration(100 * time.Millisecond) 
 
 Guard_Data :: struct {
@@ -26,7 +26,6 @@ Guard_Work :: struct {
 
 Guard_Order :: union {
     Guard_Work,
-
 }
 
 Guard_Record :: struct {
@@ -35,6 +34,7 @@ Guard_Record :: struct {
 }
 
 Guard_Proc :: proc(t: ^thread.Thread) {
+    fmt.println("Guard thread started")
     gd := cast(^Guard_Data)t.data
     to_watch: [dynamic]Guard_Order
 
@@ -53,23 +53,35 @@ Guard_Proc :: proc(t: ^thread.Thread) {
             } else { break }
         }
 
-        for order in to_watch {
-            switch v in order {
+        for &order, index in to_watch {
+            switch &v in order {
                 case Guard_Work:
-                    net.recv_tcp(v.work, )
+                    if state, ok := v.work.request.header.(^header_parser.Parser_State) ; ok {
+                        n, err := net.recv_tcp(v.work.socket, state.header.header_data.data[state.header.header_data.end:])
+                        #partial switch err { // something is now working, partial should not be required
+                            case .None:
+                                Set_Work(gd.send_chans, v.work, v.record.priority)
+                            case .Would_Block:
+                                if diff := time.diff(v.record.lastHeard, time.now()) ; diff > TIMEOUT {
+                                    fmt.println(diff, TIMEOUT)
+                                    clean_up_Guard_Order(&order)
+                                    unordered_remove(&to_watch, index)
+                                } 
+                            case:
+                                clean_up_Guard_Order(&order)
+                                unordered_remove(&to_watch, index)
+                        }
+                    } else { log.panic("A guard should not be watching a completed header!") }
                 case: log.panic("You problalbly not implemented an order for the guard!")
             }
         }
-        
-
-        
-
-        
     }
 }
 
-clean_up :: proc(to: Guard_Order) {
-    switch v in to{
-        
+clean_up_Guard_Order :: proc(to: ^Guard_Order) {
+    switch &v in to {
+        case Guard_Work:
+            clean_up_Work(&v.work)
+        case: log.panic("You problalbly not implemented an order for the guard (clean_up)!")
     }
 }

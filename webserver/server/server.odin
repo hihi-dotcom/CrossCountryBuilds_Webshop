@@ -78,12 +78,12 @@ patch : Setter : proc(s: ^Server, path: string, settings: Settings(typeid), toRu
         settings = settings
     }
 }
-delete : Setter : proc(s: ^Server, path: string, settings: Settings(typeid), toRun: Handler_proc) {
+/* delete : Setter : proc(s: ^Server, path: string, settings: Settings(typeid), toRun: Handler_proc) {
     s.endpoints[{"DELETE", path}] = {
         toRun = toRun,
         settings = settings
     }
-}
+} */
 
 run :: proc(port: int, $P: typeid) {
     context.logger = log.create_console_logger()
@@ -145,4 +145,17 @@ make_Work_chans :: proc() -> (recv: Recv_Chans, send: Send_Chans, guard_send: Se
     guard_recv = chan.as_recv(guard)
 
     return
+}
+
+clean_up_Request :: proc(rq: Request) {
+    assert(rq.body == "") 
+    delete(rq.params)
+
+    switch v in rq.header {
+        case ^header_parser.Parser_State:
+            header_parser.parser_state_and_contents_free(v)
+        case ^header_parser.Header:
+            header_parser.header_free(v)
+        case: log.panic("You probably should not be here!")
+    }
 }
