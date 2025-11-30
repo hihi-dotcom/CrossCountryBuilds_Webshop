@@ -17,7 +17,7 @@ Listener_Proc :: proc(t: ^thread.Thread) {
     soc, listen_err := net.listen_tcp(ep)
     if listen_err != nil do log.panic("There was an error when creating the listener socket!")
 
-    fmt.println("Listener started on port:", ep)
+    fmt.println("Listener started on", ep)
 
     for {
         client, _, accept_err := net.accept_tcp(soc)

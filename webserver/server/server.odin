@@ -7,17 +7,17 @@ import "core:log"
 import "core:time"
 import "core:net"
 import "./header_parser"
+import "./response_builder"
+import "./static"
 import "core:thread"
 import "core:sync/chan"
 
 CHANNEL_BUFFER_SIZE :: 1024
 
-Server :: struct($Permissions: typeid) {
+Server :: struct {
+    endpoints: map[Endpoint]Handler,
     root: string,
-    endpoints: map[Endpoint]Handler(Permissions),
     workers: u8,
-    permissions: Permissions,
-    permissions_handler: proc(Request) -> Permissions
 }
 
 Body :: string
@@ -29,63 +29,24 @@ Request :: struct {
     body: Body
 }
 
-Settings :: struct($Permission: typeid) {
-    acceptable_permissions: []Permission,
-    acceptable_MIMEtypes: []string,
-}
-
-
-Handler :: struct($Permission: typeid) {
+Handler :: struct {
     toRun: Handler_proc,
-    settings: Settings(Permission)
 }
 
-Handler_proc :: proc(Request, Response)
-
-Response :: struct {
-    status: u16,
-
-}
+Handler_proc :: proc(Request, response_builder.Response)
 
 Endpoint :: struct {
     method: string,
     path: string
 }
 
-Setter :: proc(s: ^Server, path: string, settings: Settings(typeid), toRun: Handler_proc)
+add :: proc(s: ^Server, ep: Endpoint, toRun: Handler_proc) {
+    s.endpoints[ep] = {
+        toRun = toRun
+    }
+}
 
-get : Setter : proc(s: ^Server, path: string, settings: Settings(typeid), toRun: Handler_proc) {
-    s.endpoints[{"POST", path}] = {
-        toRun = toRun,
-        settings = settings
-    }
-}
-post : Setter : proc(s: ^Server, path: string, settings: Settings(typeid), toRun: Handler_proc) {
-    s.endpoints[{"POST", path}] = {
-        toRun = toRun,
-        settings = settings
-    }
-}
-put : Setter : proc(s: ^Server, path: string, settings: Settings(typeid), toRun: Handler_proc) {
-    s.endpoints[{"PUT", path}] = {
-        toRun = toRun,
-        settings = settings
-    }
-}
-patch : Setter : proc(s: ^Server, path: string, settings: Settings(typeid), toRun: Handler_proc) {
-    s.endpoints[{"PATCH", path}] = {
-        toRun = toRun,
-        settings = settings
-    }
-}
-/* delete : Setter : proc(s: ^Server, path: string, settings: Settings(typeid), toRun: Handler_proc) {
-    s.endpoints[{"DELETE", path}] = {
-        toRun = toRun,
-        settings = settings
-    }
-} */
-
-run :: proc(port: int, $P: typeid) {
+run :: proc(server: Server, port: int) {
     context.logger = log.create_console_logger()
     recv, send, guard_send, guard_recv := make_Work_chans()
     
@@ -101,7 +62,8 @@ run :: proc(port: int, $P: typeid) {
     t2.init_context = context
     t2.data = &Worker_Thread_Data {
         chans = recv,
-        guard = guard_send
+        guard = guard_send,
+        server = server
     }
     thread.start(t2)
 

@@ -51,6 +51,3 @@ Get_Work :: proc(chans: Recv_Chans) -> Work {
     }
     log.panic("How can this be?")
 }
-
-
-
