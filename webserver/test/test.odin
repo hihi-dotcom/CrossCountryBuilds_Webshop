@@ -7,6 +7,11 @@ import vmem "core:mem/virtual"
 import "core:strings"
 import "../server/header_parser"
 
+ttttttttest :: struct {
+    t1: string,
+    t3: string,
+}
+
 main :: proc() {
     track: mem.Tracking_Allocator
     mem.tracking_allocator_init(&track, context.allocator)
@@ -21,7 +26,7 @@ main :: proc() {
         mem.tracking_allocator_destroy(&track)
     }
 
-    tttest()
+
 
    
 

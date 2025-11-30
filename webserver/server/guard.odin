@@ -58,7 +58,7 @@ Guard_Proc :: proc(t: ^thread.Thread) {
                 case Guard_Work:
                     if state, ok := v.work.request.header.(^header_parser.Parser_State) ; ok {
                         n, err := net.recv_tcp(v.work.socket, state.header.header_data.data[state.header.header_data.end:])
-                        #partial switch err { // something is now working, partial should not be required
+                        #partial switch err {
                             case .None:
                                 Set_Work(gd.send_chans, v.work, v.record.priority)
                             case .Would_Block:

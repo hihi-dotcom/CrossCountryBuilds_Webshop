@@ -2,8 +2,6 @@
 
 package header_parser
 
-import "core:fmt"
-
 @(private)
 HEADER_BUFFER_SIZE : uint : 1024 * 8 
 

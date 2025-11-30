@@ -15,7 +15,8 @@ Work :: struct {
 
 Worker_Thread_Data :: struct {
     chans: Recv_Chans,
-    guard: Send_Guard
+    guard: Send_Guard,
+    server: Server
 }
 
 Worker_Porc :: proc(t: ^thread.Thread) {
@@ -26,18 +27,15 @@ Worker_Porc :: proc(t: ^thread.Thread) {
         work := Get_Work(wtd.chans)
         fmt.println("Got Work:", work)
 
-        //if ok := try_header(wtd, &work)  ; !ok do continue
-
-        ok := try_header(wtd, &work)
+        if ok := try_header(wtd, &work) ; !ok do continue
 
         if h, ok := work.request.header.(^header_parser.Header) ; ok {
             fmt.println(h.Method, h.Path, h.Protocol)
         } else { fmt.println("What???") }
         
         
-
+        
     }
-    
 }
 
 @(private="file")
@@ -69,13 +67,14 @@ try_header :: proc(wtd: ^Worker_Thread_Data, w: ^Work) -> (ok: bool) {
 try_recv :: proc(wtd: ^Worker_Thread_Data, w: ^Work) -> (bool) {
     if state, ok := w.request.header.(^header_parser.Parser_State) ; ok {
         n, recvErr := net.recv_tcp(w.socket, state.header.header_data.data[state.header.header_data.end:])
-        if recvErr == .Would_Block {
-            return send_to_guard(wtd, w^)
-        } else if recvErr == .None {
-            return true
-        } else {
-            clean_up_Work(w)
-            return false
+        #partial switch recvErr {
+            case .Would_Block:
+                return send_to_guard(wtd, w^)
+            case .None:
+                return true
+            case:
+                clean_up_Work(w)
+                return false
         }
     } else { log.panic("The header was done, so it should not be here.")}
     log.panic("You should not be here!")

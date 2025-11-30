@@ -12,11 +12,6 @@ import vmem "core:mem/virtual"
 import "core:mem"
 import "./server"
 
-Permissions :: enum {
-    Admin,
-    User
-}
-
 main :: proc() {
     context.logger = log.create_console_logger()
     when ODIN_DEBUG {
@@ -35,18 +30,7 @@ main :: proc() {
     }
 
     
-    server.run(30000, Permissions)   
-}
-
-load_file :: proc (path: string) -> (file: []u8, err: os.Error) {
-    handle := os.open(path) or_return
-    defer os.close(handle)
-    info := os.fstat(handle) or_return
-    defer os.file_info_delete(info)
-
-    buffer := make([]u8, info.size) or_return
-    os.read(handle, buffer) or_return
-    return buffer, nil
+    server.run({}, 30000)   
 }
 
 /* test :: proc() {
