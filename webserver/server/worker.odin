@@ -38,7 +38,7 @@ Worker_Porc :: proc(t: ^thread.Thread) {
             }
         } else { fmt.println("What???") }
 
-        file, len, _ := static.load_whole_file("../root/hehe.html")
+        file, len, _ := static.load_whole_file("./root/hehe.html")
         testbuffer: [1024]u8
  
         slen := fmt.bprint(testbuffer[:], len)
