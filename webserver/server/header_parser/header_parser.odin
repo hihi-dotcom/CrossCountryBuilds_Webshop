@@ -1,4 +1,4 @@
-// kell majd talán -- tárolni a többször mejelenő fejléceket külön, kis berű - nagy betű, üres fejlécek
+// kell majd talán -- tárolni a többször mejelenő fejléceket külön, üres fejlécek
 
 package header_parser
 

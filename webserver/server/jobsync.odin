@@ -27,13 +27,13 @@ Send_Chans :: struct {
 Set_Work :: proc(chans: Send_Chans, w: Work, p: Priority) {
     switch p {
         case .Low:
-            if ok := chan.send(chans.low, w) ; !ok do log.panic("Work channel is closed! Low")
+            if !chan.send(chans.low, w) do log.panic("Work channel is closed! Low")
             sync.sema_post(chans.sema)
         case .Medium:
-            if ok := chan.send(chans.medium, w) ; !ok do log.panic("Work channel is closed! Medium")
+            if !chan.send(chans.medium, w) do log.panic("Work channel is closed! Medium")
             sync.sema_post(chans.sema)
         case .High:
-            if ok := chan.send(chans.high, w) ; !ok do log.panic("Work channel is closed! High")
+            if !chan.send(chans.high, w) do log.panic("Work channel is closed! High")
             sync.sema_post(chans.sema)
         case:
             log.panic("You should not be here!")

@@ -27,15 +27,27 @@ main :: proc() {
     }
 
     /* for i in 0..=25 {
-        fmt.println(rune('A' + i),'A' + i)
+        fmt.println(rune('0' + i),'0' + i)
     } */
+    hehe := "something"[:]
+    fmt.println(hehe)
+}
 
-    fmt.println(int('a'-'A'))
-    
+hundreds_and_tens_and_ones :: proc(number: int) -> (hundreds: int, tens: int, ones: int) {
+    hundreds = number / 100
+    tens = (number - (hundreds * 100)) / 10
+    ones = (number - (hundreds * 100) - (tens * 10))
+    return
+}
+status_to_bytes :: proc(number: int) -> (bytes: [3]u8) {
+    hundreds := number / 100
+    tens := (number - (hundreds * 100)) / 10
+    ones := (number - (hundreds * 100) - (tens * 10))
 
-   
-
-
+    bytes[0] = u8('0') + u8(hundreds)
+    bytes[1] = u8('0') + u8(tens)
+    bytes[2] = u8('0') + u8(ones)
+    return
 }
 
 tttest :: proc() {
