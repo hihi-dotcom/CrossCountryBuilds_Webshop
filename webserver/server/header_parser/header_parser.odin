@@ -17,22 +17,8 @@ Maybe_Header :: union {
 }
 
 Header :: struct {
-    Method: string,
-    Path: string,
-    Protocol: string,
-    Host: string,
-    User_Agent: string,
-    Accept: string,
-    Accept_Language: string,
-    Accept_Encoding: string,
-    Content_Length: string,
-    Transfer_Encoding: string,
-    Content_Type: string,
-    Connection: string,
-    Authorization: string,
-
+    pairs: map[string]string,
     header_data: Buffer,
-    rest: map[string]string,
 }
 
 /* Talán kell valmi ilyen majd
@@ -66,9 +52,9 @@ Parse :: proc(state: ^Parser_State) -> (err: Parse_Error) {
     state.cursor = 0
 
     is_header_data_whole(state) or_return
-    first_line(state, "Method")
-    first_line(state, "Path")
-    first_line(state, "Protocol")
+    first_line(state, "method")
+    first_line(state, "path")
+    first_line(state, "protocol")
     not_the_first_line(state)
 
     return
@@ -103,6 +89,9 @@ not_the_first_line :: proc(state: ^Parser_State) {
                             which = .Value
                             hit = false
                         }
+                    case 65..=90:
+                        state.header.header_data.data[i] += 32
+                        fallthrough
                     case:
                         if !hit {
                             hit = true
@@ -116,9 +105,12 @@ not_the_first_line :: proc(state: ^Parser_State) {
                             spanss.value_end = i
                             which = .Key
                             hit = false
-                            inserter(state.header, string(state.header.header_data.data[spanss.key_start:spanss.key_end]), string(state.header.header_data.data[spanss.value_start:spanss.value_end]))
+                            state.header.pairs[string(state.header.header_data.data[spanss.key_start:spanss.key_end])] = string(state.header.header_data.data[spanss.value_start:spanss.value_end])
                         }
                     case ' ', ':', '\t': continue
+                    case 65..=90:
+                        state.header.header_data.data[i] += 32
+                        fallthrough
                     case: 
                         if !hit {
                             spanss.value_start = i
@@ -137,7 +129,7 @@ first_line :: proc(state: ^Parser_State, key: string) {
         switch state.header.header_data.data[i] {
             case ' ',  '\r', '\n', '\t':
                 if hit {
-                    inserter(state.header, key, string(state.header.header_data.data[start:i]))
+                    state.header.pairs[key] = string(state.header.header_data.data[start:i])
                     state.cursor = i
                     return
                 }
@@ -181,45 +173,11 @@ parser_state_free :: proc(h: ^Parser_State) {
 }
 
 header_free :: proc(h: ^Header) {
-    delete(h.rest)
+    delete(h.pairs)
     free(h)
 }
 
 parser_state_and_contents_free :: proc(h: ^Parser_State) {
     header_free(h.header)
     parser_state_free(h)
-}
-
-@(private)
-inserter :: proc (header: ^Header, key: string, value: string) {
-    switch key {
-        case "Method":
-            header.Method = value
-        case "Path":
-            header.Path = value
-        case "Protocol":
-            header.Protocol = value
-        case "Host":
-            header.Host = value
-        case "User-Agent":
-            header.User_Agent = value
-        case "Accept":
-            header.Accept = value
-        case "Accept-Language":
-            header.Accept_Language = value
-        case "Accept-Encoding":
-            header.Accept_Encoding = value
-        case "Connection":
-            header.Connection = value
-        case "Authorization":
-            header.Authorization = value
-        case "Content-Length":
-            header.Content_Length = value
-        case "Transfer-Encoding":
-            header.Transfer_Encoding = value
-        case "Content-Type":
-            header.Content_Type = value
-        case:
-            header.rest[key] = value
-    }
 }

@@ -30,11 +30,11 @@ Worker_Porc :: proc(t: ^thread.Thread) {
         if ok := try_header(wtd, &work) ; !ok do continue
 
         if h, ok := work.request.header.(^header_parser.Header) ; ok {
-            fmt.println(h.Method, h.Path, h.Protocol)
+            fmt.println(h.pairs["method"], h.pairs["path"], h.pairs["protocol"])
+            for k, v in h.pairs {
+                fmt.println(k, v,)
+            }
         } else { fmt.println("What???") }
-        
-        
-        
     }
 }
 

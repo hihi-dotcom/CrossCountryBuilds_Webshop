@@ -26,7 +26,12 @@ main :: proc() {
         mem.tracking_allocator_destroy(&track)
     }
 
+    /* for i in 0..=25 {
+        fmt.println(rune('A' + i),'A' + i)
+    } */
 
+    fmt.println(int('a'-'A'))
+    
 
    
 
