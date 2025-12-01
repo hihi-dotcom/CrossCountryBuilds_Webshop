@@ -1,9 +1,8 @@
+import { ProductCard } from "../components/termekcomponents/termekCard";
 
 
 export function Home(){
     return(
-       <>
-       <h3>Hahha</h3>
-       </>
+        <ProductCard/>
     );
 }
