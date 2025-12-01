@@ -7,6 +7,8 @@ import "core:thread"
 import "./header_parser"
 import "core:fmt"
 import "core:log"
+import "./responder"
+import "./static"
 
 Work :: struct {
     socket: net.TCP_Socket,
@@ -35,6 +37,25 @@ Worker_Porc :: proc(t: ^thread.Thread) {
                 fmt.println(k, v,)
             }
         } else { fmt.println("What???") }
+
+        file, len, _ := static.load_whole_file("../root/hehe.html")
+        testbuffer: [1024]u8
+ 
+        slen := fmt.bprint(testbuffer[:], len)
+ 
+        o: map[string]string
+        o["content-type"] = "text/html; charset=UTF-8"
+        o["content-length"] = slen
+ 
+ 
+        res := responder.Response {
+            status = 200,
+            options = o,
+            body = file
+        }
+ 
+        n, _ := responder.Send(work.socket, res)
+        fmt.println(n)
     }
 }
 

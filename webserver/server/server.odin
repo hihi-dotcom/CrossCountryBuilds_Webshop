@@ -7,7 +7,7 @@ import "core:log"
 import "core:time"
 import "core:net"
 import "./header_parser"
-import "./response_builder"
+import "./responder"
 import "./static"
 import "core:thread"
 import "core:sync/chan"
@@ -33,7 +33,7 @@ Handler :: struct {
     toRun: Handler_proc,
 }
 
-Handler_proc :: proc(Request, response_builder.Response)
+Handler_proc :: proc(Request, responder.Response)
 
 Endpoint :: struct {
     method: string,

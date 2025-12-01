@@ -11,17 +11,27 @@ Response :: struct {
     body: []u8   
 }
 
-Build :: proc(soc: net.TCP_Socket, res: Response) -> (n: int, err: net.TCP_Recv_Error) {
-    net.send_tcp(soc, PROTOCOL)
-    net.send_tcp(soc, {' '})
-
+Send :: proc(soc: net.TCP_Socket, res: Response) -> (n: int, err: net.TCP_Send_Error) {
+    n += net.send_tcp(soc, PROTOCOL) or_return
+    n += net.send_tcp(soc, {' '}) or_return
+ 
     status_bytes := status_to_bytes(res.status)
-    net.send_tcp(soc, status_bytes[:])
-    net.send_tcp(soc, {' '})
-
-    net.send_tcp(soc, )
-    net.send_tcp(soc, {'\r', '\n'})
-    
+    n += net.send_tcp(soc, status_bytes[:]) or_return
+    n += net.send_tcp(soc, {' '}) or_return
+ 
+    n += net.send_tcp(soc, transmute([]u8)status_to_reason_phrase(res.status)) or_return
+    n += net.send_tcp(soc, {'\r', '\n'}) or_return
+ 
+    for k, v in res.options {
+        n += net.send_tcp(soc, transmute([]u8)k) or_return
+        n += net.send_tcp(soc, {':'}) or_return
+        n += net.send_tcp(soc, transmute([]u8)v) or_return
+        n += net.send_tcp(soc, {'\r', '\n'}) or_return
+    }
+    n += net.send_tcp(soc, {'\r', '\n'}) or_return
+ 
+    n += net.send_tcp(soc, res.body) or_return
+    return
 }
 
 @(private="file")

@@ -11,5 +11,5 @@ load_whole_file :: proc (path: string) -> (file: []u8, len: int, err: os.Error) 
     buffer := make([]u8, info.size) or_return
     os.read(handle, buffer) or_return
 
-    return buffer, int(info.size),nil
+    return buffer, int(info.size), nil
 }
