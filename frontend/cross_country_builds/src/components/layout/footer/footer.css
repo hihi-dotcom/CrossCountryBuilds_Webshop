@@ -1,23 +1,20 @@
-.footersection{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-}
-.cimcimsor{
-    text-align: start;
-}
 
 
+.cim-section{
+    padding-right: 120px;
+    border-right: 3px solid whitesmoke;
+}
+
+.telefon-section{
+    padding-right: 180px;
+    border-right: 3px solid whitesmoke;
+}
 
 
 
 footer{
-    background-color: #333;
     color: white;
-    padding: 20px 0;
     position: relative;
     bottom: 0;
     width: 100%;
-    text-align: center;
 }
-
