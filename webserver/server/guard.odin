@@ -21,7 +21,6 @@ Send_Guard :: chan.Chan(Guard_Order, chan.Direction.Send)
 
 Guard_Work :: struct {
     work: Work,
-    record: Guard_Record
 }
 
 Guard_Order :: union {
@@ -29,14 +28,14 @@ Guard_Order :: union {
 }
 
 Guard_Record :: struct {
+    order: Guard_Order,
     lastHeard: time.Time,
-    priority: Priority
 }
 
 Guard_Proc :: proc(t: ^thread.Thread) {
     fmt.println("Guard thread started")
     gd := cast(^Guard_Data)t.data
-    to_watch: [dynamic]Guard_Order
+    to_watch: [dynamic]Guard_Record
 
     for {
         start_cycle := time.now()
@@ -49,26 +48,30 @@ Guard_Proc :: proc(t: ^thread.Thread) {
 
         for {
             if data, ok := chan.try_recv(gd.guard_chan) ; ok {
-                append(&to_watch, data)
+                append(&to_watch, Guard_Record {
+                    order = data,
+                    lastHeard = time.now()
+                })
             } else { break }
         }
 
-        for &order, index in to_watch {
-            switch &v in order {
+        for &record, index in to_watch {
+            switch &v in record.order {
                 case Guard_Work:
                     if state, ok := v.work.request.header.(^header_parser.Parser_State) ; ok {
                         n, err := net.recv_tcp(v.work.socket, state.header.header_data.data[state.header.header_data.end:])
+                        state.header.header_data.written += n
                         #partial switch err {
                             case .None:
-                                Set_Work(gd.send_chans, v.work, v.record.priority)
+                                Set_Work(gd.send_chans, v.work, .Medium)
                             case .Would_Block:
-                                if diff := time.diff(v.record.lastHeard, time.now()) ; diff > TIMEOUT {
+                                if diff := time.diff(record.lastHeard, time.now()) ; diff > TIMEOUT {
                                     fmt.println(diff, TIMEOUT)
-                                    clean_up_Guard_Order(&order)
+                                    clean_up_Guard_Order(&record.order)
                                     unordered_remove(&to_watch, index)
                                 } 
                             case:
-                                clean_up_Guard_Order(&order)
+                                clean_up_Guard_Order(&record.order)
                                 unordered_remove(&to_watch, index)
                         }
                     } else { log.panic("A guard should not be watching a completed header!") }

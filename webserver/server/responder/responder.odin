@@ -8,7 +8,7 @@ PROTOCOL : []u8 : {'H', 'T', 'T', 'P', '/', '1', '.', '1',}
 Response :: struct {
     status: int,
     options: map[string]string,
-    body: []u8   
+    body: []u8
 }
 
 Send :: proc(soc: net.TCP_Socket, res: Response) -> (n: int, err: net.TCP_Send_Error) {

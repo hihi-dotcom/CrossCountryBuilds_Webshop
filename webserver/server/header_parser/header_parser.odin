@@ -36,6 +36,7 @@ Options :: struct {
 Buffer :: struct {
     data: [HEADER_BUFFER_SIZE]u8,
     end: int,
+    written: int
 }
 
 Parser_State :: struct {
@@ -89,7 +90,7 @@ not_the_first_line :: proc(state: ^Parser_State) {
                             which = .Value
                             hit = false
                         }
-                    case 65..=90:
+                    case 'A'..='Z':
                         state.header.header_data.data[i] += 32
                         fallthrough
                     case:
@@ -108,7 +109,7 @@ not_the_first_line :: proc(state: ^Parser_State) {
                             state.header.pairs[string(state.header.header_data.data[spanss.key_start:spanss.key_end])] = string(state.header.header_data.data[spanss.value_start:spanss.value_end])
                         }
                     case ' ', ':', '\t': continue
-                    case 65..=90:
+                    case 'A'..='Z':
                         state.header.header_data.data[i] += 32
                         fallthrough
                     case: 

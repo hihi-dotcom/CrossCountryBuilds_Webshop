@@ -29,8 +29,8 @@ main :: proc() {
     /* for i in 0..=25 {
         fmt.println(rune('0' + i),'0' + i)
     } */
-    hehe := "something"[:]
-    fmt.println(hehe)
+
+    
 }
 
 hundreds_and_tens_and_ones :: proc(number: int) -> (hundreds: int, tens: int, ones: int) {

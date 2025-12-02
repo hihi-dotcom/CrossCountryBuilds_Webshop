@@ -20,8 +20,13 @@ Server :: struct {
     workers: u8,
 }
 
-Body :: string
+Body :: BodyBuffer
 Params :: map[string]string
+
+BodyBuffer :: struct {
+    data: []u8,
+    end: int
+}
 
 Request :: struct {
     params: Params,
@@ -110,7 +115,7 @@ make_Work_chans :: proc() -> (recv: Recv_Chans, send: Send_Chans, guard_send: Se
 }
 
 clean_up_Request :: proc(rq: Request) {
-    assert(rq.body == "") 
+    assert(len(rq.body.data) == 0) 
     delete(rq.params)
 
     switch v in rq.header {
