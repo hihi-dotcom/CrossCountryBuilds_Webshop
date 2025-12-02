@@ -1,8 +1,11 @@
-import { ProductCard } from "../components/termekcomponents/termekCard";
+import { Products } from "../components/termekcomponents/termekCardSor";
 
 
 export function Home(){
     return(
-        <ProductCard/>
+        <main>
+            
+            <Products/>
+        </main>
     );
 }

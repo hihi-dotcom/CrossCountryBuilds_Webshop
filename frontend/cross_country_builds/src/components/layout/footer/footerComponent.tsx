@@ -19,8 +19,8 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="flex sm:hidden justify-around text-center">
-          <button className=' bg-[#08415C] text-white px-4 py-2 rounded-xl'>Kapcsolatok</button>
+        <div className="flex sm:hidden justify-around text-center my-6 ">
+          <button className=' bg-[#08415C] text-white px-6 py-4  rounded-xl '>Kapcsolatok</button>
         </div>
     </footer>
   );
