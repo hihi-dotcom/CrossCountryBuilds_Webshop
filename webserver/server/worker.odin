@@ -62,14 +62,35 @@ try_body :: proc(wtd: ^Worker_Thread_Data, w: ^Work) -> (bool) {
     if header, ok := w.request.header.(^header_parser.Header) ; ok {
         if value, ok := header.pairs["content-length"] ; ok {
             if bodyLength, ok := strconv.parse_int(value) ; ok {
-                // itt
-            }
+                if len(w.request.body.data) == 0 {
+                    w.request.body.data = make([]u8, bodyLength)
+                }
 
+                    
+                
+            } else {
+                length_required(wtd, w)
+                return false
+            }
         } else if value, ok := header.pairs["transfer-encoding"] ; ok {
             if value == "chunked" do fmt.println("Chunked transfer is not implemented!")
+            length_required(wtd, w)
+            return false
         }
-        
     } else { log.panic("There should not be a header_state here.") }
+}
+
+@(private="file")
+length_required :: proc(wtd: ^Worker_Thread_Data, w: ^Work) {
+    responder.Send(w.socket, responder.Response {
+        status = 411
+    })
+    return_the_socket(wtd, w^)
+}
+
+@(private="file")
+rescue_data_from_header_buffer :: proc(wtd: ^Worker_Thread_Data, w: ^Work) {
+
 }
 
 @(private="file")
