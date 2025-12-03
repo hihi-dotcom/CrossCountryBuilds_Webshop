@@ -1,5 +1,6 @@
 package server
 
+import "core:text/regex/compiler"
 import "core:net"
 import "core:time"
 import "core:sync/chan"
@@ -18,6 +19,7 @@ Work :: struct {
 
 Worker_Thread_Data :: struct {
     chans: Recv_Chans,
+    sendChans: Send_Chans,
     guard: Send_Guard,
     server: Server
 }
@@ -32,11 +34,8 @@ Worker_Porc :: proc(t: ^thread.Thread) {
 
         if !try_header(wtd, &work) do continue
         if !try_body(wtd, &work) do continue
-        return_the_socket(wtd, work)
 
         fmt.println(string(work.request.body.data[:]))
-        
-        
 
         file, len, _ := static.load_whole_file("./root/hehe.html")
         testbuffer: [1024]u8
@@ -55,6 +54,8 @@ Worker_Porc :: proc(t: ^thread.Thread) {
         }
  
         n, _ := responder.Send(work.socket, res)
+
+        back_to_work(wtd, &work)
     }
 }
 
@@ -67,9 +68,7 @@ try_body :: proc(wtd: ^Worker_Thread_Data, w: ^Work) -> (bool) {
                     w.request.body.data = make([]u8, bodyLength)
                     rescue_data_from_header_buffer(wtd, w)
                 }
-                fmt.println(len(w.request.body.data), w.request.body.end, "_________________")
-                if len(w.request.body.data) != w.request.body.end {
-
+                for len(w.request.body.data) != w.request.body.end {
                     return try_recv(wtd, w)
                 }
                 return true
@@ -91,7 +90,7 @@ length_required :: proc(wtd: ^Worker_Thread_Data, w: ^Work) {
     responder.Send(w.socket, responder.Response {
         status = 411
     })
-    return_the_socket(wtd, w^)
+    back_to_work(wtd, w)
 }
 
 @(private="file")
@@ -99,7 +98,7 @@ rescue_data_from_header_buffer :: proc(wtd: ^Worker_Thread_Data, w: ^Work) {
     if header, ok := w.request.header.(^header_parser.Header) ; ok {
         n := copyer(header.header_data.data[header.header_data.end:header.header_data.end + len(w.request.body.data)], w.request.body.data[w.request.body.end:])
         w.request.body.end += n
-        header.header_data.end += n
+        header.header_data.written += n
     } else { log.panic("There should not be a header_state here.") }
 }
 
@@ -110,18 +109,22 @@ try_header :: proc(wtd: ^Worker_Thread_Data, w: ^Work) -> (ok: bool) {
         case ^header_parser.Header:
             return true
         case ^header_parser.Parser_State:
-            for {
+            //for {
                 switch header_parser.Parse(v) {
                     case .None:
-                        w.request.header = v.header
+                        tmp := v.header
+                        header_parser.parser_state_free(w.request.header.(^header_parser.Parser_State))
+                        w.request.header = tmp
                         return true
                     case .TooLong:
                         clean_up_Work(w)
                         return false
                     case .Partial:
                         if !try_recv(wtd, w) do return false
+                        Set_Work(wtd.sendChans, w^, .Medium)
+                        return false
                 }  
-            }
+            //}
         case: log.panic("You definitaly should not be here!")
     }
     log.panic("Neither here!")
@@ -132,7 +135,7 @@ try_recv :: proc(wtd: ^Worker_Thread_Data, w: ^Work) -> (bool) {
     recvErr: net.TCP_Recv_Error
     switch &v in w.request.header {
         case ^header_parser.Parser_State:
-            n, err := net.recv_tcp(w.socket, v.header.header_data.data[v.header.header_data.end:])
+            n, err := net.recv_tcp(w.socket, v.header.header_data.data[v.header.header_data.written:])
             recvErr = err
             v.header.header_data.written += n
         case ^header_parser.Header:
@@ -160,18 +163,13 @@ send_to_guard :: proc(wtd: ^Worker_Thread_Data, w: Work) -> (ok: bool) {
 }
 
 @(private="file")
-return_the_socket :: proc(wtd: ^Worker_Thread_Data, w: Work) {
+back_to_work :: proc(wtd: ^Worker_Thread_Data, w: ^Work) {
     if state, ok := w.request.header.(^header_parser.Header) ; ok {
-        newWork := Work {
-            socket = w.socket,
-            request = Request {
-                header = header_parser.parser_state_maker()
-            }
-        }
-        if newState, ok := newWork.request.header.(^header_parser.Parser_State) ; ok {
-            newState.header.header_data.written += copyer(state.header_data.data[state.header_data.end:state.header_data.written], newState.header.header_data.data[:])
-        } else do log.panic("???")
-        _ = send_to_guard(wtd, newWork)
+        newState := header_parser.parser_state_maker()
+        newState.header.header_data.written += copyer(state.header_data.data[state.header_data.end:state.header_data.written], newState.header.header_data.data[:])
+        clean_up_Request(&w.request)
+        w.request.header = newState
+        Set_Work(wtd.sendChans, w^, .Medium)
     } else do log.panic("There should not be a header_state here.")
 }
 
@@ -179,13 +177,12 @@ return_the_socket :: proc(wtd: ^Worker_Thread_Data, w: Work) {
 copyer :: proc(from: []u8, to: []u8, test := #caller_location) -> (n: int) {
     for v, i in from {
         to[i] = v
-        n = i
+        n += 1
     }
-    n += 1
     return
 }
 
 clean_up_Work :: proc(w: ^Work) {
     net.close(w.socket)
-    clean_up_Request(w.request)
+    clean_up_Request(&w.request)
 }

@@ -67,6 +67,7 @@ run :: proc(server: Server, port: int) {
     t2.init_context = context
     t2.data = &Worker_Thread_Data {
         chans = recv,
+        sendChans = send,
         guard = guard_send,
         server = server
     }
@@ -114,8 +115,11 @@ make_Work_chans :: proc() -> (recv: Recv_Chans, send: Send_Chans, guard_send: Se
     return
 }
 
-clean_up_Request :: proc(rq: Request) {
-    assert(len(rq.body.data) == 0) 
+clean_up_Request :: proc(rq: ^Request) {
+    if rq.body.end != 0 {
+        delete(rq.body.data)
+    } 
+    rq.body.end = 0
     delete(rq.params)
 
     switch v in rq.header {
