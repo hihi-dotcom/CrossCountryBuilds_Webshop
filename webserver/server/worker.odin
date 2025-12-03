@@ -33,6 +33,8 @@ Worker_Porc :: proc(t: ^thread.Thread) {
         if !try_header(wtd, &work) do continue
         if !try_body(wtd, &work) do continue
         return_the_socket(wtd, work)
+
+        fmt.println(string(work.request.body.data[:]))
         
         
 
@@ -62,12 +64,14 @@ try_body :: proc(wtd: ^Worker_Thread_Data, w: ^Work) -> (bool) {
     if header, ok := w.request.header.(^header_parser.Header) ; ok {
         if value, ok := header.pairs["content-length"] ; ok {
             if bodyLength, ok := strconv.parse_int(value) ; ok {
-                if len(w.request.body.data) == 0 {
+                if len(w.request.body.data) != bodyLength {
                     w.request.body.data = make([]u8, bodyLength)
+                    rescue_data_from_header_buffer(wtd, w)
                 }
-
-                    
-                
+                if len(w.request.body.data) != w.request.body.end {
+                    return try_recv(wtd, w)
+                }
+                return true
             } else {
                 length_required(wtd, w)
                 return false
@@ -76,8 +80,9 @@ try_body :: proc(wtd: ^Worker_Thread_Data, w: ^Work) -> (bool) {
             if value == "chunked" do fmt.println("Chunked transfer is not implemented!")
             length_required(wtd, w)
             return false
-        }
+        } 
     } else { log.panic("There should not be a header_state here.") }
+    return true
 }
 
 @(private="file")
@@ -90,7 +95,9 @@ length_required :: proc(wtd: ^Worker_Thread_Data, w: ^Work) {
 
 @(private="file")
 rescue_data_from_header_buffer :: proc(wtd: ^Worker_Thread_Data, w: ^Work) {
-
+    if header, ok := w.request.header.(^header_parser.Header) ; ok {
+        w.request.body.end += copyer(header.header_data.data[header.header_data.end:header.header_data.written], w.request.body.data[w.request.body.end:])
+    } else { log.panic("There should not be a header_state here.") }
 }
 
 @(private="file")
@@ -119,20 +126,28 @@ try_header :: proc(wtd: ^Worker_Thread_Data, w: ^Work) -> (ok: bool) {
 
 @(private="file")
 try_recv :: proc(wtd: ^Worker_Thread_Data, w: ^Work) -> (bool) {
-    if state, ok := w.request.header.(^header_parser.Parser_State) ; ok {
-        n, recvErr := net.recv_tcp(w.socket, state.header.header_data.data[state.header.header_data.end:])
-        state.header.header_data.written += n
-        #partial switch recvErr {
-            case .Would_Block:
-                return send_to_guard(wtd, w^)
-            case .None:
-                return true
-            case:
-                clean_up_Work(w)
-                return false
-        }
-    } else { log.panic("The header was done, so it should not be here.")}
-    log.panic("You should not be here!")
+    recvErr: net.TCP_Recv_Error
+    switch &v in w.request.header {
+        case ^header_parser.Parser_State:
+            n, err := net.recv_tcp(w.socket, v.header.header_data.data[v.header.header_data.end:])
+            recvErr = err
+            v.header.header_data.written += n
+        case ^header_parser.Header:
+            n, err := net.recv_tcp(w.socket, w.request.body.data[w.request.body.end:])
+            recvErr = err
+            w.request.body.end += n
+        case: log.panic("there is someting wrong here!")
+    }
+    #partial switch recvErr {
+        case .Would_Block:
+            return send_to_guard(wtd, w^)
+        case .None:
+            return true
+        case:
+            clean_up_Work(w)
+            return false
+    }
+    log.panic("You shold not be here!")
 }
 
 @(private="file")
@@ -151,7 +166,7 @@ return_the_socket :: proc(wtd: ^Worker_Thread_Data, w: Work) {
             }
         }
         if newState, ok := newWork.request.header.(^header_parser.Parser_State) ; ok {
-            newState.header.header_data.written = copyer(state.header_data.data[state.header_data.end:state.header_data.written], newState.header.header_data.data[:])
+            newState.header.header_data.written += copyer(state.header_data.data[state.header_data.end:state.header_data.written], newState.header.header_data.data[:])
         } else do log.panic("???")
         _ = send_to_guard(wtd, newWork)
     } else do log.panic("There should not be a header_state here.")

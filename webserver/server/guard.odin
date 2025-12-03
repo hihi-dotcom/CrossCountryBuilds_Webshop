@@ -60,37 +60,9 @@ Guard_Proc :: proc(t: ^thread.Thread) {
                 case Guard_Work:
                     switch state in v.work.request.header{
                         case ^header_parser.Parser_State:
-                            n, err := net.recv_tcp(v.work.socket, state.header.header_data.data[state.header.header_data.end:])
-                            state.header.header_data.written += n
-                            #partial switch err {
-                                case .None:
-                                    Set_Work(gd.send_chans, v.work, .Medium)
-                                case .Would_Block:
-                                    if diff := time.diff(record.lastHeard, time.now()) ; diff > TIMEOUT {
-                                        fmt.println(diff, TIMEOUT)
-                                        clean_up_Guard_Order(&record.order)
-                                        unordered_remove(&to_watch, index)
-                                    } 
-                                case:
-                                    clean_up_Guard_Order(&record.order)
-                                    unordered_remove(&to_watch, index)
-                            }
+                            try_recv(gd, &v.work, state.header.header_data.data[state.header.header_data.end:], &record, &to_watch, index)
                         case ^header_parser.Header:
-                            n, err := net.recv_tcp(v.work.socket, v.work.request.body.data[v.work.request.body.end:])
-                            v.work.request.body.end += n
-                            #partial switch err {
-                                case .None:
-                                    Set_Work(gd.send_chans, v.work, .Medium)
-                                case .Would_Block:
-                                    if diff := time.diff(record.lastHeard, time.now()) ; diff > TIMEOUT {
-                                        fmt.println(diff, TIMEOUT)
-                                        clean_up_Guard_Order(&record.order)
-                                        unordered_remove(&to_watch, index)
-                                    }
-                                case:
-                                    clean_up_Guard_Order(&record.order)
-                                    unordered_remove(&to_watch, index)
-                            }
+                            try_recv(gd, &v.work, v.work.request.body.data[v.work.request.body.end:], &record, &to_watch, index)
                         case: log.panic("This should not be nil!")
                     }
                 case: log.panic("You problalbly not implemented an order for the guard!")
