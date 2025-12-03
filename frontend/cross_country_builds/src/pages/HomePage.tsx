@@ -4,11 +4,9 @@ import { DateTimeSection } from "../components/dateTimeforpagescomponents/dateti
 
 export function Home(){
     return(
-        <main> 
-            <div>
-                <DateTimeSection/>
-            </div> 
-            <div className="flex flex-col md:flex-row gap-10 px-10 py-10">
+        <main className="flex flex-col gap-10 px-10 py-10"> 
+            <DateTimeSection/>
+            <div className="flex flex-col md:flex-row gap-10">  
                 <div>
                     <Szurok/>
                 </div>
