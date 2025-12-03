@@ -74,7 +74,13 @@ Guard_Proc :: proc(t: ^thread.Thread) {
 @(private="file")
 try_recv :: proc(gd: ^Guard_Data, w: ^Work, to: []u8, record: ^Guard_Record, list: ^[dynamic]Guard_Record, index: int) {
     n, err := net.recv_tcp(w.socket, to)
-    w.request.body.end += n
+    switch &v in w.request.header {
+        case ^header_parser.Parser_State:
+            v.header.header_data.written += n
+        case ^header_parser.Header:
+            w.request.body.end += n
+        case: log.panic("There problem might be!")
+    }
     #partial switch err {
         case .None:
             Set_Work(gd.send_chans, w^, .Medium)

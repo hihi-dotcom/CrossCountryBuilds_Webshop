@@ -55,7 +55,6 @@ Worker_Porc :: proc(t: ^thread.Thread) {
         }
  
         n, _ := responder.Send(work.socket, res)
-        fmt.println(n)
     }
 }
 
@@ -68,7 +67,9 @@ try_body :: proc(wtd: ^Worker_Thread_Data, w: ^Work) -> (bool) {
                     w.request.body.data = make([]u8, bodyLength)
                     rescue_data_from_header_buffer(wtd, w)
                 }
+                fmt.println(len(w.request.body.data), w.request.body.end, "_________________")
                 if len(w.request.body.data) != w.request.body.end {
+
                     return try_recv(wtd, w)
                 }
                 return true
@@ -96,7 +97,9 @@ length_required :: proc(wtd: ^Worker_Thread_Data, w: ^Work) {
 @(private="file")
 rescue_data_from_header_buffer :: proc(wtd: ^Worker_Thread_Data, w: ^Work) {
     if header, ok := w.request.header.(^header_parser.Header) ; ok {
-        w.request.body.end += copyer(header.header_data.data[header.header_data.end:header.header_data.written], w.request.body.data[w.request.body.end:])
+        n := copyer(header.header_data.data[header.header_data.end:header.header_data.end + len(w.request.body.data)], w.request.body.data[w.request.body.end:])
+        w.request.body.end += n
+        header.header_data.end += n
     } else { log.panic("There should not be a header_state here.") }
 }
 
@@ -173,7 +176,7 @@ return_the_socket :: proc(wtd: ^Worker_Thread_Data, w: Work) {
 }
 
 @(private="file")
-copyer :: proc(from: []u8, to: []u8) -> (n: int) {
+copyer :: proc(from: []u8, to: []u8, test := #caller_location) -> (n: int) {
     for v, i in from {
         to[i] = v
         n = i
