@@ -109,7 +109,7 @@ try_header :: proc(wtd: ^Worker_Thread_Data, w: ^Work) -> (ok: bool) {
         case ^header_parser.Header:
             return true
         case ^header_parser.Parser_State:
-            //for {
+            for {
                 switch header_parser.Parse(v) {
                     case .None:
                         tmp := v.header
@@ -121,10 +121,8 @@ try_header :: proc(wtd: ^Worker_Thread_Data, w: ^Work) -> (ok: bool) {
                         return false
                     case .Partial:
                         if !try_recv(wtd, w) do return false
-                        Set_Work(wtd.sendChans, w^, .Medium)
-                        return false
                 }  
-            //}
+            }
         case: log.panic("You definitaly should not be here!")
     }
     log.panic("Neither here!")
@@ -147,7 +145,7 @@ try_recv :: proc(wtd: ^Worker_Thread_Data, w: ^Work) -> (bool) {
     #partial switch recvErr {
         case .Would_Block:
             return send_to_guard(wtd, w^)
-        case .None:
+        case nil:
             return true
         case:
             clean_up_Work(w)

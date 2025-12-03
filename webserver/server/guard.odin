@@ -82,7 +82,7 @@ try_recv :: proc(gd: ^Guard_Data, w: ^Work, to: []u8, record: ^Guard_Record, lis
         case: log.panic("There problem might be!")
     }
     #partial switch err {
-        case .None:
+        case nil:
             Set_Work(gd.send_chans, w^, .Medium)
             unordered_remove(list, index)
         case .Would_Block:

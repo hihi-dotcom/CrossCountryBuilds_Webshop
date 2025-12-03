@@ -92,10 +92,10 @@ make_Work_chans :: proc() -> (recv: Recv_Chans, send: Send_Chans, guard_send: Se
     
     sema := new(sync.Sema)
 
-    assert(cerr1 == .None)
-    assert(cerr2 == .None)
-    assert(cerr3 == .None)
-    assert(cerr4 == .None)
+    assert(cerr1 == nil)
+    assert(cerr2 == nil)
+    assert(cerr3 == nil)
+    assert(cerr4 == nil)
     
     recv = Recv_Chans {
         high = chan.as_recv(high),
