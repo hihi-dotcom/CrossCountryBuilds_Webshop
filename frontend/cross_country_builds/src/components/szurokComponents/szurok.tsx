@@ -1,15 +1,16 @@
 import { TextInput } from "../formFieldComponents/inputwithPlaceholder";
 import { FormField } from "../formFieldComponents/textField";
 
+
 export function Szurok() {
     return (
-        <div className="szurok p-8 bg-[#6b818c] rounded-2xl max-w-md mx-auto ">
+        <div className="szurok p-8 bg-[#6b818c] rounded-2xl max-w-md mx-auto mt-5">
 
             <h1 className="text-center text-4xl font-semibold text-slate-100 mb-8">
                 Keresés
             </h1>
 
-            {/* Termék név + gyártó */}
+            
             <div className="space-y-6 w-full">
 
                 <FormField
@@ -26,7 +27,7 @@ export function Szurok() {
 
             </div>
 
-            {/* Termék ára */}
+           
             <div className="mt-8 w-full">
                 <label className="block text-slate-100 mb-2">Termék ára:</label>
 
@@ -49,7 +50,7 @@ export function Szurok() {
                 </div>
             </div>
 
-            {/* Gomb */}
+        
             <button
                 type="button"
                 className="mt-10 block mx-auto bg-[#cc2936] text-amber-50 py-3 px-8 
@@ -59,6 +60,8 @@ export function Szurok() {
                 Keresés
             </button>
         </div>
+
+
     );
 
 
