@@ -1,5 +1,6 @@
 interface FieldProps{
-    label: string;
+    label: string,
+
 }
 
 export function Field({label}: FieldProps){

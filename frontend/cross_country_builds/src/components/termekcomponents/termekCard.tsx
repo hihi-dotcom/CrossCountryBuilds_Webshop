@@ -1,13 +1,6 @@
 
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"
-
-interface ProductProps {
-    kep: string
-    name: string;
-    category: string;
-    maker: string;
-    price: number;
-}
+import type ProductProps  from "../../models/productProps";
 
 export function Product({kep, name, category, maker, price}: ProductProps){
 
