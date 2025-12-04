@@ -5,14 +5,9 @@ import "core:fmt"
 import "core:time"
 
 main :: proc () {
-    s := "asdf"
-    n := 0
-    for i := n ; i < 2 ; i += 1 {
-        n += 1
-        fmt.println(rune(s[i]))
-    }
-    for i := n ; i < len(s) ; i += 1 {
-        fmt.println(rune(s[i]))
+    b: []u8
+    for {
+        delete(b)
     }
 }
 
@@ -42,4 +37,15 @@ soc, _ := net.listen_tcp(net.Endpoint { address = net.IP4_Address([4]u8{0,0,0,0}
     }
     
     fmt.println(nil)
+
+
+    s := "asdf"
+    n := 0
+    for i := n ; i < 2 ; i += 1 {
+        n += 1
+        fmt.println(rune(s[i]))
+    }
+    for i := n ; i < len(s) ; i += 1 {
+        fmt.println(rune(s[i]))
+    }
 `

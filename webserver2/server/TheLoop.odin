@@ -10,8 +10,11 @@ TIMEOUT :: 5 * time.Second
 MAX_HEADER_LENGTH :: 1024 //8192
 
 Server :: struct {
-
+    handlers: map[string]Handler
 }
+
+Handler :: proc ()
+
 
 BodyBuffer :: struct {
     data: []u8,
@@ -38,6 +41,13 @@ run :: proc (server: Server, port: int) {
     conns: [dynamic]Conn
     listener := init_listener_soc(port)
 
+    file, read, _ := load_whole_file("./root/hehe.html")
+
+    b: [1024]u8
+    testResponse: Response
+    testResponse.status = 200
+    testResponse.options["content-length"] = fmt.bprint(b[:], read)
+    testResponse.body = file
     for {
         cycle_start := time.now()
         defer {
@@ -48,16 +58,36 @@ run :: proc (server: Server, port: int) {
         }
 
         listen(&conns, listener)
-
         make_headers(&conns)
 
-        for v, i in conns {
-            if !v.req.header.done {
-                fmt.println(v)
-            }  
+        for &v, i in conns {
+            if v.req.header.done {
+                Send(v.soc.soc, testResponse)
+                return_Conn(&v)
+            }
         }
-
     }
+}
+
+return_Conn :: proc (conn: ^Conn) {
+    if conn.req.body.written != 0 {
+        delete(conn.req.body.data)
+    }
+    new: Request
+    new.header.buf.written += copyer(excess_header_data(&conn.req.header), new.header.buf.data[:])
+    conn.req = new
+}
+
+excess_header_data :: proc (header: ^Header) -> []u8 {
+    return header.buf.data[header.buf.end:header.buf.written]
+}
+
+copyer :: proc (from: []u8, to: []u8) -> (written: int) {
+    for b, i in from {
+        to[i] = b
+        written += 1
+    }
+    return
 }
 
 @(private="file")
