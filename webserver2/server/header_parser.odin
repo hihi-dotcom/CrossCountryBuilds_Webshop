@@ -2,12 +2,28 @@
 
 package loop
 
-Parse :: proc(header: ^Header) {
-    is_header_data_whole(header) 
-    first_line(header, "method")
-    first_line(header, "path")
-    first_line(header, "protocol")
-    not_the_first_line(header)
+HeaderBuffer :: struct {
+    data: [MAX_HEADER_LENGTH]u8,
+    end: int,
+    written: int
+}
+
+Header :: struct {
+    pairs: map[string]string,
+    buf: HeaderBuffer,
+    done: bool
+}
+
+Parse :: proc(header: ^Header) -> bool {
+    if header.done do return true
+    is_header_data_whole(header) or_return
+    if !header.done do return true
+    cursor := 0
+    first_line(&cursor, header, "method")
+    first_line(&cursor, header, "path")
+    first_line(&cursor, header, "protocol")
+    not_the_first_line(&cursor, header)
+    return true
 }
 
 @(private="file")
@@ -18,52 +34,57 @@ k_or_v :: enum {
 
 @(private="file")
 spans :: struct {
-    key_start: int,
-    value_start: int,
-    key_end: int,
-    value_end: int
+    key: start_and_end,
+    value: start_and_end
 }
 
 @(private="file")
-not_the_first_line :: proc(state: ^Header) {
+start_and_end :: struct {
+    start: int,
+    end: int
+}
+
+
+@(private="file")
+not_the_first_line :: proc(cursor: ^int, header: ^Header) {
     which: k_or_v = .Key
     hit := false
     spanss: spans
-    for i := state.cursor ; i < state.header.header_data.end - 1 ; i += 1 {
+    for i := cursor^ ; i < header.buf.end ; i += 1 {
         switch which {
             case .Key:
-                switch state.header.header_data.data[i] {
+                switch header.buf.data[i] {
                     case ' ',  '\r', '\n', ':', '\t':
                         if hit {
-                            spanss.key_end = i
+                            spanss.key.end = i
                             which = .Value
                             hit = false
                         }
                     case 'A'..='Z':
-                        state.header.header_data.data[i] += 32
+                        header.buf.data[i] += 32
                         fallthrough
                     case:
                         if !hit {
                             hit = true
-                            spanss.key_start = i
+                            spanss.key.start = i
                         }
                 }
             case .Value:
-                switch state.header.header_data.data[i] {
+                switch header.buf.data[i] {
                     case '\r', '\n':
                         if hit {
-                            spanss.value_end = i
+                            spanss.value.end = i
                             which = .Key
                             hit = false
-                            state.header.pairs[string(state.header.header_data.data[spanss.key_start:spanss.key_end])] = string(state.header.header_data.data[spanss.value_start:spanss.value_end])
+                            header.pairs[string(header.buf.data[spanss.key.start:spanss.key.end])] = string(header.buf.data[spanss.value.start:spanss.value.end])
                         }
                     case ' ', ':', '\t': continue
                     case 'A'..='Z':
-                        state.header.header_data.data[i] += 32
+                        header.buf.data[i] += 32
                         fallthrough
                     case: 
                         if !hit {
-                            spanss.value_start = i
+                            spanss.value.start = i
                             hit = true
                         }
                 }
@@ -72,15 +93,15 @@ not_the_first_line :: proc(state: ^Header) {
 }
 
 @(private="file")
-first_line :: proc(state: ^Parser_State, key: string) {
-    start := state.cursor
+first_line :: proc(cursor: ^int, header: ^Header, key: string) {
     hit := false
-    for i := state.cursor ; i < state.header.header_data.end - 1 ; i += 1 {
-        switch state.header.header_data.data[i] {
+    start := 0
+    for i := cursor^ ; i < header.buf.end ; i += 1 {
+        cursor^ += 1
+        switch header.buf.data[i] {
             case ' ',  '\r', '\n', '\t':
                 if hit {
-                    state.header.pairs[key] = string(state.header.header_data.data[start:i])
-                    state.cursor = i
+                    header.pairs[key] = string(header.buf.data[start:i])
                     return
                 }
             case:
@@ -93,21 +114,22 @@ first_line :: proc(state: ^Parser_State, key: string) {
 }
 
 @(private="file")
-is_header_data_whole :: proc(state: ^Parser_State) -> (err: Parse_Error) {
-    for i := state.header.header_data.end ; i < len(state.header.header_data.data) ; i += 1 {
-        switch state.header.header_data.data[i] {
+is_header_data_whole :: proc(header: ^Header) -> bool {
+    line_break := 0
+    for i := 0 ; i < header.buf.written ; i += 1 {
+        switch header.buf.data[i] {
             case '\r', '\n':
-                state.line_break += 1
-            case 0:
-                state.header.header_data.end = i
-                return .Partial 
-            case: 
-                state.line_break = 0
+                line_break += 1
+            case:
+                line_break = 0
         }
-        if state.line_break == 4 {
-            state.header.header_data.end = i + 1
-            return .None
+        if line_break == 4 {
+            header.done = true
+            if i == 0 do header.buf.end = 0
+            else do header.buf.end = i + 1
+            break
         }
     }
-    return .TooLong
+    if len(header.buf.data) == header.buf.written && !header.done do return false
+    return true
 }

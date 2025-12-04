@@ -5,8 +5,19 @@ import "core:fmt"
 import "core:time"
 
 main :: proc () {
-    
-    soc, _ := net.listen_tcp(net.Endpoint { address = net.IP4_Address([4]u8{0,0,0,0}), port = 30001} )
+    s := "asdf"
+    n := 0
+    for i := n ; i < 2 ; i += 1 {
+        n += 1
+        fmt.println(rune(s[i]))
+    }
+    for i := n ; i < len(s) ; i += 1 {
+        fmt.println(rune(s[i]))
+    }
+}
+
+a := `
+soc, _ := net.listen_tcp(net.Endpoint { address = net.IP4_Address([4]u8{0,0,0,0}), port = 30001} )
     net.set_blocking(soc, false)
 
     c: net.TCP_Socket
@@ -31,4 +42,4 @@ main :: proc () {
     }
     
     fmt.println(nil)
-}
+`
