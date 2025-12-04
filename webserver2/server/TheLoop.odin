@@ -1,5 +1,6 @@
 package loop
 
+import "core:container/intrusive/list"
 import "core:net"
 import "core:time"
 import "core:log"
@@ -10,11 +11,17 @@ TIMEOUT :: 5 * time.Second
 MAX_HEADER_LENGTH :: 1024 //8192
 
 Server :: struct {
-    handlers: map[string]Handler
+    handlers: map[Endpoint][]Handler
 }
 
-Handler :: proc ()
+Endpoint :: [2]string
 
+Handler :: proc (req: ^Request, res: ^Response)
+
+Maybe_More :: union {
+    Handler,
+    []Handler
+}
 
 BodyBuffer :: struct {
     data: []u8,
@@ -36,18 +43,24 @@ Conn :: struct {
     req: Request
 }
 
+add :: proc (server: ^Server, ep: Endpoint, handlers: ..Maybe_More) {
+    count := 0
+    for h in handlers {
+        switch v in h {
+            case Handler:
+
+            case []Handler:
+                
+            case: log.panic("???")
+        }
+    }
+}
+
 run :: proc (server: Server, port: int) {
     context.logger = log.create_console_logger()
     conns: [dynamic]Conn
     listener := init_listener_soc(port)
 
-    file, read, _ := load_whole_file("./root/hehe.html")
-
-    b: [1024]u8
-    testResponse: Response
-    testResponse.status = 200
-    testResponse.options["content-length"] = fmt.bprint(b[:], read)
-    testResponse.body = file
     for {
         cycle_start := time.now()
         defer {
@@ -62,10 +75,10 @@ run :: proc (server: Server, port: int) {
 
         for &v, i in conns {
             if v.req.header.done {
-                Send(v.soc.soc, testResponse)
-                return_Conn(&v)
+
             }
         }
+        fmt.println(len(conns))
     }
 }
 
@@ -159,5 +172,18 @@ clean_up_Conn :: proc (conn: ^Conn) {
     }
     net.close(conn.soc.soc)
 }
+
+e := `
+file, read, _ := load_whole_file("./root/hehe.html")
+
+    fmt.println(string(file[:]), read)
+
+    b: [1024]u8
+    testResponse: Response
+    testResponse.status = 200
+    testResponse.options["content-length"] = fmt.bprint(b[:], read)
+    testResponse.options["content-type"] = "text/html"
+    testResponse.body = file
+`
 
  

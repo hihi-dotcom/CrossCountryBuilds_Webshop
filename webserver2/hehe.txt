@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+<body>
+    <h1>hehe</h1>
+    <button id="theButton">THE BUTTON</button>
+    <script>
+        async function doSomething(e) {
+            const response = await fetch("127.0.0.1:30000", {
+                method: "POST",
+                body: "hehehe"
+            })
+            console.log(await response.text())
+        }
+        document.getElementById("theButton").onclick = doSomething
+    </script>
+</body>
+</html>
