@@ -5,14 +5,33 @@ import "core:fmt"
 import "core:time"
 
 main :: proc () {
-    b: []u8
+    b: [512]u8
+    soc, _ := net.listen_tcp(net.Endpoint { address = net.IP4_Address([4]u8{0,0,0,0}), port = 30001} )
+    net.set_blocking(soc, false)
+
+    c: net.TCP_Socket
+    err: net.Accept_Error
     for {
-        delete(b)
+        time.sleep(1 * time.Second)
+        c, _, err = net.accept_tcp(soc)
+        fmt.println(c, err)
+        if err == nil do break
+    }
+
+    net.set_blocking(c, false)
+    
+    for {
+        time.sleep(1 * time.Second)
+        n, err := net.recv_tcp(c, b[0:0])
+        fmt.println(n, err)
+        if err != .None && err != .Would_Block {
+            fmt.println(err, n)
+        }
     }
 }
 
 a := `
-soc, _ := net.listen_tcp(net.Endpoint { address = net.IP4_Address([4]u8{0,0,0,0}), port = 30001} )
+
     net.set_blocking(soc, false)
 
     c: net.TCP_Socket

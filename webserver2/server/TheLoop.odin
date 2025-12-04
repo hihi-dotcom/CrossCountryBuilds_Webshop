@@ -1,26 +1,32 @@
 package loop
 
-import "core:container/intrusive/list"
 import "core:net"
 import "core:time"
 import "core:log"
-import "core:fmt"
 
 TICK :: 100 * time.Millisecond
 TIMEOUT :: 5 * time.Second
 MAX_HEADER_LENGTH :: 1024 //8192
 
 Server :: struct {
-    handlers: map[Endpoint][]Handler
+    global: [dynamic]Handler,
+    handlers: map[Endpoint][dynamic]Handler
 }
 
 Endpoint :: [2]string
 
-Handler :: proc (req: ^Request, res: ^Response)
+Handler :: proc (conn: ^Conn) -> Appeal
 
 Maybe_More :: union {
     Handler,
     []Handler
+}
+
+Appeal :: enum {
+    None,
+    Retry,
+    Error,
+    Stop
 }
 
 BodyBuffer :: struct {
@@ -43,17 +49,17 @@ Conn :: struct {
     req: Request
 }
 
-add :: proc (server: ^Server, ep: Endpoint, handlers: ..Maybe_More) {
-    count := 0
-    for h in handlers {
-        switch v in h {
-            case Handler:
-
-            case []Handler:
-                
-            case: log.panic("???")
-        }
+use :: proc (server: ^Server, handlers: ..Maybe_More) {
+    concatonated := concatenate_handlers(..handlers)
+    for h in concatonated {
+        append(&server.global, h) 
     }
+    delete(concatonated)
+}
+
+add :: proc (server: ^Server, ep: Endpoint, handlers: ..Maybe_More) {
+    concatenated := concatenate_handlers(..handlers)
+    server.handlers[ep] = concatenated
 }
 
 run :: proc (server: Server, port: int) {
@@ -72,29 +78,77 @@ run :: proc (server: Server, port: int) {
 
         listen(&conns, listener)
         make_headers(&conns)
-
-        for &v, i in conns {
-            if v.req.header.done {
-
-            }
-        }
-        fmt.println(len(conns))
+        serve(server, &conns)
     }
 }
 
-return_Conn :: proc (conn: ^Conn) {
-    if conn.req.body.written != 0 {
-        delete(conn.req.body.data)
+@(private="file")
+serve :: proc (server: Server, conns: ^[dynamic]Conn) {
+    for &conn, i in conns {
+        if conn.req.header.done {
+            res: Response
+            if !run_handlers(&conn, conns, i, server.global) do continue
+            if handler, ok := server.handlers[{conn.req.header.pairs["method"], conn.req.header.pairs["path"]}] ; ok {
+                if !run_handlers(&conn, conns, i, handler) do continue
+            } else {
+                Send(&conn.soc, Response { status = 404 } )
+                clean_up_Conn(&conn)
+                unordered_remove(conns, i)
+            }
+        }
+    }   
+}
+
+@(private="file")
+run_handlers :: proc (conn: ^Conn, conns: ^[dynamic]Conn, index: int, handlers: [dynamic]Handler) -> bool {
+    err: Appeal
+    for h in handlers {
+        err = h(conn)
+        if err == .Retry || err == .Stop || err == .Error do break
     }
+    if err == .Retry do return false
+    if err == .Stop {
+        return_Conn(conn)
+        return false
+    }
+    if err == .Error {
+        clean_up_Conn(conn)
+        unordered_remove(conns, index)
+        return false
+    }
+    return true
+}
+
+@(private="file")
+concatenate_handlers :: proc (handlers: ..Maybe_More) -> (hlist: [dynamic]Handler) {
+    for maybe, i in handlers {
+        switch v in maybe {
+            case Handler:
+                append(&hlist, v)
+            case []Handler:
+                for h in v do append(&hlist, h) 
+            case: log.panic("???")
+        }
+    }
+    return
+}
+ 
+@(private="file")
+return_Conn :: proc (conn: ^Conn) {
+    delete(conn.req.body.data)
+    delete(conn.req.header.pairs)
     new: Request
-    new.header.buf.written += copyer(excess_header_data(&conn.req.header), new.header.buf.data[:])
+    new.header.buf.written += excess_header_data(&conn.req.header, new.header.buf.data[:])
     conn.req = new
 }
 
-excess_header_data :: proc (header: ^Header) -> []u8 {
-    return header.buf.data[header.buf.end:header.buf.written]
+excess_header_data :: proc (header: ^Header, to: []u8) -> (n: int) {
+    n = copyer(header.buf.data[header.buf.end:header.buf.written], to)
+    header.buf.end += n
+    return n
 }
 
+@(private="file")
 copyer :: proc (from: []u8, to: []u8) -> (written: int) {
     for b, i in from {
         to[i] = b
@@ -139,6 +193,7 @@ make_headers :: proc (conns: ^[dynamic]Conn) {
 
 @(private="file")
 get_header :: proc (conn: ^Conn) -> bool {
+    Parse(&conn.req.header) or_return
     recv_header(conn) or_return
     Parse(&conn.req.header) or_return
     return true
@@ -151,7 +206,6 @@ recv_header :: proc (conn: ^Conn) -> bool {
     return ok
 }
 
-@(private="file")
 recv :: proc (soc: ^Socket, to: []u8) -> (recived: int, ok: bool) {
     n, recvErr := net.recv_tcp(soc.soc, to)
     #partial switch recvErr {
@@ -167,23 +221,8 @@ recv :: proc (soc: ^Socket, to: []u8) -> (recived: int, ok: bool) {
 
 @(private="file")
 clean_up_Conn :: proc (conn: ^Conn) {
-    if conn.req.body.written != 0 {
-        delete(conn.req.body.data)
-    }
+    delete(conn.req.body.data)
+    delete(conn.req.header.pairs)
+
     net.close(conn.soc.soc)
 }
-
-e := `
-file, read, _ := load_whole_file("./root/hehe.html")
-
-    fmt.println(string(file[:]), read)
-
-    b: [1024]u8
-    testResponse: Response
-    testResponse.status = 200
-    testResponse.options["content-length"] = fmt.bprint(b[:], read)
-    testResponse.options["content-type"] = "text/html"
-    testResponse.body = file
-`
-
- 

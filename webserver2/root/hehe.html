@@ -7,7 +7,7 @@
     <button id="theButton">THE BUTTON</button>
     <script>
         async function doSomething(e) {
-            const response = await fetch("127.0.0.1:30000", {
+            const response = await fetch("http://127.0.0.1:30000/", {
                 method: "POST",
                 body: "hehehe"
             })
@@ -17,14 +17,13 @@
     </script>
     <script>
         async function hehe() {
-    let counter = 0
-    while (true) {
-        await fetch("http://127.0.0.1:30000")
-        counter ++
-        console.log(counter)
-    }
-}
-hehe()
+            let counter = 0
+            while (true) {
+                await fetch("http://127.0.0.1:30000")
+                counter ++
+                console.log(counter)
+            }
+        }
     </script>
 </body>
 </html>

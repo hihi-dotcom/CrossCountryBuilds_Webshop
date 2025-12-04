@@ -1,6 +1,7 @@
 package loop
 
 import "core:net"
+import "core:time"
 
 @(private="file")
 PROTOCOL : []u8 : {'H', 'T', 'T', 'P', '/', '1', '.', '1',}
@@ -11,9 +12,10 @@ Response :: struct {
     body: []u8
 }
 
-Send :: proc (soc: net.TCP_Socket, res: Response) -> (n: int, ok: bool) {
-    written, err := try_send(soc, res)
+Send :: proc (soc: ^Socket, res: Response) -> (n: int, ok: bool) {
+    written, err := try_send(soc.soc, res)
     if err == nil {
+        soc.last_heard = time.now()
         return written, true
     } else {
         return 0, false
