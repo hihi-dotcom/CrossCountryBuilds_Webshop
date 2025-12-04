@@ -19,7 +19,8 @@ HeaderBuffer :: struct {
 
 Header :: struct {
     pairs: map[string]string,
-    buf: HeaderBuffer
+    buf: HeaderBuffer,
+    done: bool
 }
 
 BodyBuffer :: struct {
@@ -28,7 +29,7 @@ BodyBuffer :: struct {
 }
 
 Request :: struct {
-    header: Header, 
+    header: Header,
     body: BodyBuffer
 }
 
@@ -88,8 +89,12 @@ listen :: proc (conns: ^[dynamic]Conn, soc: net.TCP_Socket) {
     }
 }
 
-get_header :: proc (conns: ^[dynamic]Conn, ) {
+get_header :: proc (conns: ^[dynamic]Conn, ) -> (err: net.TCP_Recv_Error) {
+    for &conn, i in conns {
+        conn.req.header.buf.written += net.recv_tcp(conn.soc, conn.req.header.buf.data[:]) or_return
+        
 
+    }
 }
 
 
