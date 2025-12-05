@@ -3,6 +3,8 @@ package loop
 import "core:net"
 import "core:time"
 import "core:log"
+import "core:c/libc"
+import "core:fmt"
 
 TICK :: 100 * time.Millisecond
 TIMEOUT :: 5 * time.Second
@@ -62,12 +64,14 @@ add :: proc (server: ^Server, ep: Endpoint, handlers: ..Maybe_More) {
     server.handlers[ep] = concatenated
 }
 
+should_stop := false
 run :: proc (server: Server, port: int) {
     context.logger = log.create_console_logger()
+    signal := libc.signal(libc.SIGINT, proc "c" (i: i32) { if i == libc.SIGINT do should_stop = true  })
     conns: [dynamic]Conn
     listener := init_listener_soc(port)
 
-    for {
+    for !should_stop || len(conns) != 0 {
         cycle_start := time.now()
         defer {
             cycle_end := time.now()
@@ -75,11 +79,12 @@ run :: proc (server: Server, port: int) {
                 time.sleep(TICK - diff)
             }
         }
-
-        listen(&conns, listener)
+        
+        if !should_stop do listen(&conns, listener)
         make_headers(&conns)
         serve(server, &conns)
     }
+    
 }
 
 @(private="file")
@@ -160,7 +165,9 @@ copyer :: proc (from: []u8, to: []u8) -> (written: int) {
 @(private="file")
 init_listener_soc :: proc (port: int) -> (soc: net.TCP_Socket) {
     err := proc (soc: ^net.TCP_Socket,  port: int) -> net.Network_Error {
-        soc^ = net.listen_tcp(net.Endpoint { address = net.IP4_Address([4]u8{0,0,0,0}), port = port }) or_return
+        ep := net.Endpoint { address = net.IP4_Address([4]u8{0,0,0,0}), port = port }
+        soc^ = net.listen_tcp(ep) or_return
+        log.info("Server started on", ep)
         net.set_blocking(soc^, false) or_return
         return nil
     } (&soc, port) 
