@@ -9,13 +9,10 @@ import "core:c/libc"
 flag := false
 
 main :: proc () {
+    test := "ads"
+    delete(test)
+    fmt.println("worked")
     
-    for {
-        if flag == true {
-            fmt.println(flag)
-            break
-        }
-    }
 }
 
 a := `

@@ -4,7 +4,6 @@ import "core:net"
 import "core:time"
 import "core:log"
 import "core:c/libc"
-import "core:fmt"
 
 TICK :: 100 * time.Millisecond
 TIMEOUT :: 5 * time.Second
@@ -17,7 +16,7 @@ Server :: struct {
 
 Endpoint :: [2]string
 
-Handler :: proc (conn: ^Conn) -> Appeal
+Handler :: proc (req: ^Request, res: ^Response) -> Appeal
 
 Maybe_More :: union {
     Handler,
@@ -27,6 +26,7 @@ Maybe_More :: union {
 Appeal :: enum {
     None,
     Retry,
+    Recive,
     Error,
     Stop
 }
@@ -48,7 +48,8 @@ Socket :: struct {
 
 Conn :: struct {
     soc: Socket,
-    req: Request
+    req: Request,
+    res: Response
 }
 
 use :: proc (server: ^Server, handlers: ..Maybe_More) {
@@ -67,7 +68,7 @@ add :: proc (server: ^Server, ep: Endpoint, handlers: ..Maybe_More) {
 should_stop := false
 run :: proc (server: Server, port: int) {
     context.logger = log.create_console_logger()
-    signal := libc.signal(libc.SIGINT, proc "c" (i: i32) { if i == libc.SIGINT do should_stop = true  })
+    libc.signal(libc.SIGINT, proc "c" (i: i32) { if i == libc.SIGINT do should_stop = true })
     conns: [dynamic]Conn
     listener := init_listener_soc(port)
 
@@ -84,7 +85,7 @@ run :: proc (server: Server, port: int) {
         make_headers(&conns)
         serve(server, &conns)
     }
-    
+    log.info("The server has stopped.")
 }
 
 @(private="file")
@@ -100,6 +101,8 @@ serve :: proc (server: Server, conns: ^[dynamic]Conn) {
                 clean_up_Conn(&conn)
                 unordered_remove(conns, i)
             }
+            Send(&conn.soc, conn.res)
+            return_Conn(&conn)
         }
     }   
 }
@@ -108,18 +111,31 @@ serve :: proc (server: Server, conns: ^[dynamic]Conn) {
 run_handlers :: proc (conn: ^Conn, conns: ^[dynamic]Conn, index: int, handlers: [dynamic]Handler) -> bool {
     err: Appeal
     for h in handlers {
-        err = h(conn)
-        if err == .Retry || err == .Stop || err == .Error do break
+        err = h(&conn.req, &conn.res)
+        if err != .None do break
     }
     if err == .Retry do return false
     if err == .Stop {
+        Send(&conn.soc, conn.res)
         return_Conn(conn)
         return false
     }
     if err == .Error {
+        Send(&conn.soc, conn.res)
         clean_up_Conn(conn)
         unordered_remove(conns, index)
         return false
+    }
+    if err == .Recive {
+        n, recvErr := recv(&conn.soc, conn.req.body.data[conn.req.body.written:])
+        if recvErr {
+            conn.req.body.written += n
+            return false
+        } else {
+            clean_up_Conn(conn)
+            unordered_remove(conns, index)
+            return false
+        }
     }
     return true
 }
@@ -140,8 +156,8 @@ concatenate_handlers :: proc (handlers: ..Maybe_More) -> (hlist: [dynamic]Handle
  
 @(private="file")
 return_Conn :: proc (conn: ^Conn) {
-    delete(conn.req.body.data)
-    delete(conn.req.header.pairs)
+    delete_Conn_data(conn)
+
     new: Request
     new.header.buf.written += excess_header_data(&conn.req.header, new.header.buf.data[:])
     conn.req = new
@@ -228,8 +244,16 @@ recv :: proc (soc: ^Socket, to: []u8) -> (recived: int, ok: bool) {
 
 @(private="file")
 clean_up_Conn :: proc (conn: ^Conn) {
+    delete_Conn_data(conn)
+    net.close(conn.soc.soc)
+}
+
+delete_Conn_data :: proc (conn: ^Conn) {
+    for k, v in conn.res.options {
+        delete(v)
+    }
     delete(conn.req.body.data)
     delete(conn.req.header.pairs)
-
-    net.close(conn.soc.soc)
+    delete(conn.res.body)
+    delete(conn.res.options)
 }
