@@ -31,7 +31,7 @@ main :: proc () {
     server.add(&s, {"POST", "/"}, get_static_body, proc (req: ^server.Request, res: ^server.Response) -> server.Appeal {
         fmt.println(string(req.body.data[:]))
         res.status = 200
-        res.options["content-length"] = "0" 
+        res.options["content-length"] = fmt.aprint(0)
 
         return .Stop
     })
@@ -48,7 +48,7 @@ send_hehe : server.Handler : proc (req: ^server.Request, res: ^server.Response) 
     file, len, _ := server.load_whole_file("./root/hehe.html")
     res.status = 200
     res.options["content-length"] = fmt.aprint(len)
-    res.options["content-type"] = "text/html"
+    res.options["content-type"] = fmt.aprint("text/html")
     res.body = file
     return .Stop
 }

@@ -90,9 +90,8 @@ run :: proc (server: Server, port: int) {
 
 @(private="file")
 serve :: proc (server: Server, conns: ^[dynamic]Conn) {
-    for &conn, i in conns {
+    #reverse for &conn, i in conns {
         if conn.req.header.done {
-            res: Response
             if !run_handlers(&conn, conns, i, server.global) do continue
             if handler, ok := server.handlers[{conn.req.header.pairs["method"], conn.req.header.pairs["path"]}] ; ok {
                 if !run_handlers(&conn, conns, i, handler) do continue
@@ -100,6 +99,7 @@ serve :: proc (server: Server, conns: ^[dynamic]Conn) {
                 Send(&conn.soc, Response { status = 404 } )
                 clean_up_Conn(&conn)
                 unordered_remove(conns, i)
+                continue
             }
             Send(&conn.soc, conn.res)
             return_Conn(&conn)
@@ -114,30 +114,29 @@ run_handlers :: proc (conn: ^Conn, conns: ^[dynamic]Conn, index: int, handlers: 
         err = h(&conn.req, &conn.res)
         if err != .None do break
     }
-    if err == .Retry do return false
-    if err == .Stop {
-        Send(&conn.soc, conn.res)
-        return_Conn(conn)
-        return false
-    }
-    if err == .Error {
-        Send(&conn.soc, conn.res)
-        clean_up_Conn(conn)
-        unordered_remove(conns, index)
-        return false
-    }
-    if err == .Recive {
-        n, recvErr := recv(&conn.soc, conn.req.body.data[conn.req.body.written:])
-        if recvErr {
-            conn.req.body.written += n
+    switch err {
+        case .Retry: return false
+        case .Stop:
+            Send(&conn.soc, conn.res)
+            return_Conn(conn)
             return false
-        } else {
+        case .Error:
+            Send(&conn.soc, conn.res)
             clean_up_Conn(conn)
             unordered_remove(conns, index)
             return false
-        }
+        case .Recive:
+            n, recvErr := recv(&conn.soc, conn.req.body.data[conn.req.body.written:])
+            if recvErr {
+                conn.req.body.written += n
+            } else {
+                clean_up_Conn(conn)
+                unordered_remove(conns, index)
+            }
+            return false
+        case .None: return true
     }
-    return true
+    log.panic("There should be no way to get here!")
 }
 
 @(private="file")
@@ -156,11 +155,10 @@ concatenate_handlers :: proc (handlers: ..Maybe_More) -> (hlist: [dynamic]Handle
  
 @(private="file")
 return_Conn :: proc (conn: ^Conn) {
+    newReq: Request
+    newReq.header.buf.written += excess_header_data(&conn.req.header, newReq.header.buf.data[:])
     delete_Conn_data(conn)
-
-    new: Request
-    new.header.buf.written += excess_header_data(&conn.req.header, new.header.buf.data[:])
-    conn.req = new
+    conn.req = newReq
 }
 
 excess_header_data :: proc (header: ^Header, to: []u8) -> (n: int) {
@@ -174,6 +172,7 @@ copyer :: proc (from: []u8, to: []u8) -> (written: int) {
     for b, i in from {
         to[i] = b
         written += 1
+        if written == len(to) do break
     }
     return
 }
@@ -249,11 +248,13 @@ clean_up_Conn :: proc (conn: ^Conn) {
 }
 
 delete_Conn_data :: proc (conn: ^Conn) {
-    for k, v in conn.res.options {
+    for k, &v in conn.res.options {
         delete(v)
     }
     delete(conn.req.body.data)
     delete(conn.req.header.pairs)
     delete(conn.res.body)
     delete(conn.res.options)
+    conn.res = {}
+    conn.req = {}
 }
