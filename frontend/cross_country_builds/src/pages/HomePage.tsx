@@ -1,6 +1,10 @@
+
+
 import { Products } from "../components/termekcomponents/termekCardSor";
 import { Szurok } from "../components/szurokComponents/szurok";
 import { DateTimeSection } from "../components/dateTimeforpagescomponents/datetimesection";
+
+
 
 export default function HomePage(){
     return(

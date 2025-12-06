@@ -2,9 +2,16 @@
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"
 import type ProductProps  from "../../models/productProps";
 
-export function Product({kep, name, category, maker, price}: ProductProps){
+
+
+
+export function Product({kep, name, category, maker, price, OnCart}: ProductProps){
+
+
 
     return(
+    <>
+        
         <div className="bg-neutral-primary-soft block border border-default rounded-base shadow-xs w-60 rounded-lg overflow-hidden bg-[#106187]">
             <img src={kep} alt="Eladó termék"/>
             <h2 className="termekneve font-semibold my-4 mx-2">{name}</h2>
@@ -15,9 +22,9 @@ export function Product({kep, name, category, maker, price}: ProductProps){
             </div>
             <div className="flex px-3 gap-x-5 my-2">
                 <button type="button" className="bg-[#08415c] text-amber-50 p-3 rounded-2xl">Részletek</button>
-                <button type="button" className="bg-[#cc2936] text-amber-50 p-3 rounded-2xl flex items-center mr-4"><ShoppingCartIcon/>Kosárba</button>
+                <button type="button" className="bg-[#cc2936] text-amber-50 p-3 rounded-2xl flex items-center mr-4" id="kosarba-button" onClick={OnCart}><ShoppingCartIcon/>Kosárba</button>
             </div>
         </div>
-
+    </>
     );
 }

@@ -22,7 +22,7 @@ export default function AppRouter(){
                 <Route path="/getnewpass" element={<GetNewPasswordPage/>}/>
                 <Route path="/login" element={<LogInPage/>}/>
                 <Route path="/mydata" element={<MyDataPage/>}/>
-                <Route path="/registration" element={<RegistrationPage/>}/>
+                <Route path="/signup" element={<RegistrationPage/>}/>
                 <Route path="/product/:termeknev" element={<ProductPage/>}/>
             </Routes>
             <Footer/>

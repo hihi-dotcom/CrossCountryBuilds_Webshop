@@ -4,4 +4,5 @@ export default interface ProductProps {
     category: string;
     maker: string;
     price: number;
+    OnCart: () => void;
 }
