@@ -1,8 +1,30 @@
 import { TextInput } from "../formFieldComponents/inputwithPlaceholder";
 import { FormField } from "../formFieldComponents/textField";
 
+import KategoriakSelect from "../htmlselectComponents/selectinszurok";
+
 
 export function Szurok() {
+
+    const termekKategoriak = [
+    {
+        value: "kerekparok",
+        name: "kerékpárok"
+    },
+    {
+        value: "kiegeszitok",
+        name: "kiegészítők"
+    },
+    {
+        value: "eszkozok",
+        name: "Eszközök"
+    },
+    {
+        value: "ruhazat",
+        name: "ruházat"
+    }
+    ];
+
     return (
         <div className="szurok p-8 bg-[#6b818c] rounded-2xl max-w-md mx-auto mt-5">
 
@@ -25,6 +47,7 @@ export function Szurok() {
                     input_placeholder="termék gyártója"
                 />
 
+                <KategoriakSelect options={termekKategoriak}/>
             </div>
 
            
