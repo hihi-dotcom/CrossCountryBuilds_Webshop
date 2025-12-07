@@ -5,11 +5,14 @@ import HowtoRegIcon from "@mui/icons-material/HowToReg"
 export default function Navbar(){
     return(
         <>
-            <nav className="hidden sm:flex bg-[#08415c] w-full z-20 top-0  border-default items-center mr-40 px-4  h-20 mx-auto mt-10 rounded-2xl">
-                <div className="hidden sm:flex gap-20  sm:ml-auto px-20">
-                    <Link to="/login" className="bg-[#6b818c] px-2 py-2 rounded-lg border-black">Bejelentkezés</Link>
-                    <Link to="/signup" className="bg-[#a1202b] text-center px-2 py-2 rounded-lg border-black ">Regisztrálok!</Link>
+            <nav className="hidden sm:flex w-full px-2 mt-10">
+                <div className="bg-[#08415c] min-w-7xl z-20 border-default items-center h-20 rounded-2xl mx-auto flex">
+                    <div className="hidden sm:flex gap-20  ml-auto px-20">
+                        <Link to="/login" className="bg-[#6b818c] px-2 py-2 rounded-lg border-black">Bejelentkezés</Link>
+                        <Link to="/signup" className="bg-[#a1202b] text-center px-2 py-2 rounded-lg border-black ">Regisztrálok!</Link>
+                    </div>
                 </div>
+
             </nav>
 
             <div className="flex sm:hidden sm:bg-[#117eb1]">

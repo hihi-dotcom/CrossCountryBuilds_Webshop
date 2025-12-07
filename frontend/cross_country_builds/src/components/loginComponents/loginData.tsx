@@ -1,8 +1,13 @@
 import { FormField } from "../formFieldComponents/textField";
 import ArrowRightIcon from "@mui/icons-material/ArrowRightAltRounded"
+import { useRef } from "react";
 import {Link} from "react-router-dom"
 
 export default function LoginModule(){
+
+    const userNameRef = useRef("");
+    const passwordRef = useRef("");
+
     return(
         <div className="flex flex-col w-full ">
             <form id="loginsection" className="flex flex-col justify-center items-center bg-transparent sm:bg-[#74171f] p-6 md:p-10 rounded-2xl mx-4 sm:mx-auto max-w-md lg:max-w-4xl mt-8 md:mt-20">
@@ -13,17 +18,19 @@ export default function LoginModule(){
                             input_name="felhasznalonev"
                             input_id="felhasznalonev"
                             input_placeholder="felhasználónév"
+                            ref={userNameRef}
                         />
 
                         <FormField
                             input_name="jelszo"
                             input_id="jelszo"
                             input_placeholder="jelszó"
+                            ref={passwordRef}
                         />
                         
                         <div className="flex flex-col sm:flex-row gap-3 text-sm">
-                            <Link to={"/"} className=" bg-[#08415c] text-center hover:border-white border-2 border-transparent p-3 text-base md:p-4 md:text-lg rounded-2xl w-full sm:w-auto">Bejelentkezés</Link>
-                            <Link to={"/getnewpass"} className=" bg-[#cc2936] hover:border-white border-2 border-transparent p-3 md:p-4 rounded-2xl text-base md:text-lg w-full text-center sm:w-auto">Elfelejtettem a jelszavam</Link>
+                            <button type="submit" className=" bg-[#08415c] text-center hover:border-white border-2 border-transparent p-1 text-base md:p-2.5 md:text-base rounded-2xl w-full sm:w-auto">Bejelentkezés</button>
+                            <Link to={"/getnewpass"} className=" bg-[#cc2936] hover:border-white border-2 border-transparent p-1 md:p-2.5 rounded-2xl text-base md:text-base  w-full text-center sm:w-auto">Elfelejtettem a jelszavam</Link>
                         </div>
                     </div>
                 </div>

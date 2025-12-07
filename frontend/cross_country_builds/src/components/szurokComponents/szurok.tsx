@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { TextInput } from "../formFieldComponents/inputwithPlaceholder";
 import { FormField } from "../formFieldComponents/textField";
 
@@ -25,6 +26,10 @@ export function Szurok() {
     }
     ];
 
+    const termekNeveRef = useRef("");
+    const termekGyartojaRef = useRef("");
+    const kategoriakRef = useRef("");
+
     return (
         <div className="szurok p-8 bg-[#6b818c] rounded-2xl max-w-md mx-auto mt-5">
 
@@ -39,15 +44,17 @@ export function Szurok() {
                     input_name="termek_neve"
                     input_id="termek_neve"
                     input_placeholder="termék neve"
+                    ref={termekNeveRef}
                 />
 
                 <FormField
                     input_name="termek_gyartoja"
                     input_id="termek_gyartoja"
                     input_placeholder="termék gyártója"
+                    ref={termekGyartojaRef}
                 />
 
-                <KategoriakSelect options={termekKategoriak}/>
+                <KategoriakSelect options={termekKategoriak} ref={kategoriakRef}/>
             </div>
 
            
