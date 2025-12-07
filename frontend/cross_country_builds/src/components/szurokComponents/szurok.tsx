@@ -31,9 +31,9 @@ export function Szurok() {
     const kategoriakRef = useRef("");
 
     return (
-        <div className="szurok p-8 bg-[#6b818c] rounded-2xl max-w-md mx-auto mt-5">
+        <div className="szurok bg-transparent p-8 sm:bg-[#6b818c] rounded-2xl max-w-md mx-auto mt-5">
 
-            <h1 className="text-center text-4xl font-semibold text-slate-100 mb-8">
+            <h1 className="text-center text-8xl sm:text-9xl font-semibold text-slate-100 mb-8">
                 Keresés
             </h1>
 

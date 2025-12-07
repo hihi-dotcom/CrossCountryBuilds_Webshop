@@ -16,9 +16,9 @@ export function Product({kep, name, category, maker, price, OnCart}: ProductProp
             <img src={kep} alt="Eladó termék"/>
             <h2 className="termekneve font-semibold my-4 mx-2">{name}</h2>
             <div className="termekdetails m-3">
-                   <h4 className="termekkategoria">Kategória: {category} </h4>
-                   <h4 className="termekgyarto">Gyártó: {maker} </h4>
-                   <h2 className="termekara">{price} ft</h2>
+                   <h4 className="termekkategoria text-lg">Kategória: {category} </h4>
+                   <h4 className="termekgyarto text-lg">Gyártó: {maker} </h4>
+                   <h2 className="termekara text-xl">{price} ft</h2>
             </div>
             <div className="flex px-3 gap-x-5 my-2">
                 <button type="button" className="bg-[#08415c] text-amber-50 p-3 rounded-2xl">Részletek</button>
