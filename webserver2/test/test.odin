@@ -5,13 +5,10 @@ import "core:net"
 import "core:fmt"
 import "core:time"
 import "core:c/libc"
-
-flag := false
+import "../pq"
 
 main :: proc () {
-    test := "ads"
-    delete(test)
-    fmt.println("worked")
+    
     
 }
 

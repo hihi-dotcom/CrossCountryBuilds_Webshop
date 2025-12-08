@@ -8,9 +8,11 @@ PROTOCOL : []u8 : {'H', 'T', 'T', 'P', '/', '1', '.', '1',}
 
 Response :: struct {
     status: int,
-    options: map[string]string,
+    options: Options,
     body: []u8
 }
+
+Options :: map[string]string
 
 Send :: proc (soc: ^Socket, res: Response) -> (n: int, ok: bool) {
     written, err := try_send(soc.soc, res)

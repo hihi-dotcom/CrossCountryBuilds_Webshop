@@ -1,5 +1,6 @@
 package loop
 
+import "core:fmt"
 import "core:net"
 import "core:time"
 import "core:log"
@@ -72,7 +73,7 @@ run :: proc (server: Server, port: int) {
     conns: [dynamic]Conn
     listener := init_listener_soc(port)
 
-    for !should_stop || len(conns) != 0 {
+    for !should_stop {
         cycle_start := time.now()
         defer {
             cycle_end := time.now()
@@ -81,11 +82,24 @@ run :: proc (server: Server, port: int) {
             }
         }
         
-        if !should_stop do listen(&conns, listener)
+        listen(&conns, listener)
         make_headers(&conns)
         serve(server, &conns)
     }
     log.info("The server has stopped.")
+}
+
+insert_static_body :: proc (res: ^Response, get_body: proc(res: ^Response) -> bool) -> bool {
+    if len(res.body) == 0 {
+        return get_body(res)
+    }
+    return true
+}
+
+insert_option :: proc (res: ^Response, key: string, value: ..any) {
+    if _, ok := res.options[key] ; !ok {
+        res.options[key] = fmt.aprint(..value)
+    }
 }
 
 @(private="file")
