@@ -1,105 +1,131 @@
-// Minimal libpq 18 bindings for Odin - Non-blocking async usage
+// Complete libpq 18 bindings for Odin
 // Based on PostgreSQL 18 libpq documentation
+// Covers: connections, queries, async, COPY, large objects, pipeline mode, cancellation, etc.
 package pq
 
 import "core:c"
 
-// Link to libpq system library
+// =============================================================================
+// Library Linking
+// =============================================================================
+
 when ODIN_OS == .Windows {
-    foreign import pq "system:libpq.lib"
+    foreign import pq "./libpq.lib"
 } else {
     foreign import pq "system:pq"
 }
 
 // =============================================================================
-// Opaque Types
+// Opaque Handle Types
 // =============================================================================
 
-// Connection handle - opaque struct
-Conn :: distinct rawptr
-
-// Result handle - opaque struct  
-Result :: distinct rawptr
+Conn :: distinct rawptr           // PGconn*
+Result :: distinct rawptr         // PGresult*
+Cancel :: distinct rawptr         // PGcancel*
+Cancel_Conn :: distinct rawptr    // PGcancelConn* (PostgreSQL 17+)
 
 // =============================================================================
 // Basic Named Types
 // =============================================================================
 
-// OID type (PostgreSQL object identifier)
 Oid :: distinct c.uint
 INVALID_OID :: Oid(0)
 
-// Socket file descriptor
 Socket :: distinct c.int
 INVALID_SOCKET :: Socket(-1)
 
-// Backend process ID
 Backend_PID :: distinct c.int
-
-// Row index (0-based)
 Row :: distinct c.int
-
-// Column index (0-based)
 Column :: distinct c.int
-
-// Number of rows
 Row_Count :: distinct c.int
-
-// Number of columns  
 Column_Count :: distinct c.int
-
-// Number of parameters
 Param_Count :: distinct c.int
-
-// Field length in bytes
 Field_Length :: distinct c.int
-
-// Field size (-1 for variable length types)
 Field_Size :: distinct c.int
 
+// Large object types
+LO_Fd :: distinct c.int           // Large object file descriptor
+INVALID_LO_FD :: LO_Fd(-1)
+
+pg_int64 :: distinct c.longlong   // For lo_lseek64, lo_tell64
+
 // =============================================================================
-// Boolean-like Return Types
+// Result Enums  
 // =============================================================================
 
-// Generic success/failure for operations that return 1/0
+// Generic 0/1 result
 Op_Result :: enum c.int {
     FAILURE = 0,
     SUCCESS = 1,
 }
 
-// Result of PQgetisnull
 Is_Null :: enum c.int {
     NOT_NULL = 0,
     NULL     = 1,
 }
 
-// Result of PQsslInUse
 SSL_In_Use :: enum c.int {
     NO  = 0,
     YES = 1,
 }
 
-// Result of PQisnonblocking
 Nonblocking_Status :: enum c.int {
     BLOCKING     = 0,
     NON_BLOCKING = 1,
 }
 
-// =============================================================================
-// Flush Result
-// =============================================================================
-
-Flush_Result :: enum c.int {
-    ERROR        = -1, // Flush failed
-    OK           = 0,  // All data flushed successfully
-    WOULD_BLOCK  = 1,  // Not all data sent, need to retry when socket writable
+// Return value of PQsetnonblocking: 0 on success, -1 on error
+Set_Nonblocking_Result :: enum c.int {
+    ERROR   = -1,
+    SUCCESS = 0,
 }
 
-// =============================================================================
-// Format Types
-// =============================================================================
+// PQisBusy: 1 if busy, 0 if not
+Busy_Status :: enum c.int {
+    NOT_BUSY = 0,
+    BUSY     = 1,
+}
 
-// Field format (text vs binary)
+// Generic boolean-style status for some connection helpers: 1 if yes, 0 if no
+Bool_Status :: enum c.int {
+    NO  = 0,
+    YES = 1,
+}
+
+// PQbinaryTuples: 1 if binary, 0 if text
+Binary_Tuples :: enum c.int {
+    TEXT   = 0,
+    BINARY = 1,
+}
+
+// Results for some large object operations
+LO_Export_Result :: enum c.int {
+    ERROR   = -1,
+    SUCCESS = 1,
+}
+
+LO_Close_Result :: enum c.int {
+    ERROR   = -1,
+    SUCCESS = 0,
+}
+
+LO_Unlink_Result :: enum c.int {
+    ERROR   = -1,
+    SUCCESS = 1,
+}
+
+// PQsetClientEncoding: 0 on success, -1 on error
+Set_Client_Encoding_Result :: enum c.int {
+    ERROR   = -1,
+    SUCCESS = 0,
+}
+
+Flush_Result :: enum c.int {
+    ERROR       = -1,
+    OK          = 0,
+    WOULD_BLOCK = 1,
+}
+
 Format :: enum c.int {
     TEXT   = 0,
     BINARY = 1,
@@ -109,344 +135,86 @@ Format :: enum c.int {
 // Connection Status Enums
 // =============================================================================
 
-// Connection status returned by PQstatus
 Conn_Status :: enum c.int {
-    OK                    = 0,  // Connection is ready
-    BAD                   = 1,  // Connection failed
-    // Async connection states (only during PQconnectPoll)
-    STARTED               = 2,  // Waiting for connection to be made
-    MADE                  = 3,  // Connection OK; waiting to send
-    AWAITING_RESPONSE     = 4,  // Waiting for server response
-    AUTH_OK               = 5,  // Received authentication
-    SETENV                = 6,  // Negotiating environment
-    SSL_STARTUP           = 7,  // Negotiating SSL
-    NEEDED                = 8,  // Internal state
-    CHECK_WRITABLE        = 9,  // Checking if writable
-    CONSUME               = 10, // Consuming remaining responses
-    GSS_STARTUP           = 11, // Negotiating GSSAPI
-    CHECK_TARGET          = 12, // Checking target server
-    CHECK_STANDBY         = 13, // Checking if standby
+    OK                = 0,
+    BAD               = 1,
+    STARTED           = 2,
+    MADE              = 3,
+    AWAITING_RESPONSE = 4,
+    AUTH_OK           = 5,
+    SETENV            = 6,
+    SSL_STARTUP       = 7,
+    NEEDED            = 8,
+    CHECK_WRITABLE    = 9,
+    CONSUME           = 10,
+    GSS_STARTUP       = 11,
+    CHECK_TARGET      = 12,
+    CHECK_STANDBY     = 13,
 }
 
-// Polling status for async operations
 Polling_Status :: enum c.int {
     FAILED  = 0,
-    READING = 1,  // Wait until socket is readable, then poll again
-    WRITING = 2,  // Wait until socket is writable, then poll again
-    OK      = 3,  // Operation complete
+    READING = 1,
+    WRITING = 2,
+    OK      = 3,
 }
 
-// Result status from PQresultStatus
 Exec_Status :: enum c.int {
-    EMPTY_QUERY      = 0,  // Empty query string
-    COMMAND_OK       = 1,  // Command completed, no data returned
-    TUPLES_OK        = 2,  // Query returned tuples
-    COPY_OUT         = 3,  // Copy Out data transfer started
-    COPY_IN          = 4,  // Copy In data transfer started
-    BAD_RESPONSE     = 5,  // Server response not understood
-    NONFATAL_ERROR   = 6,  // Notice or warning
-    FATAL_ERROR      = 7,  // Query failed
-    COPY_BOTH        = 8,  // Copy In/Out data transfer
-    SINGLE_TUPLE     = 9,  // Single tuple from PQgetResult
-    PIPELINE_SYNC    = 10, // Pipeline sync point
-    PIPELINE_ABORTED = 11, // Command aborted in pipeline
-    TUPLES_CHUNK     = 12, // Chunk of tuples
+    EMPTY_QUERY      = 0,
+    COMMAND_OK       = 1,
+    TUPLES_OK        = 2,
+    COPY_OUT         = 3,
+    COPY_IN          = 4,
+    BAD_RESPONSE     = 5,
+    NONFATAL_ERROR   = 6,
+    FATAL_ERROR      = 7,
+    COPY_BOTH        = 8,
+    SINGLE_TUPLE     = 9,
+    PIPELINE_SYNC    = 10,
+    PIPELINE_ABORTED = 11,
+    TUPLES_CHUNK     = 12,
 }
 
-// Transaction status
 Transaction_Status :: enum c.int {
-    IDLE    = 0, // Connection idle
-    ACTIVE  = 1, // Command in progress
-    INTRANS = 2, // Idle, in transaction block
-    INERROR = 3, // Idle, in failed transaction
-    UNKNOWN = 4, // Cannot determine status
+    IDLE    = 0,
+    ACTIVE  = 1,
+    INTRANS = 2,
+    INERROR = 3,
+    UNKNOWN = 4,
+}
+
+Pipeline_Status :: enum c.int {
+    OFF   = 0,
+    ON    = 1,
+    ABORTED = 2,
+}
+
+Ping_Status :: enum c.int {
+    OK          = 0,
+    REJECT      = 1,
+    NO_RESPONSE = 2,
+    NO_ATTEMPT  = 3,
 }
 
 // =============================================================================
-// Foreign Function Bindings
+// COPY Result
 // =============================================================================
 
-@(default_calling_convention = "c")
-foreign pq {
-    // =========================================================================
-    // Connection Control - Non-blocking
-    // =========================================================================
-
-    // Start async connection with connection string
-    // Returns: Conn (always non-nil, check status() for success)
-    @(link_name = "PQconnectStart")
-    connect_start :: proc(conninfo: cstring) -> Conn ---
-
-    // Start async connection with keyword/value arrays
-    // keywords and values must be null-terminated arrays
-    // expand_dbname: if non-zero, first dbname value is checked for connection string format
-    // Returns: Conn (always non-nil, check status() for success)
-    @(link_name = "PQconnectStartParams")
-    connect_start_params :: proc(
-        keywords: [^]cstring,
-        values: [^]cstring, 
-        expand_dbname: c.int,
-    ) -> Conn ---
-
-    // Poll connection during async connect
-    // Returns: READING (wait for readable), WRITING (wait for writable), OK (done), FAILED (error)
-    @(link_name = "PQconnectPoll")
-    connect_poll :: proc(conn: Conn) -> Polling_Status ---
-
-    // Close connection and free memory
-    // Must be called even if connection failed
-    @(link_name = "PQfinish")
-    finish :: proc(conn: Conn) ---
-
-    // Start non-blocking connection reset
-    // Returns: SUCCESS if reset started, FAILURE if failed immediately
-    @(link_name = "PQresetStart")
-    reset_start :: proc(conn: Conn) -> Op_Result ---
-
-    // Poll reset progress (same as connect_poll)
-    @(link_name = "PQresetPoll")
-    reset_poll :: proc(conn: Conn) -> Polling_Status ---
-
-    // =========================================================================
-    // Connection Status
-    // =========================================================================
-
-    // Get connection status
-    @(link_name = "PQstatus")
-    status :: proc(conn: Conn) -> Conn_Status ---
-
-    // Get transaction status
-    @(link_name = "PQtransactionStatus")
-    transaction_status :: proc(conn: Conn) -> Transaction_Status ---
-
-    // Get error message from connection
-    @(link_name = "PQerrorMessage")
-    error_message :: proc(conn: Conn) -> cstring ---
-
-    // Get socket file descriptor for select()/poll()
-    // Returns: valid socket or INVALID_SOCKET (-1) if no connection
-    @(link_name = "PQsocket")
-    socket :: proc(conn: Conn) -> Socket ---
-
-    // Get backend PID
-    @(link_name = "PQbackendPID")
-    backend_pid :: proc(conn: Conn) -> Backend_PID ---
-
-    // Check if connection uses SSL
-    @(link_name = "PQsslInUse") 
-    ssl_in_use :: proc(conn: Conn) -> SSL_In_Use ---
-
-    // Get database name
-    @(link_name = "PQdb")
-    db :: proc(conn: Conn) -> cstring ---
-
-    // Get user name
-    @(link_name = "PQuser")
-    user :: proc(conn: Conn) -> cstring ---
-
-    // Get host
-    @(link_name = "PQhost")
-    host :: proc(conn: Conn) -> cstring ---
-
-    // Get port
-    @(link_name = "PQport")
-    port :: proc(conn: Conn) -> cstring ---
-
-    // =========================================================================
-    // Non-blocking Mode Control
-    // =========================================================================
-
-    // Set connection to non-blocking mode (arg=1) or blocking mode (arg=0)
-    // Returns: SUCCESS (0) on success, FAILURE (-1) on error
-    @(link_name = "PQsetnonblocking")
-    set_nonblocking :: proc(conn: Conn, arg: Nonblocking_Status) -> Op_Result ---
-
-    // Check if connection is in non-blocking mode
-    @(link_name = "PQisnonblocking")
-    is_nonblocking :: proc(conn: Conn) -> Nonblocking_Status ---
-
-    // Flush output buffer
-    // Returns: OK (0) success, ERROR (-1) failure, WOULD_BLOCK (1) need retry
-    @(link_name = "PQflush")
-    flush :: proc(conn: Conn) -> Flush_Result ---
-
-    // =========================================================================
-    // Async Query Execution
-    // =========================================================================
-
-    // Send query without waiting (not for pipeline mode)
-    // Returns: SUCCESS if dispatched, FAILURE if not
-    @(link_name = "PQsendQuery")
-    send_query :: proc(conn: Conn, query: cstring) -> Op_Result ---
-
-    // Send query with parameters
-    // paramTypes: nil to let server infer types
-    // paramLengths: nil for null-terminated text params
-    // paramFormats: nil for all text, or array of Format values
-    // resultFormat: TEXT (0) or BINARY (1)
-    // Returns: SUCCESS if dispatched, FAILURE if not
-    @(link_name = "PQsendQueryParams")
-    send_query_params :: proc(
-        conn: Conn,
-        command: cstring,
-        n_params: Param_Count,
-        param_types: [^]Oid,
-        param_values: [^]cstring,
-        param_lengths: [^]c.int,
-        param_formats: [^]Format,
-        result_format: Format,
-    ) -> Op_Result ---
-
-    // Send prepared statement creation request
-    // Returns: SUCCESS if dispatched, FAILURE if not
-    @(link_name = "PQsendPrepare")
-    send_prepare :: proc(
-        conn: Conn,
-        stmt_name: cstring,
-        query: cstring,
-        n_params: Param_Count,
-        param_types: [^]Oid,
-    ) -> Op_Result ---
-
-    // Execute prepared statement asynchronously
-    // Returns: SUCCESS if dispatched, FAILURE if not
-    @(link_name = "PQsendQueryPrepared")
-    send_query_prepared :: proc(
-        conn: Conn,
-        stmt_name: cstring,
-        n_params: Param_Count,
-        param_values: [^]cstring,
-        param_lengths: [^]c.int,
-        param_formats: [^]Format,
-        result_format: Format,
-    ) -> Op_Result ---
-
-    // =========================================================================
-    // Async Result Retrieval
-    // =========================================================================
-
-    // Consume input from server (call when socket is readable)
-    // Returns: SUCCESS (1) if ok, FAILURE (0) if error
-    @(link_name = "PQconsumeInput")
-    consume_input :: proc(conn: Conn) -> Op_Result ---
-
-    // Check if PQgetResult would block
-    // Returns: SUCCESS (1) if busy/would block, FAILURE (0) if result ready
-    @(link_name = "PQisBusy")
-    is_busy :: proc(conn: Conn) -> Op_Result ---
-
-    // Get next result from async query
-    // Returns: Result handle, or nil when command complete
-    // Must call repeatedly until nil to consume all results
-    @(link_name = "PQgetResult")
-    get_result :: proc(conn: Conn) -> Result ---
-
-    // =========================================================================
-    // Result Status & Info
-    // =========================================================================
-
-    // Get result status
-    @(link_name = "PQresultStatus")
-    result_status :: proc(res: Result) -> Exec_Status ---
-
-    // Get error message from result
-    @(link_name = "PQresultErrorMessage")
-    result_error_message :: proc(res: Result) -> cstring ---
-
-    // Get error field (use PG_DIAG_* constants)
-    @(link_name = "PQresultErrorField")
-    result_error_field :: proc(res: Result, fieldcode: Error_Field) -> cstring ---
-
-    // Free result memory - must be called for every result
-    @(link_name = "PQclear")
-    clear :: proc(res: Result) ---
-
-    // =========================================================================
-    // Result Data Access
-    // =========================================================================
-
-    // Number of rows in result
-    @(link_name = "PQntuples")
-    ntuples :: proc(res: Result) -> Row_Count ---
-
-    // Number of columns in result
-    @(link_name = "PQnfields")
-    nfields :: proc(res: Result) -> Column_Count ---
-
-    // Get column name by index (0-based)
-    @(link_name = "PQfname")
-    fname :: proc(res: Result, column_number: Column) -> cstring ---
-
-    // Get column index by name
-    // Returns: column index or -1 if not found
-    @(link_name = "PQfnumber")
-    fnumber :: proc(res: Result, column_name: cstring) -> Column ---
-
-    // Get column type OID
-    @(link_name = "PQftype")
-    ftype :: proc(res: Result, column_number: Column) -> Oid ---
-
-    // Get column size (-1 for variable length)
-    @(link_name = "PQfsize")
-    fsize :: proc(res: Result, column_number: Column) -> Field_Size ---
-
-    // Get column format (TEXT or BINARY)
-    @(link_name = "PQfformat")
-    fformat :: proc(res: Result, column_number: Column) -> Format ---
-
-    // Get field value (null-terminated for text format)
-    // Returns pointer to internal storage - do not free
-    @(link_name = "PQgetvalue")
-    getvalue :: proc(res: Result, row: Row, column: Column) -> [^]u8 ---
-
-    // Get field length in bytes
-    @(link_name = "PQgetlength")
-    getlength :: proc(res: Result, row: Row, column: Column) -> Field_Length ---
-
-    // Check if field is NULL
-    @(link_name = "PQgetisnull")
-    getisnull :: proc(res: Result, row: Row, column: Column) -> Is_Null ---
-
-    // Get number of affected rows as string (e.g., "5")
-    @(link_name = "PQcmdTuples")
-    cmd_tuples :: proc(res: Result) -> cstring ---
-
-    // =========================================================================
-    // Escaping
-    // =========================================================================
-
-    // Escape string literal (returns malloc'd string, caller must free with freemem)
-    @(link_name = "PQescapeLiteral")
-    escape_literal :: proc(conn: Conn, str: cstring, length: c.size_t) -> cstring ---
-
-    // Escape identifier (returns malloc'd string, caller must free with freemem)
-    @(link_name = "PQescapeIdentifier")
-    escape_identifier :: proc(conn: Conn, str: cstring, length: c.size_t) -> cstring ---
-
-    // Free memory allocated by libpq (e.g., from escape functions)
-    @(link_name = "PQfreemem")
-    freemem :: proc(ptr: rawptr) ---
-
-    // =========================================================================
-    // NOTIFY support
-    // =========================================================================
-
-    // Check for NOTIFY messages
-    // Returns: pointer to Notify struct, or nil if none pending
-    // Caller must free with freemem
-    @(link_name = "PQnotifies")
-    notifies :: proc(conn: Conn) -> ^Notify ---
+Copy_Result :: enum c.int {
+    ERROR      = -1,
+    OK         = 0,
+    WOULD_BLOCK = 1, // For async copy
 }
 
-// NOTIFY message structure
-Notify :: struct {
-    relname: cstring,     // Notification channel name
-    be_pid:  Backend_PID, // Notifying backend's PID
-    extra:   cstring,     // Notification payload string
+Copy_Data_Result :: enum c.int {
+    ERROR       = -2,
+    WOULD_BLOCK = -1,
+    END         = 0,
+    // Positive values = number of bytes
 }
 
 // =============================================================================
-// Error Field Codes (for result_error_field)
+// Error Field Codes
 // =============================================================================
 
 Error_Field :: enum c.int {
@@ -471,10 +239,730 @@ Error_Field :: enum c.int {
 }
 
 // =============================================================================
+// Large Object Constants
+// =============================================================================
+
+INV_WRITE :: 0x00020000
+INV_READ  :: 0x00040000
+
+LO_Seek_Whence :: enum c.int {
+    SET = 0,  // SEEK_SET
+    CUR = 1,  // SEEK_CUR
+    END = 2,  // SEEK_END
+}
+
+// =============================================================================
+// Structures
+// =============================================================================
+
+Notify :: struct {
+    relname: cstring,
+    be_pid:  Backend_PID,
+    extra:   cstring,
+}
+
+Conninfo_Option :: struct {
+    keyword:  cstring,
+    envvar:   cstring,
+    compiled: cstring,
+    val:      cstring,
+    label:    cstring,
+    dispchar: cstring,
+    dispsize: c.int,
+}
+
+Print_Opt :: struct {
+    header:      c.int,     // print output field headings
+    align:       c.int,     // fill align the fields
+    standard:    c.int,     // old/standard format
+    html3:       c.int,     // output html tables
+    expanded:    c.int,     // expand tables
+    pager:       c.int,     // use pager for output
+    fieldSep:    cstring,   // field separator
+    tableOpt:    cstring,   // attributes for html table
+    caption:     cstring,   // caption for html table
+    fieldName:   [^]cstring, // null terminated array of field names
+}
+
+// =============================================================================
+// Foreign Function Bindings
+// =============================================================================
+
+@(default_calling_convention = "c")
+foreign pq {
+    // =========================================================================
+    // Connection Control - Blocking
+    // =========================================================================
+    
+    @(link_name = "PQconnectdb")
+    connectdb :: proc(conninfo: cstring) -> Conn ---
+    
+    @(link_name = "PQconnectdbParams")
+    connectdb_params :: proc(
+        keywords: [^]cstring,
+        values: [^]cstring,
+        expand_dbname: c.int,
+    ) -> Conn ---
+    
+    @(link_name = "PQsetdbLogin")
+    setdb_login :: proc(
+        pghost: cstring,
+        pgport: cstring,
+        pgoptions: cstring,
+        pgtty: cstring,
+        dbName: cstring,
+        login: cstring,
+        pwd: cstring,
+    ) -> Conn ---
+    
+    @(link_name = "PQfinish")
+    finish :: proc(conn: Conn) ---
+    
+    @(link_name = "PQreset")
+    reset :: proc(conn: Conn) ---
+    
+    // =========================================================================
+    // Connection Control - Non-blocking
+    // =========================================================================
+    
+    @(link_name = "PQconnectStart")
+    connect_start :: proc(conninfo: cstring) -> Conn ---
+    
+    @(link_name = "PQconnectStartParams")
+    connect_start_params :: proc(
+        keywords: [^]cstring,
+        values: [^]cstring,
+        expand_dbname: c.int,
+    ) -> Conn ---
+    
+    @(link_name = "PQconnectPoll")
+    connect_poll :: proc(conn: Conn) -> Polling_Status ---
+    
+    @(link_name = "PQresetStart")
+    reset_start :: proc(conn: Conn) -> Op_Result ---
+    
+    @(link_name = "PQresetPoll")
+    reset_poll :: proc(conn: Conn) -> Polling_Status ---
+    
+    // =========================================================================
+    // Connection Status
+    // =========================================================================
+    
+    @(link_name = "PQstatus")
+    status :: proc(conn: Conn) -> Conn_Status ---
+    
+    @(link_name = "PQtransactionStatus")
+    transaction_status :: proc(conn: Conn) -> Transaction_Status ---
+    
+    @(link_name = "PQparameterStatus")
+    parameter_status :: proc(conn: Conn, paramName: cstring) -> cstring ---
+    
+    @(link_name = "PQprotocolVersion")
+    protocol_version :: proc(conn: Conn) -> c.int ---
+    
+    @(link_name = "PQserverVersion")
+    server_version :: proc(conn: Conn) -> c.int ---
+    
+    @(link_name = "PQerrorMessage")
+    error_message :: proc(conn: Conn) -> cstring ---
+    
+    @(link_name = "PQsocket")
+    socket :: proc(conn: Conn) -> Socket ---
+    
+    @(link_name = "PQbackendPID")
+    backend_pid :: proc(conn: Conn) -> Backend_PID ---
+    
+    @(link_name = "PQconnectionNeedsPassword")
+    connection_needs_password :: proc(conn: Conn) -> Bool_Status ---
+    
+    @(link_name = "PQconnectionUsedPassword")
+    connection_used_password :: proc(conn: Conn) -> Bool_Status ---
+    
+    @(link_name = "PQconnectionUsedGSSAPI")
+    connection_used_gssapi :: proc(conn: Conn) -> Bool_Status ---
+    
+    @(link_name = "PQsslInUse")
+    ssl_in_use :: proc(conn: Conn) -> SSL_In_Use ---
+    
+    @(link_name = "PQsslAttribute")
+    ssl_attribute :: proc(conn: Conn, attribute_name: cstring) -> cstring ---
+    
+    @(link_name = "PQsslAttributeNames")
+    ssl_attribute_names :: proc(conn: Conn) -> [^]cstring ---
+    
+    @(link_name = "PQsslStruct")
+    ssl_struct :: proc(conn: Conn, struct_name: cstring) -> rawptr ---
+    
+    @(link_name = "PQdb")
+    db :: proc(conn: Conn) -> cstring ---
+    
+    @(link_name = "PQuser")
+    user :: proc(conn: Conn) -> cstring ---
+    
+    @(link_name = "PQpass")
+    pass :: proc(conn: Conn) -> cstring ---
+    
+    @(link_name = "PQhost")
+    host :: proc(conn: Conn) -> cstring ---
+    
+    @(link_name = "PQhostaddr")
+    hostaddr :: proc(conn: Conn) -> cstring ---
+    
+    @(link_name = "PQport")
+    port :: proc(conn: Conn) -> cstring ---
+    
+    @(link_name = "PQoptions")
+    options :: proc(conn: Conn) -> cstring ---
+    
+    // =========================================================================
+    // Connection Options
+    // =========================================================================
+    
+    @(link_name = "PQconndefaults")
+    conndefaults :: proc() -> [^]Conninfo_Option ---
+    
+    @(link_name = "PQconninfo")
+    conninfo :: proc(conn: Conn) -> [^]Conninfo_Option ---
+    
+    @(link_name = "PQconninfoParse")
+    conninfo_parse :: proc(conninfo: cstring, errmsg: ^cstring) -> [^]Conninfo_Option ---
+    
+    @(link_name = "PQconninfoFree")
+    conninfo_free :: proc(connOptions: [^]Conninfo_Option) ---
+    
+    // =========================================================================
+    // Ping
+    // =========================================================================
+    
+    @(link_name = "PQping")
+    ping :: proc(conninfo: cstring) -> Ping_Status ---
+    
+    @(link_name = "PQpingParams")
+    ping_params :: proc(
+        keywords: [^]cstring,
+        values: [^]cstring,
+        expand_dbname: c.int,
+    ) -> Ping_Status ---
+    
+    // =========================================================================
+    // Non-blocking Mode
+    // =========================================================================
+    
+    @(link_name = "PQsetnonblocking")
+    set_nonblocking :: proc(conn: Conn, arg: Nonblocking_Status) -> Set_Nonblocking_Result ---
+    
+    @(link_name = "PQisnonblocking")
+    is_nonblocking :: proc(conn: Conn) -> Nonblocking_Status ---
+    
+    @(link_name = "PQflush")
+    flush :: proc(conn: Conn) -> Flush_Result ---
+    
+    // =========================================================================
+    // Command Execution - Blocking
+    // =========================================================================
+    
+    @(link_name = "PQexec")
+    exec :: proc(conn: Conn, query: cstring) -> Result ---
+    
+    @(link_name = "PQexecParams")
+    exec_params :: proc(
+        conn: Conn,
+        command: cstring,
+        n_params: Param_Count,
+        param_types: [^]Oid,
+        param_values: [^]cstring,
+        param_lengths: [^]c.int,
+        param_formats: [^]Format,
+        result_format: Format,
+    ) -> Result ---
+    
+    @(link_name = "PQprepare")
+    prepare :: proc(
+        conn: Conn,
+        stmt_name: cstring,
+        query: cstring,
+        n_params: Param_Count,
+        param_types: [^]Oid,
+    ) -> Result ---
+    
+    @(link_name = "PQexecPrepared")
+    exec_prepared :: proc(
+        conn: Conn,
+        stmt_name: cstring,
+        n_params: Param_Count,
+        param_values: [^]cstring,
+        param_lengths: [^]c.int,
+        param_formats: [^]Format,
+        result_format: Format,
+    ) -> Result ---
+    
+    @(link_name = "PQdescribePrepared")
+    describe_prepared :: proc(conn: Conn, stmt_name: cstring) -> Result ---
+    
+    @(link_name = "PQdescribePortal")
+    describe_portal :: proc(conn: Conn, portal_name: cstring) -> Result ---
+    
+    @(link_name = "PQclosePrepared")
+    close_prepared :: proc(conn: Conn, stmt_name: cstring) -> Result ---
+    
+    @(link_name = "PQclosePortal")
+    close_portal :: proc(conn: Conn, portal_name: cstring) -> Result ---
+    
+    // =========================================================================
+    // Command Execution - Async
+    // =========================================================================
+    
+    @(link_name = "PQsendQuery")
+    send_query :: proc(conn: Conn, query: cstring) -> Op_Result ---
+    
+    @(link_name = "PQsendQueryParams")
+    send_query_params :: proc(
+        conn: Conn,
+        command: cstring,
+        n_params: Param_Count,
+        param_types: [^]Oid,
+        param_values: [^]cstring,
+        param_lengths: [^]c.int,
+        param_formats: [^]Format,
+        result_format: Format,
+    ) -> Op_Result ---
+    
+    @(link_name = "PQsendPrepare")
+    send_prepare :: proc(
+        conn: Conn,
+        stmt_name: cstring,
+        query: cstring,
+        n_params: Param_Count,
+        param_types: [^]Oid,
+    ) -> Op_Result ---
+    
+    @(link_name = "PQsendQueryPrepared")
+    send_query_prepared :: proc(
+        conn: Conn,
+        stmt_name: cstring,
+        n_params: Param_Count,
+        param_values: [^]cstring,
+        param_lengths: [^]c.int,
+        param_formats: [^]Format,
+        result_format: Format,
+    ) -> Op_Result ---
+    
+    @(link_name = "PQsendDescribePrepared")
+    send_describe_prepared :: proc(conn: Conn, stmt_name: cstring) -> Op_Result ---
+    
+    @(link_name = "PQsendDescribePortal")
+    send_describe_portal :: proc(conn: Conn, portal_name: cstring) -> Op_Result ---
+    
+    @(link_name = "PQsendClosePrepared")
+    send_close_prepared :: proc(conn: Conn, stmt_name: cstring) -> Op_Result ---
+    
+    @(link_name = "PQsendClosePortal")
+    send_close_portal :: proc(conn: Conn, portal_name: cstring) -> Op_Result ---
+    
+    @(link_name = "PQconsumeInput")
+    consume_input :: proc(conn: Conn) -> Op_Result ---
+    
+    @(link_name = "PQisBusy")
+    is_busy :: proc(conn: Conn) -> Busy_Status ---
+    
+    @(link_name = "PQgetResult")
+    get_result :: proc(conn: Conn) -> Result ---
+    
+    // =========================================================================
+    // Single Row Mode
+    // =========================================================================
+    
+    @(link_name = "PQsetSingleRowMode")
+    set_single_row_mode :: proc(conn: Conn) -> Op_Result ---
+    
+    @(link_name = "PQsetChunkedRowsMode")
+    set_chunked_rows_mode :: proc(conn: Conn, chunk_size: c.int) -> Op_Result ---
+    
+    // =========================================================================
+    // Result Status & Info
+    // =========================================================================
+    
+    @(link_name = "PQresultStatus")
+    result_status :: proc(res: Result) -> Exec_Status ---
+    
+    @(link_name = "PQresStatus")
+    res_status :: proc(status: Exec_Status) -> cstring ---
+    
+    @(link_name = "PQresultErrorMessage")
+    result_error_message :: proc(res: Result) -> cstring ---
+    
+    @(link_name = "PQresultVerboseErrorMessage")
+    result_verbose_error_message :: proc(
+        res: Result,
+        verbosity: c.int,
+        show_context: c.int,
+    ) -> cstring ---
+    
+    @(link_name = "PQresultErrorField")
+    result_error_field :: proc(res: Result, fieldcode: Error_Field) -> cstring ---
+    
+    @(link_name = "PQclear")
+    clear :: proc(res: Result) ---
+    
+    // =========================================================================
+    // Result Data Access
+    // =========================================================================
+    
+    @(link_name = "PQntuples")
+    ntuples :: proc(res: Result) -> Row_Count ---
+    
+    @(link_name = "PQnfields")
+    nfields :: proc(res: Result) -> Column_Count ---
+    
+    @(link_name = "PQfname")
+    fname :: proc(res: Result, column_number: Column) -> cstring ---
+    
+    @(link_name = "PQfnumber")
+    fnumber :: proc(res: Result, column_name: cstring) -> Column ---
+    
+    @(link_name = "PQftable")
+    ftable :: proc(res: Result, column_number: Column) -> Oid ---
+    
+    @(link_name = "PQftablecol")
+    ftablecol :: proc(res: Result, column_number: Column) -> Column ---
+    
+    @(link_name = "PQfformat")
+    fformat :: proc(res: Result, column_number: Column) -> Format ---
+    
+    @(link_name = "PQftype")
+    ftype :: proc(res: Result, column_number: Column) -> Oid ---
+    
+    @(link_name = "PQfmod")
+    fmod :: proc(res: Result, column_number: Column) -> c.int ---
+    
+    @(link_name = "PQfsize")
+    fsize :: proc(res: Result, column_number: Column) -> Field_Size ---
+    
+    @(link_name = "PQbinaryTuples")
+    binary_tuples :: proc(res: Result) -> Binary_Tuples ---
+    
+    @(link_name = "PQgetvalue")
+    getvalue :: proc(res: Result, row: Row, column: Column) -> [^]u8 ---
+    
+    @(link_name = "PQgetisnull")
+    getisnull :: proc(res: Result, row: Row, column: Column) -> Is_Null ---
+    
+    @(link_name = "PQgetlength")
+    getlength :: proc(res: Result, row: Row, column: Column) -> Field_Length ---
+    
+    @(link_name = "PQnparams")
+    nparams :: proc(res: Result) -> Param_Count ---
+    
+    @(link_name = "PQparamtype")
+    paramtype :: proc(res: Result, param_number: c.int) -> Oid ---
+    
+    @(link_name = "PQcmdStatus")
+    cmd_status :: proc(res: Result) -> cstring ---
+    
+    @(link_name = "PQcmdTuples")
+    cmd_tuples :: proc(res: Result) -> cstring ---
+    
+    @(link_name = "PQoidValue")
+    oid_value :: proc(res: Result) -> Oid ---
+    
+    // =========================================================================
+    // Escaping
+    // =========================================================================
+    
+    @(link_name = "PQescapeLiteral")
+    escape_literal :: proc(conn: Conn, str: cstring, length: c.size_t) -> cstring ---
+    
+    @(link_name = "PQescapeIdentifier")
+    escape_identifier :: proc(conn: Conn, str: cstring, length: c.size_t) -> cstring ---
+    
+    @(link_name = "PQescapeStringConn")
+    escape_string_conn :: proc(
+        conn: Conn,
+        to: [^]u8,
+        from: cstring,
+        length: c.size_t,
+        error: ^c.int,
+    ) -> c.size_t ---
+    
+    @(link_name = "PQescapeByteaConn")
+    escape_bytea_conn :: proc(
+        conn: Conn,
+        from: [^]u8,
+        from_length: c.size_t,
+        to_length: ^c.size_t,
+    ) -> [^]u8 ---
+    
+    @(link_name = "PQunescapeBytea")
+    unescape_bytea :: proc(
+        from: [^]u8,
+        to_length: ^c.size_t,
+    ) -> [^]u8 ---
+    
+    // =========================================================================
+    // Memory Management
+    // =========================================================================
+    
+    @(link_name = "PQfreemem")
+    freemem :: proc(ptr: rawptr) ---
+    
+    @(link_name = "PQmakeEmptyPGresult")
+    make_empty_result :: proc(conn: Conn, status: Exec_Status) -> Result ---
+    
+    // =========================================================================
+    // COPY Functions
+    // =========================================================================
+    
+    @(link_name = "PQputCopyData")
+    put_copy_data :: proc(conn: Conn, buffer: [^]u8, nbytes: c.int) -> Copy_Result ---
+    
+    @(link_name = "PQputCopyEnd")
+    put_copy_end :: proc(conn: Conn, errormsg: cstring) -> Copy_Result ---
+    
+    @(link_name = "PQgetCopyData")
+    get_copy_data :: proc(conn: Conn, buffer: ^[^]u8, async: c.int) -> c.int ---
+    
+    // =========================================================================
+    // Pipeline Mode (PostgreSQL 14+)
+    // =========================================================================
+    
+    @(link_name = "PQpipelineStatus")
+    pipeline_status :: proc(conn: Conn) -> Pipeline_Status ---
+    
+    @(link_name = "PQenterPipelineMode")
+    enter_pipeline_mode :: proc(conn: Conn) -> Op_Result ---
+    
+    @(link_name = "PQexitPipelineMode")
+    exit_pipeline_mode :: proc(conn: Conn) -> Op_Result ---
+    
+    @(link_name = "PQpipelineSync")
+    pipeline_sync :: proc(conn: Conn) -> Op_Result ---
+    
+    @(link_name = "PQsendFlushRequest")
+    send_flush_request :: proc(conn: Conn) -> Op_Result ---
+    
+    @(link_name = "PQsendPipelineSync")
+    send_pipeline_sync :: proc(conn: Conn) -> Op_Result ---
+    
+    // =========================================================================
+    // Cancel (Legacy)
+    // =========================================================================
+    
+    @(link_name = "PQgetCancel")
+    get_cancel :: proc(conn: Conn) -> Cancel ---
+    
+    @(link_name = "PQfreeCancel")
+    free_cancel :: proc(cancel: Cancel) ---
+    
+    @(link_name = "PQcancel")
+    cancel :: proc(cancel: Cancel, errbuf: [^]u8, errbufsize: c.int) -> Op_Result ---
+    
+    @(link_name = "PQrequestCancel")
+    request_cancel :: proc(conn: Conn) -> Op_Result ---
+    
+    // =========================================================================
+    // Cancel (PostgreSQL 17+ - non-blocking)
+    // =========================================================================
+    
+    @(link_name = "PQcancelCreate")
+    cancel_create :: proc(conn: Conn) -> Cancel_Conn ---
+    
+    @(link_name = "PQcancelBlocking")
+    cancel_blocking :: proc(cancelConn: Cancel_Conn) -> Op_Result ---
+    
+    @(link_name = "PQcancelStart")
+    cancel_start :: proc(cancelConn: Cancel_Conn) -> Op_Result ---
+    
+    @(link_name = "PQcancelPoll")
+    cancel_poll :: proc(cancelConn: Cancel_Conn) -> Polling_Status ---
+    
+    @(link_name = "PQcancelStatus")
+    cancel_status :: proc(cancelConn: Cancel_Conn) -> Conn_Status ---
+    
+    @(link_name = "PQcancelSocket")
+    cancel_socket :: proc(cancelConn: Cancel_Conn) -> Socket ---
+    
+    @(link_name = "PQcancelErrorMessage")
+    cancel_error_message :: proc(cancelConn: Cancel_Conn) -> cstring ---
+    
+    @(link_name = "PQcancelFinish")
+    cancel_finish :: proc(cancelConn: Cancel_Conn) ---
+    
+    @(link_name = "PQcancelReset")
+    cancel_reset :: proc(cancelConn: Cancel_Conn) ---
+    
+    // =========================================================================
+    // Asynchronous Notification
+    // =========================================================================
+    
+    @(link_name = "PQnotifies")
+    notifies :: proc(conn: Conn) -> ^Notify ---
+    
+    // =========================================================================
+    // Large Objects
+    // =========================================================================
+    
+    @(link_name = "lo_create")
+    lo_create :: proc(conn: Conn, lobjId: Oid) -> Oid ---
+    
+    @(link_name = "lo_creat")
+    lo_creat :: proc(conn: Conn, mode: c.int) -> Oid ---
+    
+    @(link_name = "lo_import")
+    lo_import :: proc(conn: Conn, filename: cstring) -> Oid ---
+    
+    @(link_name = "lo_import_with_oid")
+    lo_import_with_oid :: proc(conn: Conn, filename: cstring, lobjId: Oid) -> Oid ---
+    
+    @(link_name = "lo_export")
+    lo_export :: proc(conn: Conn, lobjId: Oid, filename: cstring) -> LO_Export_Result ---
+    
+    @(link_name = "lo_open")
+    lo_open :: proc(conn: Conn, lobjId: Oid, mode: c.int) -> LO_Fd ---
+    
+    @(link_name = "lo_close")
+    lo_close :: proc(conn: Conn, fd: LO_Fd) -> LO_Close_Result ---
+    
+    @(link_name = "lo_read")
+    lo_read :: proc(conn: Conn, fd: LO_Fd, buf: [^]u8, len: c.size_t) -> c.int ---
+    
+    @(link_name = "lo_write")
+    lo_write :: proc(conn: Conn, fd: LO_Fd, buf: [^]u8, len: c.size_t) -> c.int ---
+    
+    @(link_name = "lo_lseek")
+    lo_lseek :: proc(conn: Conn, fd: LO_Fd, offset: c.int, whence: LO_Seek_Whence) -> c.int ---
+    
+    @(link_name = "lo_lseek64")
+    lo_lseek64 :: proc(conn: Conn, fd: LO_Fd, offset: pg_int64, whence: LO_Seek_Whence) -> pg_int64 ---
+    
+    @(link_name = "lo_tell")
+    lo_tell :: proc(conn: Conn, fd: LO_Fd) -> c.int ---
+    
+    @(link_name = "lo_tell64")
+    lo_tell64 :: proc(conn: Conn, fd: LO_Fd) -> pg_int64 ---
+    
+    @(link_name = "lo_truncate")
+    lo_truncate :: proc(conn: Conn, fd: LO_Fd, len: c.size_t) -> c.int ---
+    
+    @(link_name = "lo_truncate64")
+    lo_truncate64 :: proc(conn: Conn, fd: LO_Fd, len: pg_int64) -> c.int ---
+    
+    @(link_name = "lo_unlink")
+    lo_unlink :: proc(conn: Conn, lobjId: Oid) -> LO_Unlink_Result ---
+    
+    // =========================================================================
+    // Tracing
+    // =========================================================================
+    
+    @(link_name = "PQtrace")
+    trace :: proc(conn: Conn, debug_port: rawptr) ---  // FILE*
+    
+    @(link_name = "PQuntrace")
+    untrace :: proc(conn: Conn) ---
+    
+    @(link_name = "PQsetTraceFlags")
+    set_trace_flags :: proc(conn: Conn, flags: c.int) ---
+    
+    // =========================================================================
+    // Miscellaneous
+    // =========================================================================
+    
+    @(link_name = "PQclientEncoding")
+    client_encoding :: proc(conn: Conn) -> c.int ---
+    
+    @(link_name = "PQsetClientEncoding")
+    set_client_encoding :: proc(conn: Conn, encoding: cstring) -> Set_Client_Encoding_Result ---
+    
+    @(link_name = "pg_encoding_to_char")
+    encoding_to_char :: proc(encoding_id: c.int) -> cstring ---
+    
+    @(link_name = "pg_char_to_encoding")
+    char_to_encoding :: proc(name: cstring) -> c.int ---
+    
+    @(link_name = "pg_valid_server_encoding_id")
+    valid_server_encoding_id :: proc(encoding_id: c.int) -> c.int ---
+    
+    @(link_name = "PQlibVersion")
+    lib_version :: proc() -> c.int ---
+    
+    @(link_name = "PQsetErrorVerbosity")
+    set_error_verbosity :: proc(conn: Conn, verbosity: c.int) -> c.int ---
+    
+    @(link_name = "PQsetErrorContextVisibility")
+    set_error_context_visibility :: proc(conn: Conn, show_context: c.int) -> c.int ---
+    
+    // =========================================================================
+    // Notice Processing
+    // =========================================================================
+    
+    // Note: Notice receivers/processors use function pointers
+    // Type definitions provided, but setting them requires casting
+    
+    @(link_name = "PQsetNoticeReceiver")
+    set_notice_receiver :: proc(
+        conn: Conn, 
+        proc_: rawptr,  // PQnoticeReceiver function pointer
+        arg: rawptr,
+    ) -> rawptr ---
+    
+    @(link_name = "PQsetNoticeProcessor")
+    set_notice_processor :: proc(
+        conn: Conn,
+        proc_: rawptr,  // PQnoticeProcessor function pointer
+        arg: rawptr,
+    ) -> rawptr ---
+    
+    // =========================================================================
+    // Event System (for extending libpq)
+    // =========================================================================
+    
+    @(link_name = "PQregisterEventProc")
+    register_event_proc :: proc(
+        conn: Conn,
+        proc_: rawptr,  // PGEventProc
+        name: cstring,
+        passThrough: rawptr,
+    ) -> Op_Result ---
+    
+    @(link_name = "PQsetInstanceData")
+    set_instance_data :: proc(conn: Conn, proc_: rawptr, data: rawptr) -> Op_Result ---
+    
+    @(link_name = "PQinstanceData")
+    instance_data :: proc(conn: Conn, proc_: rawptr) -> rawptr ---
+    
+    @(link_name = "PQresultSetInstanceData")
+    result_set_instance_data :: proc(res: Result, proc_: rawptr, data: rawptr) -> Op_Result ---
+    
+    @(link_name = "PQresultInstanceData")
+    result_instance_data :: proc(res: Result, proc_: rawptr) -> rawptr ---
+    
+    @(link_name = "PQfireResultCreateEvents")
+    fire_result_create_events :: proc(conn: Conn, res: Result) -> Op_Result ---
+}
+
+// =============================================================================
+// Trace Flags
+// =============================================================================
+
+TRACE_SUPPRESS_TIMESTAMPS :: 1
+TRACE_REGRESS_MODE        :: 2
+
+// =============================================================================
+// Verbosity Constants
+// =============================================================================
+
+ERRORS_TERSE   :: 0
+ERRORS_DEFAULT :: 1
+ERRORS_VERBOSE :: 2
+ERRORS_SQLSTATE :: 3
+
+SHOW_CONTEXT_NEVER  :: 0
+SHOW_CONTEXT_ERRORS :: 1
+SHOW_CONTEXT_ALWAYS :: 2
+
+// =============================================================================
 // Helper Functions
 // =============================================================================
 
-// Get field value as Odin string (empty string if NULL)
 get_value_string :: proc(res: Result, row: Row, column: Column) -> string {
     if getisnull(res, row, column) == .NULL {
         return ""
@@ -487,12 +975,10 @@ get_value_string :: proc(res: Result, row: Row, column: Column) -> string {
     return string(ptr[:len])
 }
 
-// Check if connection is OK
 is_connected :: proc(conn: Conn) -> bool {
     return conn != nil && status(conn) == .OK
 }
 
-// Check if result indicates success (has data or command completed)
 is_success :: proc(res: Result) -> bool {
     if res == nil {
         return false
@@ -505,12 +991,30 @@ is_success :: proc(res: Result) -> bool {
     return false
 }
 
-// Check if socket is valid
 is_valid_socket :: proc(sock: Socket) -> bool {
     return sock >= Socket(0)
 }
 
-// Iterate over all rows and columns in a result
+// Drain all remaining results from connection
+drain_results :: proc(conn: Conn) {
+    for {
+        res := get_result(conn)
+        if res == nil do break
+        clear(res)
+    }
+}
+
+// Execute query and drain results, returning last result
+exec_and_drain :: proc(conn: Conn, query: cstring) -> Result {
+    res := exec(conn, query)
+    // exec() already handles draining internally
+    return res
+}
+
+// =============================================================================
+// Result Iterator
+// =============================================================================
+
 Result_Iterator :: struct {
     res:     Result,
     row:     Row,
@@ -529,7 +1033,6 @@ make_result_iterator :: proc(res: Result) -> Result_Iterator {
     }
 }
 
-// Get next cell value, returns false when done
 iterate_cells :: proc(it: ^Result_Iterator) -> (value: string, row: Row, col: Column, ok: bool) {
     if it.row >= Row(it.n_rows) {
         return "", 0, 0, false
@@ -548,7 +1051,6 @@ iterate_cells :: proc(it: ^Result_Iterator) -> (value: string, row: Row, col: Co
     return value, row, col, true
 }
 
-// Iterate rows only
 iterate_rows :: proc(it: ^Result_Iterator) -> (row: Row, ok: bool) {
     if it.row >= Row(it.n_rows) {
         return 0, false
