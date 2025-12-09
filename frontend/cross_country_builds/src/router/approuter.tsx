@@ -18,6 +18,7 @@ import ProtectRouteAdmin from "../components/adminComponents/saferouteforadmin";
 
 import Navbar from "../components/layout/navbar/navbarComponent";
 import { Footer } from "../components/layout/footer/footerComponent";
+import Contacts from "../pages/ContactsPageOnlyMobile";
 export default function AppRouter(){
     return(
         <BrowserRouter>
@@ -33,6 +34,7 @@ export default function AppRouter(){
                 <Route path="/mydata" element={<MyDataPage/>}/>
                 <Route path="/signup" element={<RegistrationPage/>}/>
                 <Route path="/product/:termeknev" element={<ProductPage/>}/>
+                <Route path="/contacts" element={<Contacts/>}/>
 
                 <Route path="/admin/users" element={
                     <ProtectRouteAdmin>

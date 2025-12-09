@@ -2,6 +2,7 @@
 import HomeIcon from "@mui/icons-material/Home"
 import MailIcon from "@mui/icons-material/Mail"
 import CallIcon from "@mui/icons-material/Call"
+import { Link } from "react-router-dom";
 
 
 export function Footer() {
@@ -20,7 +21,7 @@ export function Footer() {
         </div>
 
         <div className="flex sm:hidden justify-around text-center my-6 ">
-          <button className=' bg-[#08415C] text-white px-6 py-4  rounded-xl '>Kapcsolatok</button>
+          <Link to={"/contacts"} className='bg-[#08415C] text-white px-6 py-4  rounded-xl '>Kapcsolatok</Link>
         </div>
     </footer>
   );
