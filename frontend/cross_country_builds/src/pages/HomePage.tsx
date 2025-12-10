@@ -3,11 +3,12 @@
 import { Products } from "../components/termekcomponents/termekCardSor";
 import { Szurok } from "../components/szurokComponents/szurok";
 import { DateTimeSection } from "../components/dateTimeforpagescomponents/datetimesection";
-
+import { Footer } from "../components/layout/footer/footerComponent";
 
 
 export default function HomePage(){
     return(
+    <>
         <main className="flex flex-col gap-10 px-10 py-10"> 
             <DateTimeSection/>
             <div className="flex flex-col md:flex-row gap-10">  
@@ -16,7 +17,9 @@ export default function HomePage(){
                 </div>
                 <Products/>
             </div>
-                
         </main>
+        <Footer/>
+    </>
+
     );
 }

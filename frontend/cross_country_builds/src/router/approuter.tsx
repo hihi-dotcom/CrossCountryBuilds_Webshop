@@ -54,7 +54,7 @@ export default function AppRouter(){
                     </ProtectRouteAdmin>
                 }/>
             </Routes>
-            <Footer/>
+            
         </BrowserRouter>
     );
 }

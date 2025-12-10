@@ -1,15 +1,16 @@
 interface FieldProps{
     label: string,
     placeholder: string
+    type: string
 
 }
 
-export function Field({label, placeholder}: FieldProps){
+export function Field({label, placeholder, type}: FieldProps){
     return(
 
         <div className="input_w_label">
-            <label htmlFor="textfield" className="block">{label}</label>
-            <input type="text" name="text" id="textfield" className="bg-amber-50 text-black border-black placeholder:text-black px-20 py-2" placeholder={placeholder}/>
+            <label htmlFor="textfield" className="block text-lg">{label}</label>
+            <input type={type} className="bg-amber-50 text-black border-black placeholder:text-black px-1.5 py-2 rounded-xl w-full" placeholder={placeholder}/>
         </div>
     );
 }
