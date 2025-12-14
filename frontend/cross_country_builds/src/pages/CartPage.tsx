@@ -10,7 +10,7 @@ export default function CartPage(){
             <h2>A kosarad tartalma: </h2>
             <RendelesEndButton/> 
         </main>
-        <Footer/>
+       
     </>
 
     );

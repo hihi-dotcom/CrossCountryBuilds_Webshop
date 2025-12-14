@@ -1,5 +1,5 @@
 import OrderSendButton from "../components/buttonComponents/orderFinishButton";
-import { Footer } from "../components/layout/footer/footerComponent";
+
 
 export default function OrderDataPage(){
     return(
@@ -7,7 +7,7 @@ export default function OrderDataPage(){
             <main>
                 <OrderSendButton/>
             </main>
-            <Footer/>
+            
         </>
     );
 }

@@ -1,9 +1,7 @@
-
-
 import { Products } from "../components/termekcomponents/termekCardSor";
 import { Szurok } from "../components/szurokComponents/szurok";
 import { DateTimeSection } from "../components/dateTimeforpagescomponents/datetimesection";
-import { Footer } from "../components/layout/footer/footerComponent";
+
 
 
 export default function HomePage(){
@@ -18,7 +16,7 @@ export default function HomePage(){
                 <Products/>
             </div>
         </main>
-        <Footer/>
+        
     </>
 
     );

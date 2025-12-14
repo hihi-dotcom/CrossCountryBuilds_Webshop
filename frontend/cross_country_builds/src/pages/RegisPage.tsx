@@ -7,9 +7,7 @@ export default function RegistrationPage(){
         <main>
             <SignUpModule/>
         </main>
-        <Footer/>
+       
     </>
-
-
     );
 }

@@ -23,38 +23,41 @@ export default function AppRouter(){
     return(
         <BrowserRouter>
             <Navbar/>
-            <Routes>
-                <Route path="/" element={<HomePage/>}/>
-                <Route path="/cart" element={<CartPage/>}/>
-                <Route path="/createnewpass" element={<CreateNewPasswordPage/>} />
-                <Route path="/orderData" element={<OrderDataPage/>}/>
-                <Route path="/appointment" element={<DateTimePage/>} />
-                <Route path="/getnewpass" element={<GetNewPasswordPage/>}/>
-                <Route path="/login" element={<LogInPage/>}/>
-                <Route path="/mydata" element={<MyDataPage/>}/>
-                <Route path="/signup" element={<RegistrationPage/>}/>
-                <Route path="/product/:termeknev" element={<ProductPage/>}/>
-                <Route path="/contacts" element={<Contacts/>}/>
+            <main className="grow">
+                    <Routes>
+                    <Route path="/" element={<HomePage/>}/>
+                    <Route path="/cart" element={<CartPage/>}/>
+                    <Route path="/createnewpass" element={<CreateNewPasswordPage/>} />
+                    <Route path="/orderData" element={<OrderDataPage/>}/>
+                    <Route path="/appointment" element={<DateTimePage/>} />
+                    <Route path="/getnewpass" element={<GetNewPasswordPage/>}/>
+                    <Route path="/login" element={<LogInPage/>}/>
+                    <Route path="/mydata" element={<MyDataPage/>}/>
+                    <Route path="/signup" element={<RegistrationPage/>}/>
+                    <Route path="/product/:termeknev" element={<ProductPage/>}/>
+                    <Route path="/contacts" element={<Contacts/>}/>
 
-                <Route path="/admin/users" element={
-                    <ProtectRouteAdmin>
-                        <UsersDashboard/>
-                    </ProtectRouteAdmin>
-                }/>
+                    <Route path="/admin/users" element={
+                        <ProtectRouteAdmin>
+                            <UsersDashboard/>
+                        </ProtectRouteAdmin>
+                    }/>
 
-                <Route path="/admin/orders" element={
-                    <ProtectRouteAdmin>
-                        <OrdersDashboard/>
-                    </ProtectRouteAdmin>
-                }/>
+                    <Route path="/admin/orders" element={
+                        <ProtectRouteAdmin>
+                            <OrdersDashboard/>
+                        </ProtectRouteAdmin>
+                    }/>
 
-                <Route path="/admin/appointments" element={
-                    <ProtectRouteAdmin>
-                        <AppointmentDashboard/>
-                    </ProtectRouteAdmin>
-                }/>
-            </Routes>
+                    <Route path="/admin/appointments" element={
+                        <ProtectRouteAdmin>
+                            <AppointmentDashboard/>
+                        </ProtectRouteAdmin>
+                    }/>
+                </Routes>
+            </main>
             
+             <Footer/>
         </BrowserRouter>
     );
 }
