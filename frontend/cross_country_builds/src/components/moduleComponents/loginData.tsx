@@ -16,6 +16,7 @@ export default function LoginModule(){
                     <div className="flex flex-col gap-6 md:gap-9 w-full">
                         <FormField
                             input_name="felhasznalonev"
+                            type="text"
                             input_id="felhasznalonev"
                             input_placeholder="felhasználónév"
                             ref={userNameRef}
@@ -23,6 +24,7 @@ export default function LoginModule(){
 
                         <FormField
                             input_name="jelszo"
+                            type="password"
                             input_id="jelszo"
                             input_placeholder="jelszó"
                             ref={passwordRef}
