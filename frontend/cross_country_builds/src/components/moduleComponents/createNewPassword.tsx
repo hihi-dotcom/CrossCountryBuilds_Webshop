@@ -12,7 +12,7 @@ export default function CreateNewPasswordModule(){
                 <FormField input_name="newjelszo" type="password" input_id="newjelszo" input_placeholder="az új jelszavad" ref={newPasswordRef}/>
                 <FormField input_name="newjelszo2" type="password" input_id="newjelszo2" input_placeholder="az új jelszavad mégegyszer" ref={newPassword2Ref}/>
 
-                <button type="submit" className="bg-[#cc2936] text-white text-2xl rounded-2xl mx-auto py-2 px-5 border-2 border-transparent hover:border-white">Mentés</button>
+                <button type="submit" className="bg-[#cc2936] text-white text-2xl rounded-2xl mx-auto py-2.5 px-7 border-2 border-transparent hover:border-white hover:font-semibold">Mentés</button>
             </div>
             <div className="sm:hidden mx-auto">
                <BackToWebShopButton/>     

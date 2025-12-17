@@ -44,6 +44,7 @@ export function Szurok() {
                     input_name="termek_neve"
                     input_id="termek_neve"
                     input_placeholder="termék neve"
+                    type="text"
                     ref={termekNeveRef}
                 />
 
@@ -51,6 +52,7 @@ export function Szurok() {
                     input_name="termek_gyartoja"
                     input_id="termek_gyartoja"
                     input_placeholder="termék gyártója"
+                    type="text"
                     ref={termekGyartojaRef}
                 />
 
@@ -59,7 +61,7 @@ export function Szurok() {
 
            
             <div className="mt-8 w-full">
-                <label className="block text-slate-100 mb-2">Termék ára:</label>
+                <label className="block text-3xl text-slate-100 mb-2">Termék ára:</label>
 
                 <div className="flex gap-4">
                     <TextInput
@@ -85,7 +87,7 @@ export function Szurok() {
                 type="button"
                 className="mt-10 block mx-auto bg-[#cc2936] text-amber-50 py-3 px-8 
                            rounded-xl text-lg font-semibold
-                           hover:bg-[#b0202c] active:bg-[#8e1a23] transition"
+                           hover:bg-[#b0202c] active:bg-[#8e1a23] hover:font-semibold transition"
             >
                 Keresés
             </button>
