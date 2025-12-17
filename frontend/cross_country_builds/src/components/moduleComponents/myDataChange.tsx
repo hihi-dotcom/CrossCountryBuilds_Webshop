@@ -1,0 +1,24 @@
+import { useRef } from "react";
+import { FormField } from "../formFieldComponents/textField";
+
+export default function MyDataChangeModule(){
+    const felhNevRef = useRef("");
+    const emailRef = useRef("");
+    const passwordRef = useRef("");
+    const deliveryRef = useRef("");
+    const billingRef = useRef("");
+
+    return(
+        <>
+            <div className="grid grid-cols-1 md:grid-cols-2 p-6 max-w-5xl gap-16 mx-auto">
+                <FormField input_name="felhnev" input_id="felhnev" type="text" input_placeholder="felhasználónév" ref={felhNevRef}/>
+                <FormField input_name="email" input_id="emailcim" type="email" input_placeholder="e-mail" ref={emailRef}/>
+                <FormField input_name="jelszo" input_id="jelszo" type="password" input_placeholder="jelszó" ref={passwordRef}/>
+                <FormField input_name="deliveryaddr" input_id="deliveryaddr" type="text" input_placeholder="szállítási cím" ref={deliveryRef}/>
+                <FormField input_name="billingaddr" input_id="billingaddr" type="text" input_placeholder="számlázási cím" ref={billingRef}/>
+
+                <button type="submit" className="text-white bg-[#cc2936] text-xl rounded-xl py-1.5 border-2 border-transparent hover:border-white px-3 w-fit mx-auto md:py-3 md:px-6">Módosítások mentése</button>
+            </div> 
+        </>
+    );
+}

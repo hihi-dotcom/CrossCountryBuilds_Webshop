@@ -5,9 +5,9 @@ import DateTimePage from "../pages/DatetimePage";
 import GetNewPasswordPage from "../pages/GetNewPasswordPage";
 import HomePage from "../pages/HomePage";
 import LogInPage from "../pages/LoginPage";
-import MyDataPage from "../pages/MyData";
+import MyDataPage from "../pages/MyDataPage";
 import ProductPage from "../pages/ProductPage";
-import OrderDataPage from "../pages/OrderData";
+import OrderDataPage from "../pages/OrderDataPage";
 import RegistrationPage from "../pages/RegisPage";
 
 import UsersDashboard from "../pages/adminPages/adminUsers";
