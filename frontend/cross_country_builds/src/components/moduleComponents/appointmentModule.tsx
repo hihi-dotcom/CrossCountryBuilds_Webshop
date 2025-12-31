@@ -24,11 +24,26 @@ export default function AppointmentModule(){
     ];
     return(
         <>
-            <div id="free-datetimes" className="flex justify-start">
-                <ul className=" max-w-xl">
-                    {test_free_datetimes.map((appointment:{time: string}) => <li>{appointment.time}<ChooseButton/></li>)}
-                </ul>
+            <h3 className="text-4xl">Foglalj időpontot hozzánk!</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2">
+                <div id="free-datetimes max-w-lg w-full">
+                    <ul className="">
+                        {test_free_datetimes.map((appointment:{time: string}) => <li className="py-3">{appointment.time}<ChooseButton/></li>)}
+                    </ul>
+                </div>
+                <div className="max-w-lg text-lg bg-[#cc2936] shadow-2xl h-fit p-5 rounded-2xl m-5">
+                    <h2 className="text-4xl">Fontos!</h2>
+                    <p>Arról, hogy mikor jöhetsz a kerékpárodért e-mailben értesítünk!</p>
+                    <p className="text-end">Köszönettel:<br/> A csapat</p>
+                </div>
+
+                <div className="max-w-lg text-lg  shadow-2xl h-fit p-5 rounded-2xl m-5">
+                    <p>Mesélj a problémádról!</p>
+                    <textarea id="message" rows={4} className="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full p-3.5 shadow-xs placeholder:text-body" placeholder="Minnél bővebben...."></textarea>
+                    <button type="submit">Beküldés</button>
+                </div>
             </div>
+
         </>
     );
 }

@@ -5,7 +5,7 @@ import type ProductProps  from "../../models/productProps";
 
 
 
-export function Product({kep, name, category, maker, price, OnCart}: ProductProps){
+export function Item({kep, name, category, maker, price, OnCart}: ProductProps){
 
 
 

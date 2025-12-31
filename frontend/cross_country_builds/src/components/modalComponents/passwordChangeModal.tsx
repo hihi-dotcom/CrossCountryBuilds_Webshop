@@ -17,6 +17,6 @@ export default function PasswordChangeModal({children}: any){
                 <p><CheckIcon/>{children}</p>
             </div>
         </dialog>,
-        document.getElementById("password-change-modal")!
+        document.getElementById("modal-root")!
     );
 }

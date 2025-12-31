@@ -1,35 +1,45 @@
 import { Link } from "react-router-dom";
-import LogInIcon from "@mui/icons-material/Login"
-import HowtoRegIcon from "@mui/icons-material/HowToReg"
+import LogInIcon from "@mui/icons-material/Login";
+import HowtoRegIcon from "@mui/icons-material/HowToReg";
 
-export default function Navbar(){
-    return(
-        <>
-            <nav className="hidden sm:flex w-full px-2 mt-10">
-                <div className="bg-[#08415c] min-w-7xl z-20 border-default items-center h-20 rounded-2xl mx-auto flex">
-                    <div className="hidden sm:flex gap-20  ml-auto px-20">
-                        <Link to="/login" className="bg-[#6b818c] px-2 py-2 rounded-lg border-black">Bejelentkezés</Link>
-                        <Link to="/signup" className="bg-[#a1202b] text-center px-2 py-2 rounded-lg border-black ">Regisztrálok!</Link>
-                    </div>
-                </div>
-
-            </nav>
-
-            <div className="flex sm:hidden sm:bg-[#117eb1]">
-                    <nav className=" w-full z-20 top-0 start-0 border-b border-default">
-                    <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-                        <div className="w-full md:block md:w-auto" id="navbar-default">
-                        <ul className="font-bold flex flex-row p-4 md:p-0 mt-4  rounded-base justify-end space-x-14">
-                            <li><Link to={"/login"}><LogInIcon fontSize="large"/></Link></li>
-                            <li><Link to={"/signup"}><HowtoRegIcon fontSize="large"/></Link></li>
-                        </ul>
-                        </div>
-                    </div>
-                    </nav>
-
+export default function Navbar() {
+  return (
+    <nav className="bg-[#08415c] max-w-6xl mx-auto text-white  shadow-lg overflow-hidden  rounded-b-2xl w-full">
+     
+      <div className=" px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-20">
+          
+          
+            <div className="shrink-0 flex items-center">
+                <Link to="/" className="flex items-center space-x-3">
+                <img src="https://flowbite.com/docs/images/logo.svg" className="h-8 w-8" alt="Flowbite Logo" />
+                <span className="text-2xl  tracking-tight">Flowbite</span>
+                </Link>
             </div>
-        </>
 
+        
+          <div className="hidden md:flex items-center space-x-4">
+            <Link 
+              to="/login" className="px-6 py-2.5 rounded-lg bg-[#435159] hover:bg-opacity-80 transition duration-200 border-transparent border-2 hover:border-white hover:font-bold">Belépés
+            </Link>
+            <Link to="/signup" className="px-5 py-2.5 rounded-lg bg-[#a1202b] hover:bg-red-700 transition duration-200 border-transparent border-2 hover:border-white hover:font-bold "
+            >
+              Regisztráció
+            </Link>
+          </div>
 
-    ); 
+        
+          <div className="flex md:hidden items-center space-x-6">
+            <Link to="/login" className="hover:text-gray-300">
+              <LogInIcon fontSize="large" />
+            </Link>
+            <Link to="/signup" className="hover:text-gray-300">
+              <HowtoRegIcon fontSize="large" />
+            </Link>
+          </div>
+
+        </div>
+      </div>
+    </nav>
+  );
 }

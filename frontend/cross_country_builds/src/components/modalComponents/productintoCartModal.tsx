@@ -21,6 +21,6 @@ export default function IntoCartModal({children}: any){
                 {children}
             </div>
         </dialog>,
-        document.getElementById("intocart-modal")!
+        document.getElementById("modal-root")!
     )
 }  

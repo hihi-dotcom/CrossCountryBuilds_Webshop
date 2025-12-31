@@ -16,6 +16,6 @@ export default function signInModal({children}: any){
             <div><CheckIcon fontSize="large"/></div>
             <div>{children}</div>
         </dialog>,
-        document.getElementById("signin-modal")!
+        document.getElementById("modal-root")!
     );
 }

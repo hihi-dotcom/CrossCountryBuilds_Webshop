@@ -23,7 +23,7 @@ export default function MyDataChangeModule(){
                     </div>
                 </div>
                 <div className="flex col-span-2  mx-auto md:mr-12 justify-end">
-                     <button type="submit" className="text-white bg-[#cc2936] text-xl rounded-xl py-1.5 border-2 border-transparent hover:border-white hover:font-semibold px-3 w-fit md:py-3 md:px-6 justify-">Módosítások mentése</button>
+                     <button type="submit" className="text-white bg-[#cc2936] text-xl rounded-xl py-1.5 border-2 border-transparent hover:border-white hover:font-semibold px-3 w-fit md:py-3 md:px-6">Módosítások mentése</button>
                 </div>
             </div> 
         </>
