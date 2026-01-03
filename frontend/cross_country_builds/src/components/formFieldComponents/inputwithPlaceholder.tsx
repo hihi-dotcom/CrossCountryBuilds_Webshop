@@ -1,4 +1,4 @@
-import type TextInputProps  from "../../models/textInputProps";
+import type TextInputProps  from "../../models/prop_models/textInputProps";
 
 export function TextInput({inp_type, inp_name, inp_id, inp_placeholder, inp_className}: TextInputProps){
     return(

@@ -1,14 +1,16 @@
 
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"
-import type ProductProps  from "../../models/productProps";
+import type ProductProps  from "../../models/prop_models/productProps";
+import { Link } from "react-router-dom";
 
 
 
 
 export function Item({kep, name, category, maker, price, OnCart}: ProductProps){
-
-
-
+    const slug = name
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, "-");
     return(
     <>
         
@@ -21,7 +23,7 @@ export function Item({kep, name, category, maker, price, OnCart}: ProductProps){
                    <h2 className="termekara text-xl">{price} ft</h2>
             </div>
             <div className="flex px-3 gap-x-5 my-2">
-                <button type="button" className="bg-[#08415c] text-amber-50 p-3 rounded-2xl">Részletek</button>
+                <Link to={`/product/${slug}`}className="bg-[#08415c] text-amber-50 p-3 rounded-2xl">Részletek</Link>
                 <button type="button" className="bg-[#cc2936] text-amber-50 p-3 rounded-2xl flex items-center mr-4" id="kosarba-button" onClick={OnCart}><ShoppingCartIcon/>Kosárba</button>
             </div>
         </div>

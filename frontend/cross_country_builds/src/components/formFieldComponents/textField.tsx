@@ -1,4 +1,4 @@
-import type FormFieldProps from "../../models/formfieldProps";
+import type FormFieldProps from "../../models/prop_models/formfieldProps";
 
 
 export function FormField({input_name, input_id, type,input_placeholder, ref}: FormFieldProps){

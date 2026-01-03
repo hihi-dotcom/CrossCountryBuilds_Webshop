@@ -1,13 +1,12 @@
 import './App.css'
-import AppRouter from './router/approuter';
-import { Footer } from "./components/layout/footer/footerComponent";
-import Navbar from './components/layout/navbar/navbarComponent';
+import AppRouter1 from "./router/approuter1";
+
 function App() {
   return (
             
     <div className='min-h-screen flex flex-col bg-[#052636]'>
       
-      <AppRouter/>
+      <AppRouter1/>
       
     </div>
   )

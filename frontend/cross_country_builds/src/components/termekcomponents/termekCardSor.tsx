@@ -1,6 +1,6 @@
 import { Item } from "./termekCard";
 import bikeProducts from "./test_data";
-import Product from "../../models/product";
+
 import BikeImg from "../../assets/letöltés.jpg"
 
 import IntoCartModal  from "../modalComponents/productintoCartModal";
@@ -30,9 +30,9 @@ export function Products(){
                 </IntoCartModal>
             )}
            
-            <div className="flex md:justify-end lg:justify-end lg:p-30 overflow-auto  w-full">
+            <div className="flex ml-5 md:justify-end lg:justify-end  overflow-auto  w-full">
 
-                <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1  lg:grid-cols-3 gap-8 flex-1 justify-center place-items-center">
+                <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1  lg:grid-cols-3  flex-1 gap-10 justify-center place-items-center">
                     {bikeProducts.map(bikeP => <Item kep={BikeImg} {...bikeP} key={bikeP.name} OnCart={() => openModal()}/>)}
                 </div>
             </div>
