@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 export function Footer() {
   return (
         <footer className="relative bottom-0  bg-transparent sm:bg-[#6B818C] rounded-base shadow-xs text-lg ">
-        <div className="hidden sm:flex w-full mx-auto max-w-screen-xl p-6  sm:items-center sm:justify-between justify-items-center sm:text-sm md:text-lg ">
+        <div className="hidden sm:flex w-full mx-auto max-w-screen-xl p-6  sm:items-center sm:justify-between justify-items-center sm:text-sm md:text-2xl ">
           <div className="cim-section flex items-center gap-3">
             <p><HomeIcon className='hidden md:inline' sx={{ fontSize: 30 }}/>:1025 Budapest Huhu utca 28.</p>
           </div>

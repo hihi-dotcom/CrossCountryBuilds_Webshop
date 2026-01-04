@@ -7,7 +7,7 @@ import { DateTimeSection } from "../components/dateTimeforpagescomponents/dateti
 export default function HomePage(){
     return(
     <>
-        <main className="flex flex-col gap-10 px-10 py-10"> 
+        <main className="flex flex-col gap-10 px-10 pb-12"> 
             <DateTimeSection/>
             <div className="flex flex-col md:flex-row gap-10">  
                 <div>
