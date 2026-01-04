@@ -13,13 +13,13 @@ Továbbá még vannak elkészült komponensek, amelyek rész elemei egyes állap
 - http://localhost:5173/orderend
 
   Hiányzó oldalak:
-  http://localhost:5173/appointment
-  http://localhost:5173/product/termeknev
-  http://localhost:5173/cart
+  -http://localhost:5173/appointment
+  -http://localhost:5173/product/termeknev
+  -http://localhost:5173/cart
 
-  http://localhost:5173/admin/usersdashboard
-  http://localhost:5173/admin/ordersdashboard
-  http://localhost:5173/admin/appointmentdashboard
+  -http://localhost:5173/admin/usersdashboard
+  -http://localhost:5173/admin/ordersdashboard
+  -http://localhost:5173/admin/appointmentdashboard
 
 
 # React + TypeScript + Vite
