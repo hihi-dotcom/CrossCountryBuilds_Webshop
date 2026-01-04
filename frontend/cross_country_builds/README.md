@@ -1,3 +1,27 @@
+# Idáig elkészült oldalak:
+Eddig kizárólag csak a kinézetre és a látványtervben lévő elemek megvalósításán volt a fókusz.
+Az itt felsorolt oldalak szinte teljesen készen vannak.
+Továbbá még vannak elkészült komponensek, amelyek rész elemei egyes állapotonként egy-egy komponensnek, így azok jelenleg nincsenek beépítve.
+- http://localhost:5173/
+- http://localhost:5173/login
+- http://localhost:5173/signup
+- http://localhost:5173/createnewpass
+- http://localhost:5173/getnewpass
+- http://localhost:5173/contacts
+- http://localhost:5173/mydata
+- http://localhost:5173/orderdata
+- http://localhost:5173/orderend
+
+  Hiányzó oldalak:
+- http://localhost:5173/appointment
+- http://localhost:5173/product/termeknev
+- http://localhost:5173/cart
+
+- http://localhost:5173/admin/usersdashboard
+- http://localhost:5173/admin/ordersdashboard
+- http://localhost:5173/admin/appointmentdashboard
+
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
