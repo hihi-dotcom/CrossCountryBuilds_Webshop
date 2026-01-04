@@ -11,10 +11,7 @@ export default function Navbar() {
           
           
             <div className="shrink-0 flex items-center">
-                <Link to="/" className="flex items-center space-x-3">
-                <img src="https://flowbite.com/docs/images/logo.svg" className="h-8 w-8" alt="Flowbite Logo" />
-                <span className="text-2xl  tracking-tight">Flowbite</span>
-                </Link>
+
             </div>
 
         
