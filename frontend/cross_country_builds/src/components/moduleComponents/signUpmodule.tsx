@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
+
 import ArrowRightIcon from "@mui/icons-material/ArrowRightAltRounded";
-import { Footer } from "../layout/footer/footerComponent";
+import {Link, Form, useActionData, useNavigation} from "react-router-dom";
 import { Field } from "../formFieldComponents/textFieldwLabel";
 
 export default function SignUpModule(){
@@ -13,7 +13,7 @@ export default function SignUpModule(){
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 ">
                 <div className="w-full px-3">
-                    <form className="flex flex-col gap-5 w-full max-w-md mx-auto">
+                    <Form method="post" className="flex flex-col gap-5 w-full max-w-md mx-auto">
                         <Field label="Add meg a neved: " placeholder="név" type="text"/>
 
                         <Field label="Add meg az email címed: " placeholder="e-mail" type="email"/>
@@ -22,7 +22,7 @@ export default function SignUpModule(){
 
                         <Field label="Erősítsd meg a jelszavad: " placeholder="a te jelszavad újra" type="text"/>
                        
-                    </form>
+                    </Form>
                     
                 </div>
                 

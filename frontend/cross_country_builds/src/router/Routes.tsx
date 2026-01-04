@@ -10,8 +10,6 @@ import ProductPage from "../pages/ProductPage";
 import OrderDataPage from "../pages/OrderDataPage";
 import RegistrationPage from "../pages/RegisPage";
 import EndofOrderPage from "../pages/EndofOrderPage";
-
-
 import UsersDashboard from "../pages/adminPages/adminUsers";
 import OrdersDashboard from "../pages/adminPages/adminOrders";
 import AppointmentDashboard from "../pages/adminPages/adminAppointments";
