@@ -2,7 +2,7 @@ import type QuantityProps from "../../models/prop_models/quantityForProductProps
 
 
 
-export default function QuantitySelector({quantity, setQuantity, min = 1}: QuantityProps){
+export default function QuantitySelectorCart({quantity, setQuantity, min = 1}: QuantityProps){
     const increment1 = () => setQuantity((prev: number) => prev + 1);
     const decrement1 = () => setQuantity((prev:number) => (prev > min ? prev - 1 : min));
 

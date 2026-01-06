@@ -7,7 +7,7 @@ export default function EndofOrderPage(){
         <>
             <main>
                 <EndofOrderModule/>
-                <BacktoTheWebShopSection/>
+                <BacktoTheWebShopSection children={"Más is megtetszett? Itt visszatérhetsz a webshophoz"}/>
             </main>
         </>
     );
