@@ -14,7 +14,7 @@ export default function CartProduct({termek_name, termek_pic,termek_price}: Cart
                     <h2 className="text-xl sm:text-2xl font-bold text-black wrap-break-word">{termek_name}</h2>
                 </div>
                 <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 w-full sm:w-auto justify-center sm:justify-end">
-                    <h2 className="text-xl sm:text-2xl font-bold whitespace-nowrap text-black">{termek_price} Ft</h2>
+                    <h2 className="text-2xl sm:text-3xl font-bold whitespace-nowrap text-black">{termek_price} Ft</h2>
                     <QuantitySelectorCart quantity={quan} setQuantity={setQuan} min={1}/>
                     <button type="button" className="hover:text-red-600 p-2" ><DeleteIcon className="text-black"  sx={{fontSize: 40}}/></button>
                 </div>

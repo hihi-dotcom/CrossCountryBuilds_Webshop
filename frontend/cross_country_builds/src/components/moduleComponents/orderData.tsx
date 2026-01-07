@@ -15,26 +15,31 @@ export default function OrderDataModule(){
     const paying_options = [
         {
             value: "kartya-uzlet",
-            name: "üzletben bankártyával"
+            name: "kartya-uzlet" ,
+            innerText: "üzletben bankártyával"
         },
         {
             value: "penz-uzlet",
-            name: "üzletben készpénzzel"
+            name: "penz-uzlet",
+            innerText: "üzletben készpénzzel"
         },
         {
             value: "futar-penz",
-            name: "futárunknak készpénzzel"
+            name: "futar-penz",
+            innerText: "futárunknak készpénzzel"
         },
     ];
 
     const shipping_methods = [
         {
             value: "futar",
-            name: "házhoz szállítás"
+            name: "futar",
+            innerText: "házhoz szállítás"
         },
         {
             value: "uzlet",
-            name: "személyes átvétel az üzletünkben"
+            name: "uzlet",
+            innerText: "személyes átvétel az üzletünkben"
         }
     ];
     return(

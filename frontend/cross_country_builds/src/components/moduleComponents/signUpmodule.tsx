@@ -32,9 +32,9 @@ export default function SignUpModule(){
                 </div>
             </div>
             <div className=" flex flex-col sm:flex-row items-center sm:justify-between w-full py-2 px-3 gap-6 md:gap-30">
-                <button type="submit" className="bg-[#cc2936] text-white text-lg border-2 border-transparent hover:border-[#eee5e9] sm:w-fit ml-24 mt-6 px-8 py-4 rounded-xl">Regisztrálok!</button>
+                <button type="submit" className="bg-[#cc2936] text-white text-lg border-2 border-transparent hover:border-[#eee5e9] sm:w-fit mx-auto sm:ml-24 mt-6 px-8 py-4 rounded-xl">Regisztrálok!</button>
                 <div className="flex flex-row items-center text-white "> 
-                            <h3 className="text-xl">Van már fiókod? Lépj be</h3>
+                            <h3 className="text-xl">Van már fiókod? Lépj be!</h3>
                             <ArrowRightIcon sx={{fontSize: 50, color: 'white'}}/>
                             <Link to={"/login"} className="text-black py-1 px-7 bg-[#eee5e9] rounded-xl text-xl border-4 border-transparent hover:border-black">Belépek!</Link>
                 </div>
