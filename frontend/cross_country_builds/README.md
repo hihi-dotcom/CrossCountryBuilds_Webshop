@@ -2,7 +2,7 @@
 Eddig kizárólag csak a kinézetre és a látványtervben lévő elemek megvalósításán volt a fókusz.
 Az itt felsorolt oldalak szinte teljesen készen vannak.
 Továbbá még vannak elkészült komponensek, amelyek rész elemei egyes állapotonként egy-egy komponensnek, így azok jelenleg nincsenek beépítve.
-Ezek mellett még elkezdtem a service osztályokat is létrehozni elsősorban az egyszerűbb GET típusú kéréseket megírva.
+Ezek mellett még elkezdtem a service osztályokat is létrehozni elsősorban az Auth osztállyal kezdve.
 - http://localhost:5173/
 - http://localhost:5173/login
 - http://localhost:5173/signup
