@@ -2,6 +2,7 @@
 Eddig kizárólag csak a kinézetre és a látványtervben lévő elemek megvalósításán volt a fókusz.
 Az itt felsorolt oldalak szinte teljesen készen vannak.
 Továbbá még vannak elkészült komponensek, amelyek rész elemei egyes állapotonként egy-egy komponensnek, így azok jelenleg nincsenek beépítve.
+Ezek mellett még elkezdtem a service osztályokat is létrehozni elsősorban az Auth osztállyal kezdve.
 - http://localhost:5173/
 - http://localhost:5173/login
 - http://localhost:5173/signup
@@ -11,12 +12,11 @@ Továbbá még vannak elkészült komponensek, amelyek rész elemei egyes állap
 - http://localhost:5173/mydata
 - http://localhost:5173/orderdata
 - http://localhost:5173/orderend
-
-  Hiányzó oldalak:
 - http://localhost:5173/appointment
 - http://localhost:5173/product/termeknev
 - http://localhost:5173/cart
 
+# Hiányzó oldalak:
 - http://localhost:5173/admin/usersdashboard
 - http://localhost:5173/admin/ordersdashboard
 - http://localhost:5173/admin/appointmentdashboard
