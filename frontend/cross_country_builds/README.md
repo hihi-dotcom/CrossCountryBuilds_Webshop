@@ -12,7 +12,7 @@ Ezek mellett még elkezdtem a service osztályokat is létrehozni elsősorban az
 - http://localhost:5173/mydata
 - http://localhost:5173/orderdata
 - http://localhost:5173/orderend
-- http://localhost:5173/appointment
+- http://localhost:5173/date
 - http://localhost:5173/product/termeknev
 - http://localhost:5173/cart
 
