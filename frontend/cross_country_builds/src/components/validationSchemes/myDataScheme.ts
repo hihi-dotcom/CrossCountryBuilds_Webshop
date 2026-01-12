@@ -6,7 +6,7 @@ const myDataScheme = z.object({
     password: z.string().optional().or(z.literal("")),
     shippingAddr: z.string().min(5, "A szállítási cím kötelező!"),
     billingAddr: z.string().min(5, "A számlázási cím kötelező!"),
-    sameAddress: z.boolean()
+ 
 });
 
 export default myDataScheme;

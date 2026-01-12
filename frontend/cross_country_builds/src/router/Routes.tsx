@@ -39,7 +39,7 @@ const routes = [
                     { path: "getnewpass", element: <GetNewPasswordPage /> },
                     { path: "createnewpass", element: <CreateNewPasswordPage /> },
                     { path: "contacts", element: <Contacts /> },
-                    { path: "product/:productname", element: <ProductPage /> },
+                    { path: "product/:id", element: <ProductPage /> },
 
                     
                     {

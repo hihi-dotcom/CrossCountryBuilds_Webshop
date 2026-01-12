@@ -40,24 +40,32 @@ export function Szurok() {
 
                 
                 <div className="space-y-6 w-full">
-
-                    <FormField
-                        input_name="termek_neve"
-                        input_id="termek_neve"
-                        input_placeholder="termék neve"
-                        type="text"
-                        ref={termekNeveRef}
-                    />
-
-                    <FormField
-                        input_name="termek_gyartoja"
-                        input_id="termek_gyartoja"
-                        input_placeholder="termék gyártója"
-                        type="text"
-                        ref={termekGyartojaRef}
-                    />
-
-                    <KategoriakSelect options={termekKategoriak} ref={kategoriakRef}/>
+                    <div>
+                         <FormField
+                            input_name="productName"
+                            input_id="termek_neve"
+                            input_placeholder="termék neve"
+                            type="text"
+                            ref={termekNeveRef}
+                        />
+                        <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
+                    </div>
+                       
+                    <div>
+                        <FormField
+                            input_name="maker"
+                            input_id="termek_gyartoja"
+                            input_placeholder="termék gyártója"
+                            type="text"
+                            ref={termekGyartojaRef}
+                        />
+                        <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
+                    </div>
+                    <div>
+                        <KategoriakSelect options={termekKategoriak} ref={kategoriakRef}/>
+                        <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
+                    </div>
+                    
                 </div>
 
             
@@ -65,21 +73,27 @@ export function Szurok() {
                     <label className="block text-3xl text-slate-100 mb-2">Termék ára:</label>
 
                     <div className="flex gap-4">
-                        <TextInput
-                            inp_type="number"
-                            inp_name="artol"
-                            inp_id="artol"
-                            inp_placeholder="-tól"
-                            inp_className="text-black bg-amber-50 w-full rounded-lg h-10 px-3 placeholder-black"
-                        />
+                        <div>
+                            <TextInput
+                                inp_type="number"
+                                inp_name="priceFrom"
+                                inp_id="artol"
+                                inp_placeholder="-tól"
+                                inp_className="text-black bg-amber-50 w-full rounded-lg h-10 px-3 placeholder-black"
+                            />
+                            <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
+                        </div>
+                        <div>
+                            <TextInput
+                                inp_type="number"
+                                inp_name="priceTo"
+                                inp_id="arig"
+                                inp_placeholder="-ig"
+                                inp_className="text-black bg-amber-50 w-full rounded-lg h-10 px-3 placeholder-black"
+                            />
+                            <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
+                        </div>   
 
-                        <TextInput
-                            inp_type="number"
-                            inp_name="arig"
-                            inp_id="arig"
-                            inp_placeholder="-ig"
-                            inp_className="text-black bg-amber-50 w-full rounded-lg h-10 px-3 placeholder-black"
-                        />
                     </div>
                 </div>
 
@@ -92,6 +106,7 @@ export function Szurok() {
                 >
                     Keresés
                 </button>
+                 <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
             </div>
         </Form>
 

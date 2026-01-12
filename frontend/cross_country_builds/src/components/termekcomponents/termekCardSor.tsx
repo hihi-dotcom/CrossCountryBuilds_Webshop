@@ -1,8 +1,6 @@
 import { Item } from "./termekCard";
 import bikeProducts from "./test_data";
 
-import BikeImg from "../../assets/letöltés.jpg"
-
 import IntoCartModal  from "../modalComponents/productintoCartModal";
 
 import { useState, useEffect } from 'react';
@@ -10,6 +8,7 @@ import { useState, useEffect } from 'react';
 export function Products(){
 
     const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [products, setProducts] = useState(bikeProducts);
 
     function openModal(){
         setModalIsOpen(true);
@@ -32,7 +31,7 @@ export function Products(){
            
             <div className="w-full">
                 <div className="grid grid-cols-1  md:grid-cols-2  xl:grid-cols-3  gap-6 justify-items-center">
-                    {bikeProducts.map(bikeP => <Item kep={BikeImg} {...bikeP} key={bikeP.name} OnCart={() => openModal()}/>)}
+                    {products.map(bikeP => <Item  product={bikeP} key={bikeP.name} OnCart={() => openModal()}/>)}
                 </div>
             </div>
         </section>

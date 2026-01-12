@@ -3,6 +3,9 @@ import LogInIcon from "@mui/icons-material/Login";
 import HowtoRegIcon from "@mui/icons-material/HowToReg";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCartRounded";
 
+import MyDataButton from "../../buttonComponents/myDataButton";
+import LogOutButton from "../../buttonComponents/LogOutButton";
+
 export default function Navbar() {
   return (
     <nav className="bg-[#08415c] max-w-6xl mx-auto text-white  shadow-lg overflow-hidden  rounded-b-2xl w-full">
@@ -11,11 +14,9 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-20">
           
           
-            <div className="shrink-0 flex items-center">
+          <div className="shrink-0 flex items-center">
 
-            </div>
-
-        
+          </div>
           <div className="hidden md:flex items-center space-x-4">
             <Link to="/login" className="px-6 py-2.5 rounded-lg bg-[#435159] hover:bg-opacity-80 transition duration-200 border-transparent border-2 hover:border-white hover:font-bold">Belépés</Link>
             <Link to="/signup" className="px-5 py-2.5 rounded-lg bg-[#a1202b] hover:bg-red-700 transition duration-200 border-transparent border-2 hover:border-white hover:font-bold">Regisztráció</Link>

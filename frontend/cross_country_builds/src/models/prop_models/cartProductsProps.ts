@@ -1,3 +1,6 @@
 export default interface CartProductsProps {
-    cartproducts: { name: string; category: string; maker: string; price: number; }[]
+    cartproducts: { 
+        name: string,
+        pic: string
+        price: number; }[]
 }
