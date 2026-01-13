@@ -13,7 +13,7 @@ export default function CartPage(){
             <BacktoTheWebShopSection children={"Elfelejtettél valamit? Itt még visszatérhetsz a webshophoz"}/>
             <div className="flex flex-col max-w-4xl mx-start gap-y-8">
                 <h2 className="text-4xl font-medium mb-3">A kosarad tartalma: </h2>
-                <CartProducts cartproducts={cartProducts}/>
+                <CartProducts cartproducts={cartProducts.map(p => ({ name: p.name, pic: '', price: p.price }))}/>
             </div>
             
             <div className="w-full max-w-5xl mx-auto flex justify-center sm:justify-end mt-4">

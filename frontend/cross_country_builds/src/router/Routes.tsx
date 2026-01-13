@@ -11,12 +11,15 @@ import OrderDataPage from "../pages/OrderDataPage";
 import RegistrationPage from "../pages/RegisPage";
 import EndofOrderPage from "../pages/EndofOrderPage";
 import ErrorPage from "../pages/errorPages/ErrorPage";
+
+
 import UsersDashboard from "../pages/adminPages/adminUsers";
 import OrdersDashboard from "../pages/adminPages/adminOrders";
 import AppointmentDashboard from "../pages/adminPages/adminAppointments";
+import ProductDashboard from "../pages/adminPages/adminProducts";
 import AdminErrorPage from "../pages/errorPages/AdminErrorPage";
 
-import ProtectRouteAdmin from "../components/adminComponents/saferouteforadmin";
+import ProtectRouteAdmin from "../pages/adminPages/saferouteforadmin";
 
 
 import Contacts from "../pages/ContactsPageOnlyMobile";
@@ -66,7 +69,8 @@ const routes = [
         children: [
             { index: true, element: <UsersDashboard /> },
             { path: "orders", element: <OrdersDashboard /> },
-            { path: "dates", element: <AppointmentDashboard /> }
+            { path: "dates", element: <AppointmentDashboard /> },
+            {path: "products", element: <ProductDashboard/>}
         ]
     }
 ];

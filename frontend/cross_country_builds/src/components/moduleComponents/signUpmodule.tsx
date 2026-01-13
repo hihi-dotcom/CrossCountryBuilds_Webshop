@@ -15,7 +15,7 @@ export default function SignUpModule(){
                 <div className="w-full px-3">
                     <Form method="post" className="flex flex-col gap-5 w-full max-w-md mx-auto">
                         <div>
-                            <Field label="Add meg a neved: " placeholder="név" type="text" name="name"/>
+                            <Field label="Adj meg egy felhasználónevet: " placeholder="név" type="text" name="name"/>
                             <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
                         </div>
                         <div>
