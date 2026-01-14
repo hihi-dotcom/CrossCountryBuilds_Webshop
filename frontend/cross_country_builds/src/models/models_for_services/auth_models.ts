@@ -1,7 +1,8 @@
 export interface RegistrationCreds{
-    name: string,
+    username: string,
     email: string,
-    password: string
+    password: string,
+    confirmPassword: string
 }
 
 export interface LoginCreds{

@@ -19,33 +19,50 @@ import AppointmentDashboard from "../pages/adminPages/adminAppointments";
 import ProductDashboard from "../pages/adminPages/adminProducts";
 import AdminErrorPage from "../pages/errorPages/AdminErrorPage";
 
-import ProtectRouteAdmin from "../pages/adminPages/saferouteforadmin";
+import ProtectRouteAdmin from "../pages/protects/saferouteforadmin";
 
 
 import Contacts from "../pages/ContactsPageOnlyMobile";
 
+import { loginAction, registerAction, logoutAction } from "../actions/authActions";
+import AuthService from "../services/AuthService";
+import ProtectRouteUser from "../pages/protects/ProtectiveRouteUser";
+import PublicOnlyRoute from "../pages/protects/ProtectPublicOnly";
 
+const rootLoader = async () => {
+    return await AuthService.gettingCurrentUser();
+}
 
 const routes = [
     {
         path: "/",
         element: <RootLayout />,
         id: "root",
+        loader: rootLoader,
         children: [
             {
-
                 errorElement: <ErrorPage />,
                 children: [
                     { index: true, element: <HomePage /> },
-                    { path: "login", element: <LogInPage /> },
-                    { path: "signup", element: <RegistrationPage /> },
-                    { path: "getnewpass", element: <GetNewPasswordPage /> },
-                    { path: "createnewpass", element: <CreateNewPasswordPage /> },
+                    { path: "logout", action: logoutAction },
+                    
+                    // --- ITT A VÉDELEM A LOGIN ELLEN (PublicOnlyRoute) ---
+                    {
+                        element: <PublicOnlyRoute />,
+                        children: [
+                            { path: "login", action: loginAction, element: <LogInPage /> },
+                            { path: "signup", action: registerAction, element: <RegistrationPage /> },
+                            { path: "getnewpass", element: <GetNewPasswordPage /> },
+                            { path: "createnewpass", element: <CreateNewPasswordPage /> },
+                        ]
+                    },
+                   
+
                     { path: "contacts", element: <Contacts /> },
                     { path: "product/:id", element: <ProductPage /> },
 
-                    
                     {
+                        element: <ProtectRouteUser />,
                         children: [
                             { path: "mydata", element: <MyDataPage /> },
                             { path: "orderData", element: <OrderDataPage /> },
@@ -54,7 +71,6 @@ const routes = [
                             { path: "date", element: <DateTimePage /> },
                         ]
                     },
-                    
                     { path: "*", element: <ErrorPage /> }
                 ]
             }
@@ -64,13 +80,15 @@ const routes = [
     
     {
         path: "admin",
+        id: "admin",
         element: <ProtectRouteAdmin />,
-        errorElement: <AdminErrorPage />, 
+        loader: rootLoader, 
+        errorElement: <AdminErrorPage />,
         children: [
             { index: true, element: <UsersDashboard /> },
             { path: "orders", element: <OrdersDashboard /> },
             { path: "dates", element: <AppointmentDashboard /> },
-            {path: "products", element: <ProductDashboard/>}
+            { path: "products", element: <ProductDashboard /> }
         ]
     }
 ];

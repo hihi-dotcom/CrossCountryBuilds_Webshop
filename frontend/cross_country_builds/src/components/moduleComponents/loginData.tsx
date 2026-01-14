@@ -5,7 +5,7 @@ import { useRef,} from "react";
 import {Link, Form, useActionData, useNavigation} from "react-router-dom";
 
 export default function LoginModule(){
-    
+    const actionData = useActionData();
 
     const userNameRef = useRef("");
     const passwordRef = useRef("");
@@ -24,7 +24,9 @@ export default function LoginModule(){
                             input_placeholder="felhasználónév"
                             ref={userNameRef}
                         />
-                         <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
+                         {actionData?.errors?.username && (<p className="text-red-600 text-2xl pt-3 font-semibold">
+                            {actionData.errors.username}
+                         </p>)}
 
                         <FormField
                             input_name="password"
@@ -33,14 +35,18 @@ export default function LoginModule(){
                             input_placeholder="jelszó"
                             ref={passwordRef}
                         />
-                         <p className="text-red-600 text-2xl font-semibold"></p>
+                        {actionData?.errors?.password && (<p className="text-red-600 text-2xl pt-3 font-semibold">
+                            {actionData.errors.password}
+                         </p>)}
                         
                         <div className="flex flex-col sm:flex-row gap-3 text-xl">
                             <button type="submit" className=" bg-[#08415c] text-center hover:border-white border-2 border-transparent p-2 hover:font-bold  md:p-3 md:text-xl  rounded-2xl w-full sm:w-auto">Bejelentkezés</button>
                             <Link to={"/getnewpass"} className=" bg-[#cc2936] text-center  hover:border-white border-2 border-transparent p-2 md:p-3 hover:font-bold rounded-2xl  md:text-xl  w-full sm:w-auto">Elfelejtettem a jelszavam</Link>
                         </div>
                         <div className="flex flex-col">
-                            <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
+                            {actionData?.serverError && (<p className="text-red-600 text-2xl pt-3 font-semibold">
+                            {actionData.serverError}
+                         </p>)}
                         </div>
                     </div>
                 </div>

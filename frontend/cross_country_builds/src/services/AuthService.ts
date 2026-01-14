@@ -1,23 +1,25 @@
 import type { RegistrationCreds, LoginCreds } from "../models/models_for_services/auth_models";
 
-const API_url: string = `http://localhost:3000/auth/`;
+const API_url: string = `http://localhost:3000/`;
 
 class AuthService {
-    async _request(endpoint: string, options = {}){
+    async _request(endpoint: string, options : RequestInit = {}){
         const url =`${API_url}${endpoint}`;
 
-        const defaultOptions = {
+        const defaultOptions : RequestInit = {
             credentials: 'include',
             headers: {
                 'Content-Type':'application/json'
             }
-        }
+        };
+
+        return await fetch(url, {...defaultOptions, ...options})
     }
 
-    async registration({name, email, password}:RegistrationCreds){
-        return this._request('registration', {
+    async registration({username, email, password, confirmPassword}:RegistrationCreds){
+        return this._request('signup', {
             method: "POST",
-            body: JSON.stringify({name, email, password}),
+            body: JSON.stringify({username, email, password, confirmPassword}),
         })
     }
 
@@ -36,11 +38,18 @@ class AuthService {
 
     async gettingCurrentUser(){
         try{
-            return await this._request('user', {
+            const response =  await this._request('user', {
                 method: "GET"
             })
+
+            if(!response.ok){
+                return null;
+            }
+
+            return await response.json();
         }
         catch(err){
+            console.error("Hiba a user lekérésekor:", err)
             return null;
         }
     }
