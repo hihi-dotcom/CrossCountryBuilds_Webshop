@@ -4,11 +4,12 @@ import bikeProducts from "./test_data";
 import IntoCartModal  from "../modalComponents/productintoCartModal";
 
 import { useState, useEffect } from 'react';
-
+import { useRouteLoaderData } from "react-router-dom";
 export function Products(){
 
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [products, setProducts] = useState(bikeProducts);
+    const  user  = useRouteLoaderData("root") as {id:number, role:string} | null;
 
     function openModal(){
         setModalIsOpen(true);
@@ -25,7 +26,8 @@ export function Products(){
         <section className="w-full h-full">
             {modalIsOpen && (
                 <IntoCartModal onClose={() => setModalIsOpen(false)}>
-                    A termék bekerült a kosarába!
+                    {user && <p>A termék bekerült a kosarába!</p>}
+                    {!user && (<p>Ahhoz, hogy megnézd a kosarad, be kell, hogy jelentkezz!</p>)}
                 </IntoCartModal>
             )}
            
