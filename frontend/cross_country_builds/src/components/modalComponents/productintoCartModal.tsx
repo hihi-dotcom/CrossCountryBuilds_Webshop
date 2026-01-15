@@ -13,7 +13,7 @@ export default function IntoCartModal({children}: any){
         }
     }, [])
     return createPortal(
-        <dialog className="inline-flex bg-[#eee5e9] text-black sm:text-lg md:text-xl  backdrop:bg-opacity-200 rounded-2xl p-6 text-center justify-center items-center mx-auto mt-20 gap-5" ref={dialog}>
+        <dialog className="inline-flex bg-[#eee5e9] text-black sm:text-lg md:text-xl  backdrop:bg-opacity-100 rounded-2xl p-6 text-center justify-center items-center mx-auto mt-20 gap-5 border-black border-2"  ref={dialog}>
             <div className="chekcircle">
                 <CheckCircleIcon fontSize="large"/>
             </div>

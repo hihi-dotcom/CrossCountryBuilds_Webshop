@@ -5,30 +5,43 @@ import { Form } from "react-router-dom";
 import KategoriakSelect from "../htmlselectComponents/selectinszurok";
 
 
-export function Szurok() {
+export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
 
     const termekKategoriak = [
     {
-        value: "kerekparok",
+        value: "kerékpárok",
         name: "kerékpárok"
     },
     {
-        value: "kiegeszitok",
+        value: "kiegészítők",
         name: "kiegészítők"
     },
     {
-        value: "eszkozok",
+        value: "Eszközök",
         name: "Eszközök"
     },
     {
-        value: "ruhazat",
+        value: "ruházat",
         name: "ruházat"
     }
     ];
 
-    const termekNeveRef = useRef("");
-    const termekGyartojaRef = useRef("");
-    const kategoriakRef = useRef("");
+    const termekNeveRef = useRef<HTMLInputElement>(null);
+    const termekGyartojaRef = useRef<HTMLInputElement>(null);
+    const kategoriakRef = useRef<HTMLSelectElement>(null);
+    const priceFrom = useRef<HTMLInputElement>(null);
+    const priceTo = useRef<HTMLInputElement>(null);
+
+    const handleSearching = () => {
+            const searchData = {
+                name: termekNeveRef.current?.value || "",
+                maker: termekGyartojaRef.current?.value || "",
+                category: kategoriakRef.current?.value || "",
+                priceFrom: Number(priceFrom.current?.value) || 0,
+                priceTo: Number(priceTo.current?.value) || 4000000
+            };
+            onSearch(searchData);
+    };
 
     return(
         <Form method="post">
@@ -80,6 +93,7 @@ export function Szurok() {
                                 inp_id="artol"
                                 inp_placeholder="-tól"
                                 inp_className="text-black bg-amber-50 w-full rounded-lg h-10 px-3 placeholder-black"
+                                ref={priceFrom}
                             />
                             <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
                         </div>
@@ -90,6 +104,7 @@ export function Szurok() {
                                 inp_id="arig"
                                 inp_placeholder="-ig"
                                 inp_className="text-black bg-amber-50 w-full rounded-lg h-10 px-3 placeholder-black"
+                                ref={priceTo}
                             />
                             <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
                         </div>   
@@ -100,6 +115,7 @@ export function Szurok() {
             
                 <button
                     type="button"
+                    onClick={handleSearching}
                     className="mt-10 block mx-auto bg-[#cc2936] text-amber-50 py-3 px-8 
                             rounded-xl text-lg font-semibold
                             hover:bg-[#b0202c] active:bg-[#8e1a23] border-transparent border-2 hover:border-white hover:font-bold  transition"

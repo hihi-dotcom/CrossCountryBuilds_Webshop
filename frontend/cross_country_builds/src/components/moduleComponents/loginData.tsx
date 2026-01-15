@@ -24,7 +24,7 @@ export default function LoginModule(){
                             input_placeholder="felhasználónév"
                             ref={userNameRef}
                         />
-                         {actionData?.errors?.username && (<p className="text-red-600 text-2xl pt-3 font-semibold">
+                         {actionData?.errors?.username && (<p className="text-red-600 text-lg pt-3 font-semibold">
                             {actionData.errors.username}
                          </p>)}
 

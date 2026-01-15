@@ -35,7 +35,7 @@ class AuthService {
             method: "POST"
         })
     }
-
+    /*
     async gettingCurrentUser(){
         try{
             const response =  await this._request('user', {
@@ -53,6 +53,7 @@ class AuthService {
             return null;
         }
     }
+        */
 };
 
 

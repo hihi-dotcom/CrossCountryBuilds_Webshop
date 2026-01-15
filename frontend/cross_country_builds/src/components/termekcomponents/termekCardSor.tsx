@@ -1,14 +1,14 @@
 import { Item } from "./termekCard";
-import bikeProducts from "./test_data";
 
+import type Product from "../../models/product";
 import IntoCartModal  from "../modalComponents/productintoCartModal";
 
 import { useState, useEffect } from 'react';
 import { useRouteLoaderData } from "react-router-dom";
-export function Products(){
+export function Products({filteredItems}: {filteredItems: Product[]}){
 
     const [modalIsOpen, setModalIsOpen] = useState(false);
-    const [products, setProducts] = useState(bikeProducts);
+    const displayProducts = filteredItems;
     const  user  = useRouteLoaderData("root") as {id:number, role:string} | null;
 
     function openModal(){
@@ -33,9 +33,12 @@ export function Products(){
            
             <div className="w-full">
                 <div className="grid grid-cols-1  md:grid-cols-2  xl:grid-cols-3  gap-6 justify-items-center">
-                    {products.map(bikeP => <Item  product={bikeP} key={bikeP.name} OnCart={() => openModal()}/>)}
+                    {displayProducts.map(bikeP => <Item  product={bikeP} key={bikeP.name} OnCart={() => openModal()}/>)}
                 </div>
             </div>
+            {displayProducts.length === 0 && (
+                    <p className="text-white text-center text-2xl mt-10">Nincs a keresésnek megfelelő termék.</p>
+                )}
         </section>
     );
 }

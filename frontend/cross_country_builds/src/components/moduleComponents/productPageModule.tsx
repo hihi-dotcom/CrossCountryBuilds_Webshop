@@ -3,13 +3,15 @@ import BackToWebShopButton from "../buttonComponents/backtoWebshopButton";
 import Bigbicikli from "../../assets/letöltés.jpg";
 import QuantitySelector from "../quantity_components/Quantity_Selector";
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import biciklik from "../termekcomponents/test_data"
+import { useParams, useRouteLoaderData } from "react-router-dom";
+import biciklik from "../termekcomponents/test_data";
+import IntoCartModal  from "../modalComponents/productintoCartModal";
 
 export default function ProductModule(){
     const { id } = useParams();
-    const [product, setProduct] = useState(null);
     const [menny, setMenny] = useState(1);
+    const [IsModalOpen, setIsModalOpen] = useState(false);
+    const  user  = useRouteLoaderData("root") as {id:number, role:string} | null;
 
     const termek = biciklik.find(b => b.id === Number(id))
 
@@ -20,11 +22,26 @@ export default function ProductModule(){
     if(!termek){
         return <h2>A termék nem található! (ID: {id})</h2>;
     }
+    function openModal(){
+        setIsModalOpen(true);
+    }
+
+    useEffect(() =>{
+        const timer = setTimeout(() => {setIsModalOpen(false)}, 1500);
+
+        return () => clearTimeout(timer);
+    }, [IsModalOpen])
 
     useEffect(() => {})
     return(
         <main>
             <section>
+                {IsModalOpen && (
+                                <IntoCartModal onClose={() => setIsModalOpen(false)}>
+                                    {user && <p>A termék bekerült a kosarába!</p>}
+                                    {!user && (<p>Ahhoz, hogy megnézd a kosarad, be kell, hogy jelentkezz!</p>)}
+                                </IntoCartModal>
+                )}
                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10 xl:gap-16 items-start mb-10">
                     <div className="w-full">
@@ -47,7 +64,7 @@ export default function ProductModule(){
                                 <p className="text-4xl font-bold whitespace-nowrap">{termek.price} Ft</p>
                                 <div className="flex flex-row items-center gap-x-8">
                                     <QuantitySelector quantity={menny} setQuantity={setMenny} min={1}/>
-                                    <KosarbaButton/>
+                                    <KosarbaButton OntoCart={() => {openModal()}}/>
                                 </div>
                             </div>
                         </div>

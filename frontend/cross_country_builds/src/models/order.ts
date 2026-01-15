@@ -1,9 +1,9 @@
-import Product from "./product";
+import type Product from "./product";
 
-class Order{
-    order_id!: number;
-    ship_method!: string;
-    pay_method!: string;
-    sel_products!: Product[];
-    order_status!: string;
+export default interface Order{
+    id: number;
+    ship_method: string;
+    pay_method: string;
+    sel_products: Product[];
+    order_status: string;
 }

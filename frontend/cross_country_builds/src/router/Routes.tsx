@@ -28,17 +28,18 @@ import { loginAction, registerAction, logoutAction } from "../actions/authAction
 import AuthService from "../services/AuthService";
 import ProtectRouteUser from "../pages/protects/ProtectiveRouteUser";
 import PublicOnlyRoute from "../pages/protects/ProtectPublicOnly";
-
+import { serviceDateTimeAction } from "../actions/serviceActions";
+/*
 const rootLoader = async () => {
     return await AuthService.gettingCurrentUser();
 }
-
+*/
 const routes = [
     {
         path: "/",
         element: <RootLayout />,
         id: "root",
-        loader: rootLoader,
+        //loader: rootLoader,
         children: [
             {
                 errorElement: <ErrorPage />,
@@ -46,9 +47,9 @@ const routes = [
                     { index: true, element: <HomePage /> },
                     { path: "logout", action: logoutAction },
                     
-                    // --- ITT A VÉDELEM A LOGIN ELLEN (PublicOnlyRoute) ---
+
                     {
-                        element: <PublicOnlyRoute />,
+                        //element: <PublicOnlyRoute />,
                         children: [
                             { path: "login", action: loginAction, element: <LogInPage /> },
                             { path: "signup", action: registerAction, element: <RegistrationPage /> },
@@ -62,13 +63,15 @@ const routes = [
                     { path: "product/:id", element: <ProductPage /> },
 
                     {
-                        element: <ProtectRouteUser />,
+                        //element: <ProtectRouteUser />,
                         children: [
                             { path: "mydata", element: <MyDataPage /> },
                             { path: "orderData", element: <OrderDataPage /> },
                             { path: "orderend", element: <EndofOrderPage /> },
                             { path: "cart", element: <CartPage /> },
-                            { path: "date", element: <DateTimePage /> },
+                            { path: "appointment",
+                                action: serviceDateTimeAction,
+                            element: <DateTimePage /> },
                         ]
                     },
                     { path: "*", element: <ErrorPage /> }
@@ -82,7 +85,7 @@ const routes = [
         path: "admin",
         id: "admin",
         element: <ProtectRouteAdmin />,
-        loader: rootLoader, 
+        //loader: rootLoader, 
         errorElement: <AdminErrorPage />,
         children: [
             { index: true, element: <UsersDashboard /> },
