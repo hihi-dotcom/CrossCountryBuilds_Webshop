@@ -29,17 +29,17 @@ import AuthService from "../services/AuthService";
 import ProtectRouteUser from "../pages/protects/ProtectiveRouteUser";
 import PublicOnlyRoute from "../pages/protects/ProtectPublicOnly";
 import { serviceDateTimeAction } from "../actions/serviceActions";
-/*
+
 const rootLoader = async () => {
     return await AuthService.gettingCurrentUser();
 }
-*/
+
 const routes = [
     {
         path: "/",
         element: <RootLayout />,
         id: "root",
-        //loader: rootLoader,
+        loader: rootLoader,
         children: [
             {
                 errorElement: <ErrorPage />,
@@ -49,7 +49,7 @@ const routes = [
                     
 
                     {
-                        //element: <PublicOnlyRoute />,
+                        element: <PublicOnlyRoute />,
                         children: [
                             { path: "login", action: loginAction, element: <LogInPage /> },
                             { path: "signup", action: registerAction, element: <RegistrationPage /> },
@@ -63,7 +63,7 @@ const routes = [
                     { path: "product/:id", element: <ProductPage /> },
 
                     {
-                        //element: <ProtectRouteUser />,
+                        element: <ProtectRouteUser />,
                         children: [
                             { path: "mydata", element: <MyDataPage /> },
                             { path: "orderData", element: <OrderDataPage /> },

@@ -4,4 +4,5 @@ export default interface FormFieldProps{
     type: string,
     input_placeholder: string,
     ref: any,
+    onChange: () => void
 };

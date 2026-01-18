@@ -1,11 +1,13 @@
 import Navbar from "../components/layout/navbar/navbarComponent";
 import { Footer } from "../components/layout/footer/footerComponent";
-import { Outlet } from "react-router-dom";
+import { Outlet, useRouteError } from "react-router-dom";
 
 export default function RootLayout(){
+
+    const error = useRouteError();
     return(
         <>
-            <Navbar/>
+            {!error && <Navbar/>}
             <main className="grow">
                 <Outlet/>
             </main>

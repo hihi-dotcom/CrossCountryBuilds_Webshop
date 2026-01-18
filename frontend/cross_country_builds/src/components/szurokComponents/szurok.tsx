@@ -60,6 +60,7 @@ export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
                             input_placeholder="termék neve"
                             type="text"
                             ref={termekNeveRef}
+                            onChange={handleSearching}
                         />
                         <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
                     </div>
@@ -71,11 +72,12 @@ export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
                             input_placeholder="termék gyártója"
                             type="text"
                             ref={termekGyartojaRef}
+                            onChange={handleSearching}
                         />
                         <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
                     </div>
                     <div>
-                        <KategoriakSelect options={termekKategoriak} ref={kategoriakRef}/>
+                        <KategoriakSelect options={termekKategoriak} ref={kategoriakRef} OnChange={handleSearching}/>
                         <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
                     </div>
                     
@@ -94,6 +96,7 @@ export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
                                 inp_placeholder="-tól"
                                 inp_className="text-black bg-amber-50 w-full rounded-lg h-10 px-3 placeholder-black"
                                 ref={priceFrom}
+                                OnChange={handleSearching}
                             />
                             <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
                         </div>
@@ -105,6 +108,7 @@ export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
                                 inp_placeholder="-ig"
                                 inp_className="text-black bg-amber-50 w-full rounded-lg h-10 px-3 placeholder-black"
                                 ref={priceTo}
+                                OnChange={handleSearching}
                             />
                             <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
                         </div>   

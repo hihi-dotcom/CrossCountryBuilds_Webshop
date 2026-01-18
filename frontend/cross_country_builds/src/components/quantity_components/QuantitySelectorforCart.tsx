@@ -3,8 +3,8 @@ import type QuantityProps from "../../models/prop_models/quantityForProductProps
 
 
 export default function QuantitySelectorCart({quantity, setQuantity, min = 1}: QuantityProps){
-    const increment1 = () => setQuantity((prev: number) => prev + 1);
-    const decrement1 = () => setQuantity((prev:number) => (prev > min ? prev - 1 : min));
+    const increment1 = () => setQuantity(quantity + 1);
+    const decrement1 = () => setQuantity(quantity  > min ? quantity  - 1 : min);
 
     return(
         <div className="flex flex-row items-center mx-auto text-4xl w-fit  ">

@@ -1,12 +1,6 @@
+import type Product from "../product";
+
 export default interface ProductProps {
-    product: {
-       id: any;
-       
-       // pic: string
-       name: string,
-       category: string,
-       maker: string,
-       price:number
-    }
+    product: Product
     OnCart: () => void;
 }

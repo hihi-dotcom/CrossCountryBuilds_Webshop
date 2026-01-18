@@ -15,12 +15,16 @@ export default function ErrorPage(){
     }
 
     return(
-        <main>
+        <main className="min-h-screen flex items-center justify-center">
             <section>
-                <div className="text-center mt-20 py-5 text-white text-shadow-4xl">
-                    <h1 className="pb-8">{error_title}</h1>
-                    <p className="text-lg pb-8">{error_message}</p>
-                    <BackToWebShopButton/>
+                <div className="text-center py-5 text-white mx-auto px-4">
+                    <h1 className="text-5xl pb-8 font-bold">{error_title}</h1>
+                    <p className="text-2xl pb-12 opacity-90">{error_message}</p>
+                    
+                    {/* Ez a konténer kényszeríti középre a gombot */}
+                    <div className="flex justify-center w-full">
+                        <BackToWebShopButton />
+                    </div>
                 </div>
             </section>
         </main>

@@ -1,6 +1,7 @@
 import { use } from "react";
 import SelectforDatetime from "../htmlselectComponents/selectforDateTime";
 import { Form, useActionData } from "react-router-dom";
+import BackToWebShopButton from "../buttonComponents/backtoWebshopButton";
 
 export default function AppointmentModule(){
     const actionData = useActionData();
@@ -55,6 +56,9 @@ export default function AppointmentModule(){
                     </div>
                 </div>
             </Form>
+            <div className="flex w-full justify-center md:justify-end mt-4 px-6">
+                <BackToWebShopButton/>
+            </div>
         </>
     );
 }

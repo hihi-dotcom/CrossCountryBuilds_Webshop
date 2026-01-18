@@ -2,6 +2,7 @@ import KosarbaButton from "../buttonComponents/kosarbaonProductPage";
 import BackToWebShopButton from "../buttonComponents/backtoWebshopButton";
 import Bigbicikli from "../../assets/letöltés.jpg";
 import QuantitySelector from "../quantity_components/Quantity_Selector";
+import { useCart } from "../custom_hooks/CartContext";
 import { useState, useEffect } from "react";
 import { useParams, useRouteLoaderData } from "react-router-dom";
 import biciklik from "../termekcomponents/test_data";
@@ -11,6 +12,7 @@ export default function ProductModule(){
     const { id } = useParams();
     const [menny, setMenny] = useState(1);
     const [IsModalOpen, setIsModalOpen] = useState(false);
+    const { addToCart } = useCart();
     const  user  = useRouteLoaderData("root") as {id:number, role:string} | null;
 
     const termek = biciklik.find(b => b.id === Number(id))
@@ -61,10 +63,13 @@ export default function ProductModule(){
                         </div>
                         <div className="mt-4 flex flex-col lg:items-end items-center  gap-8 pt-6">
                             <div className="flex flex-col flex-wrap sm:flex-row items-center justify-center gap-8 w-full lg:w-auto">
-                                <p className="text-4xl font-bold whitespace-nowrap">{termek.price} Ft</p>
+                                <p className="text-4xl font-bold whitespace-nowrap">{termek.price * menny} Ft</p>
                                 <div className="flex flex-row items-center gap-x-8">
                                     <QuantitySelector quantity={menny} setQuantity={setMenny} min={1}/>
-                                    <KosarbaButton OntoCart={() => {openModal()}}/>
+                                    <KosarbaButton OntoCart={() => {
+                                        addToCart(termek, menny);
+                                        openModal();
+                                        }}/>
                                 </div>
                             </div>
                         </div>

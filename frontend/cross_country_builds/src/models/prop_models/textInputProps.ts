@@ -4,5 +4,6 @@ export default interface TextInputProps{
     inp_id: string,
     ref: any,
     inp_placeholder: string,
-    inp_className: string
+    inp_className: string,
+    OnChange: () => void
 }

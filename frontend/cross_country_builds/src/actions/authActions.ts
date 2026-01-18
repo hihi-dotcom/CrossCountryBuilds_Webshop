@@ -53,6 +53,6 @@ export async function registerAction({ request }: {request: Request}) {
 
 export async function logoutAction(){
     await AuthService.logout();
-
+    localStorage.removeItem('bike-cart');
     return redirect("/login");
 }

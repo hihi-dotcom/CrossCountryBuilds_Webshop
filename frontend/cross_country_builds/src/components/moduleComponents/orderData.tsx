@@ -1,10 +1,18 @@
 import OrderSendButton from "../buttonComponents/orderFinishButton";
 import SelectforOrder from "../htmlselectComponents/selectforOrderData";
 import { FormField } from "../formFieldComponents/textField";
+import { useCart } from "../custom_hooks/CartContext";
 import { Form, useActionData, useNavigation} from "react-router-dom"
 import { useRef } from "react";
 
 export default function OrderDataModule(){
+    const {totalPrice, cartItems} = useCart();
+    const actionData = useActionData() as {error?: string};
+    const navigation = useNavigation();
+    const isSubmitting = navigation.state === "submitting";
+
+
+
     const nevRef = useRef("");
     const orderEmailRef = useRef("");
     const orderDeliveryAddrRef = useRef("");
@@ -44,7 +52,7 @@ export default function OrderDataModule(){
     ];
     return(
         <>
-            <Form method="post">
+            <Form method="post" className="py-2">
                 <div className="grid grid-cols-1 md:grid-cols-2 p-6 max-w-5xl gap-4 md:gap-8 mx-auto">
                     <div>
                         <FormField
@@ -55,7 +63,7 @@ export default function OrderDataModule(){
                             ref={nevRef}
 
                         />
-                        <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
+                        
                     </div>
                     <div>
                         <FormField
@@ -65,7 +73,7 @@ export default function OrderDataModule(){
                             input_placeholder="a te e-mail címed"
                             ref={orderEmailRef}
                         />
-                        <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
+                        
                     </div>
                     <div>
                         <FormField
@@ -75,7 +83,7 @@ export default function OrderDataModule(){
                             input_placeholder="szállítási cím"
                             ref={orderDeliveryAddrRef}
                         />
-                        <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
+                        
                     </div>
                     <div>
                         <FormField
@@ -85,7 +93,7 @@ export default function OrderDataModule(){
                             input_placeholder="számlázási cím"
                             ref={orderBillingAddrRef}
                         />
-                    <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
+                    
                     </div>
                     <div>
                         <SelectforOrder
@@ -95,7 +103,7 @@ export default function OrderDataModule(){
                             options={paying_options}
                             ref={payingMRef}
                         />
-                        <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
+                        
                     </div>
                     <div>
                         <SelectforOrder
@@ -106,20 +114,24 @@ export default function OrderDataModule(){
                             ref={shippingMRef}
 
                         />
-                        <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
+                        
                     </div>
                     <div>
-                        <h2 className="text-4xl">Végösszeg: </h2>
-                        <p></p>
+                        <h2 className="text-4xl py-2">Fizetendő összesen: </h2>
+                        <p className="text-4xl">{totalPrice.toLocaleString()} Ft</p>
                     </div>
                     
                     <div className="flex flex-row items-center w-full gap-0.5 sm:gap-2 md:gap-5">
                         <input id="default-checkbox" type="checkbox" value="" name="sameAddress" className="w-5 h-5  border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft"/>
                         <p className="select-none ms-2 font-medium text-heading text-[21px] ">A szállítási és a számlázási cím megegyezik.</p>
                     </div>
-
-                    <div className="flex justify-end">
-                        <OrderSendButton />
+                    {actionData?.error && (
+                        <div className="md:col-span-2 text-red-500 font-bold rounded text-center">
+                            {actionData.error}
+                        </div>
+                    )}
+                    <div className="flex justify-end md:col-span-2 mt-4">
+                        <OrderSendButton disabled={isSubmitting}/>
                     </div>
 
                 </div>
