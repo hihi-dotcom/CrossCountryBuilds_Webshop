@@ -47,7 +47,7 @@ export default function Navbar() {
                   <Link to="/cart" className="relative p-2 transition-transform hover:scale-110">
                     <ShoppingCartIcon sx={{ fontSize: 40 }} />
                     {totalItems > 0 && (
-                      <span className="absolute top-0 right-0 text-white text-base font-bold drop-shadow-md">
+                      <span className="absolute -top-1 -right-1 bg-red-600 text-white text-base font-bold w-6 h-6 flex items-center justify-center rounded-full drop-shadow-md">
                         {totalItems}
                       </span>
                     )}
@@ -73,14 +73,14 @@ export default function Navbar() {
                 <Link to="/cart" className=" p-1 relative">
                   <ShoppingCartIcon fontSize="large" />
                   {totalItems > 0 && (
-                    <span className="absolute top-0 text-white text-base font-bold drop-shadow-md">
+                    <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full drop-shadow-md">
                       {totalItems}
                     </span>
                   )}
                 </Link>)}
                 {!isOrderFlow && (
                   <Form method="post" action="/logout">
-                    <LogOutIcon/>
+                    <button type="submit"><LogOutIcon className="hover:shadow-2xl"/></button>
                   </Form>
                 )}
               </>

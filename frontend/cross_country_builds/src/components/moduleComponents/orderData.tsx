@@ -122,7 +122,7 @@ export default function OrderDataModule(){
                     </div>
                     
                     <div className="flex flex-row items-center w-full gap-0.5 sm:gap-2 md:gap-5">
-                        <input id="default-checkbox" type="checkbox" value="" name="sameAddress" className="w-5 h-5  border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft"/>
+                        <input id="default-checkbox" type="checkbox" value="" name="sameAddress" className="w-5 h-5   rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft"/>
                         <p className="select-none ms-2 font-medium text-heading text-[21px] ">A szállítási és a számlázási cím megegyezik.</p>
                     </div>
                     {actionData?.error && (

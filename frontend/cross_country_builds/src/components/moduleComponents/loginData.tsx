@@ -13,10 +13,10 @@ export default function LoginModule(){
 
     return(
         <div className="flex shrink-0 flex-col w-full ">
-            <Form method="post" id="loginsection" className="flex flex-col justify-center items-center bg-transparent sm:bg-[#74171f]  p-6 md:p-10 rounded-2xl mx-4 my-4 sm:mx-auto max-w-md lg:max-w-4xl mt-8 md:mt-20 ">
-                <div className="flex flex-col md:flex-row gap-6 md:gap-8 w-full md:items-center">
+            <Form method="post" id="loginsection" className="flex flex-col justify-center items-center bg-transparent  sm:bg-[#74171f]  p-6 md:p-10 rounded-2xl mx-4 my-4 sm:mx-auto max-w-md lg:max-w-4xl mt-8 md:mt-20 ">
+                <div className="flex flex-col lg:flex-row gap-6 md:gap-8 w-full md:items-center">
                     <h2 className="text-4xl md:text-5xl font-bold text-center">BEJELENTKEZÉS</h2>
-                    <div className="flex flex-col gap-1 md:gap-3 w-full">
+                    <div className="flex flex-col gap-3 md:gap-3 w-full">
                         <FormField
                             input_name="username"
                             type="text"
@@ -24,7 +24,7 @@ export default function LoginModule(){
                             input_placeholder="felhasználónév"
                             ref={userNameRef}
                         />
-                         {actionData?.errors?.username && (<p className="text-red-600 text-lg pt-3 font-semibold">
+                         {actionData?.errors?.username && (<p className="text-red-600 text-lg">
                             {actionData.errors.username}
                          </p>)}
 
@@ -35,7 +35,7 @@ export default function LoginModule(){
                             input_placeholder="jelszó"
                             ref={passwordRef}
                         />
-                        {actionData?.errors?.password && (<p className="text-red-600 text-2xl pt-3 font-semibold">
+                        {actionData?.errors?.password && (<p className="text-red-600 text-lg">
                             {actionData.errors.password}
                          </p>)}
                         

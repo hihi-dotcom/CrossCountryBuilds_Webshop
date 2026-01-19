@@ -22,25 +22,25 @@ export default function SignUpModule(){
                 <div>
                   <Field label="Adj meg egy felhasználónevet: " placeholder="név" type="text" name="username" />
                   {actionData?.errors?.name && (
-                    <p className="text-red-600 text-2xl pt-3 font-semibold">{actionData.errors.name}</p>
+                    <p className="text-red-600 text-lg">{actionData.errors.name}</p>
                   )}
                 </div>
                 <div>
                   <Field label="Add meg az email címed: " placeholder="e-mail" type="email" name="email" />
                   {actionData?.errors?.email && (
-                    <p className="text-red-600 text-2xl pt-3 font-semibold">{actionData.errors.email}</p>
+                    <p className="text-red-600 text-lg">{actionData.errors.email}</p>
                   )}
                 </div>
                 <div>
                   <Field label="Adj meg egy erős jelszót: " placeholder="a te jelszavad" type="password" name="password" /> 
                   {actionData?.errors?.password && (
-                    <p className="text-red-600 text-2xl pt-3 font-semibold">{actionData.errors.password}</p>
+                    <p className="text-red-600 text-lg">{actionData.errors.password}</p>
                   )}
                 </div>
                 <div>
                   <Field label="Erősítsd meg a jelszavad: " placeholder="a te jelszavad újra" type="password" name="confirmPassword" />
                   {actionData?.errors?.confirmPassword && (
-                    <p className="text-red-600 text-2xl pt-3 font-semibold">{actionData.errors.confirmPassword}</p>
+                    <p className="text-red-600 text-lg">{actionData.errors.confirmPassword}</p>
                   )}
                 </div>
               </div>
