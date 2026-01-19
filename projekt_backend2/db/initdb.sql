@@ -56,3 +56,37 @@ create table Products_Orders (
     foreign key(Order_id) references Orders(id),
     foreign key(Product_id) references Products(id)
 );
+
+delimiter $$
+
+create procedure termekek(
+    p_from int, 
+    p_to int
+)
+begin
+    select
+        name as név,
+        category as kategória,
+        manufacturer as gyártó,
+        description as leírás,
+        picture as kép,
+        price as ár,
+        quantity as mennyiség
+    from Products
+    limit p_from - p_to offset p_from;
+end$$
+
+create procedure products(
+    p_which int,
+    p_name varchar(64),
+    p_category varchar(64),
+    p_manufacturer varchar(64),
+    p_from_price int,
+    p_to_price int,
+)
+begin
+    select 
+end$$
+    
+
+delimiter ;

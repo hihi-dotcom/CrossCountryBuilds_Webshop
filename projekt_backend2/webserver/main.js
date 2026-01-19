@@ -10,7 +10,7 @@ app.use(exp.json())
 /**
  * @type {import("mysql2/promise").Connection}
  */
-let conn = undefined
+let conn;
 
 app.get("/api/products", products)
 
@@ -27,7 +27,7 @@ _ = async function() {
         console.log(err)
         console.log("FATAL -- Server can't connect to database!")
     }
-    app.listen(PORT, () => { console.log(`Webserver started! Listening on port ${PORT}`) })
+    (conn) ? app.listen(PORT, () => { console.log(`Webserver started! Listening on port ${PORT}`) }) : false
 } ()
 
 /**
