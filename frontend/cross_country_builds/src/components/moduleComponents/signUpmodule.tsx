@@ -2,6 +2,7 @@
 import ArrowRightIcon from "@mui/icons-material/ArrowRightAltRounded";
 import {Link, Form, useActionData, useNavigation} from "react-router-dom";
 import { Field } from "../formFieldComponents/textFieldwLabel";
+import BackToWebShopButton from "../buttonComponents/backtoWebshopButton";
 
 export default function SignUpModule(){
     const actionData = useActionData();
@@ -77,6 +78,9 @@ export default function SignUpModule(){
           </div>
 
         </Form> 
+      </div>
+      <div className="flex justify-center md:justify-end w-full mb-5 pb-2  pt-4 md:px-10">
+        <BackToWebShopButton/>
       </div>
     </>
   );

@@ -24,12 +24,23 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-20">
 
  
-          <div className="shrink-0 flex items-center">
-            
-
+          <div className=" hidden shrink-0 md:flex items-center">
+            <Link to="/" className="flex items-center group no-underline">
+              <div className="flex items-center italic font-black uppercase text-2xl">
+                <span className="text-white transition-colors duration-200 ">
+                  Cross
+                </span>
+                <span className="text-[#a1202b] ml-1 transition-transform  ">
+                  Country
+                </span>
+                <span className="ml-2 text-xs font-light not-italic lowercase tracking-widest text-gray-400 self-end mb-1">
+                  builds
+                </span>
+              </div>
+            </Link>
           </div>
     
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden md:flex items-center justify-end space-x-6">
             {user ? (
               <>
 
@@ -55,7 +66,7 @@ export default function Navbar() {
                 )}
               </>
             ) : (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4 justify-end">
                 <Link to="/login" className="px-6 py-2.5 rounded-lg bg-[#435159] hover:bg-opacity-80 transition duration-200 border-transparent border-2 hover:border-white hover:font-bold">
                   Belépés
                 </Link>
@@ -66,7 +77,7 @@ export default function Navbar() {
             )}
           </div>
 
-          <div className="flex md:hidden items-center space-x-6">
+          <div className="flex md:hidden items-center space-x-6 ml-auto">
             {user ? (
               <>
                 {!isOrderEnd && !isOnCart && (

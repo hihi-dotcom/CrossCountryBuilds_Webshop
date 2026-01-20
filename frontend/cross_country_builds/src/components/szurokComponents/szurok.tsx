@@ -45,7 +45,7 @@ export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
 
     return(
         <Form method="post" className="border-t-2 border-white border-b-2 md:border-transparent ">
-            <div className="szurok bg-transparent p-6 sm:bg-[#3f484c] rounded-2xl w-full mx-auto">
+            <div className="szurok bg-transparent p-6 md:bg-[#3f484c] rounded-2xl w-full mx-auto">
 
                 <h1 className="text-center text-5xl sm:text-7xl font-semibold text-slate-100 mb-8">
                     Keresés

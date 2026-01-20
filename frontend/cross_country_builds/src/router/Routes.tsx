@@ -85,7 +85,7 @@ const routes = [
         path: "admin",
         id: "admin",
         element: <ProtectRouteAdmin />,
-        //loader: rootLoader, 
+        loader: rootLoader, 
         errorElement: <AdminErrorPage />,
         children: [
             { index: true, element: <UsersDashboard /> },

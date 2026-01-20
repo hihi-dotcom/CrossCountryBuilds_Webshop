@@ -3,6 +3,7 @@ import { FormField } from "../formFieldComponents/textField";
 import ArrowRightIcon from "@mui/icons-material/ArrowRightAltRounded"
 import { useRef,} from "react";
 import {Link, Form, useActionData, useNavigation} from "react-router-dom";
+import BackToWebShopButton from "../buttonComponents/backtoWebshopButton";
 
 export default function LoginModule(){
     const actionData = useActionData();
@@ -51,9 +52,12 @@ export default function LoginModule(){
                     </div>
                 </div>
             </Form>
-            <div className="flex flex-col sm:flex-row items-center gap-4 mx-auto my-6 md:my-10 text-lg md:text-2xl">
+            <div className="flex flex-col md:flex-row items-center gap-4 mx-auto my-6 md:my-10 text-lg md:text-2xl ">
                 <h3 className="text-center sm:text-left">Nincs még fiókod?  Regisztrálj<ArrowRightIcon fontSize="large" className="hidden text-center sm:inline-block"/></h3>
                 <Link to={"/signup"} className="bg-[#eee5e9] text-black p-3 rounded-xl hover:border-black border-4 border-transparent text-center">Regisztrálok</Link>
+            </div>
+            <div className="flex justify-center md:justify-end w-full mb-5 py-4 md:px-10">
+                <BackToWebShopButton/>
             </div>
         </div>
     );
