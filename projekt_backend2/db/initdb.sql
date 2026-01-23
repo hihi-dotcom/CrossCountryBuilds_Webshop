@@ -155,9 +155,12 @@ begin
         name = coalesce(p_name, name),
         shipping_address = coalesce(p_shipping_address, shipping_address),
         billing_address = coalesce(p_billing_address, billing_address),
-        email = coalesce(p_email, email),
         password = coalesce(p_password, password)
     where id = p_id;
+
+    if p_email is not null and p_email <> (select email from Visitors where id = p_id) then
+        update Visitors set email = p_email where id = p_id;
+    end if;
 end$$
 
 create procedure get_user( 
@@ -174,10 +177,15 @@ begin
 end$$
 
 create procedure create_order(
-
+    in p_uid int
 )
 begin
-
+    insert into Orders (Visitor_id) values
+        (p_uid);
 end$$
+
+create procedure 
+
+
 
 delimiter ;

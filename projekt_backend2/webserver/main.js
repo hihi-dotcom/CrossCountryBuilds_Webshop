@@ -22,7 +22,6 @@ app.put("/api/registration", registration)
 app.get("/api/user", auth, get_user)
 app.patch("/api/user", auth, update_user)
  
-
 app.listen(PORT, () => { console.log(`Webserver started! Listening on port ${PORT}`) })
 
 /**
@@ -54,10 +53,18 @@ async function order(req, res) {
 
     const conn = await sql.createConnection(DBConnP)
 
-
     for (const p in products) {
         const name = p["product name"]
         const number = p["product number"]
+
+        await conn.query("start transaction")
+
+        const result = await conn.query("call create_order(?)",
+            [req.uid]
+        )
+        
+        console.log(result)
+
 
     }
 
@@ -147,5 +154,3 @@ async function update_user(req, res) {
     }
     res.status(202).send("Resource changed")
 }
-
-
