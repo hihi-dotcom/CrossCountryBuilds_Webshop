@@ -22,26 +22,26 @@ export default function SignUpModule(){
               <div className="flex flex-col gap-5 w-full max-w-md mx-auto">
                 <div>
                   <Field label="Adj meg egy felhasználónevet: " placeholder="név" type="text" name="username" />
-                  {actionData?.errors?.name && (
-                    <p className="text-red-600 text-lg">{actionData.errors.name}</p>
+                  {actionData?.errors?.username && (
+                    <p className="text-rose-400 md:text-orange-400 text-lg">{actionData.errors.username[0]}</p>
                   )}
                 </div>
                 <div>
                   <Field label="Add meg az email címed: " placeholder="e-mail" type="email" name="email" />
                   {actionData?.errors?.email && (
-                    <p className="text-red-600 text-lg">{actionData.errors.email}</p>
+                    <p className="text-rose-400 md:text-orange-400 text-lg">{actionData.errors.email[0]}</p>
                   )}
                 </div>
                 <div>
                   <Field label="Adj meg egy erős jelszót: " placeholder="a te jelszavad" type="password" name="password" /> 
                   {actionData?.errors?.password && (
-                    <p className="text-red-600 text-lg">{actionData.errors.password}</p>
+                    <p className="text-rose-400 md:text-orange-400 text-lg">{actionData.errors.password[0]}</p>
                   )}
                 </div>
                 <div>
                   <Field label="Erősítsd meg a jelszavad: " placeholder="a te jelszavad újra" type="password" name="confirmPassword" />
                   {actionData?.errors?.confirmPassword && (
-                    <p className="text-red-600 text-lg">{actionData.errors.confirmPassword}</p>
+                    <p className="text-rose-400 md:text-orange-400 text-lg">{actionData.errors.confirmPassword[0]}</p>
                   )}
                 </div>
               </div>
@@ -55,8 +55,8 @@ export default function SignUpModule(){
             
             <div className="col-span-1 md:col-span-2 text-center">
                {actionData?.serverError && (
-                <p className="text-red-600 text-2xl pt-3 font-semibold">
-                  {actionData.serverError}
+                <p className="text-rose-400 md:text-orange-400 text-2xl pt-3 font-semibold">
+                  {actionData.serverError[0]}
                 </p>
               )}
             </div>

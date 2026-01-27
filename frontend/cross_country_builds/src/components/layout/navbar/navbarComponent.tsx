@@ -24,7 +24,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-20">
 
  
-          <div className=" hidden shrink-0 md:flex items-center">
+          <div className="shrink-0 flex items-center">
             <Link to="/" className="flex items-center group no-underline">
               <div className="flex items-center italic font-black uppercase text-2xl">
                 <span className="text-white transition-colors duration-200 ">
@@ -33,7 +33,7 @@ export default function Navbar() {
                 <span className="text-[#a1202b] ml-1 transition-transform  ">
                   Country
                 </span>
-                <span className="ml-2 text-xs font-light not-italic lowercase tracking-widest text-gray-400 self-end mb-1">
+                <span className="hidden md:flex ml-2 text-xs font-light not-italic lowercase tracking-widest text-gray-400 self-end mb-1">
                   builds
                 </span>
               </div>
@@ -91,7 +91,7 @@ export default function Navbar() {
                 </Link>)}
                 {!isOrderFlow && (
                   <Form method="post" action="/logout">
-                    <button type="submit"><LogOutIcon className="hover:shadow-2xl"/></button>
+                    <button type="submit" className="bg-[#cc2936] py-2 rounded-xl px-2 text-white "><LogOutIcon sx={{ fontSize: 30 }} className="hover:shadow-2xl "/></button>
                   </Form>
                 )}
               </>

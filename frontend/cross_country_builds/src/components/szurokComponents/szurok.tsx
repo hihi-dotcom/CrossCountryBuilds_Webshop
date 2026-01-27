@@ -1,12 +1,13 @@
 import { useRef } from "react";
 import { TextInput } from "../formFieldComponents/inputwithPlaceholder";
-import { FormField } from "../formFieldComponents/textField";
 import { Form } from "react-router-dom";
 import KategoriakSelect from "../htmlselectComponents/selectinszurok";
+import { useState } from "react";
+import searchScheme from "../validationSchemes/searchScheme";
 
 
 export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
-
+    const [errors, setErrors] = useState<Record<string, string>>({});
     const termekKategoriak = [
     {
         value: "kerékpárok",
@@ -40,6 +41,18 @@ export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
                 priceFrom: Number(priceFrom.current?.value) || 0,
                 priceTo: Number(priceTo.current?.value) || 4000000
             };
+
+            const result = searchScheme.safeParse(searchData);
+
+            if(!result.success){
+                const fieldErrors: Record<string, string> = {};
+                result.error.issues.forEach((issue) => {
+                    const key = String(issue.path[0])
+                    fieldErrors[key] = issue.message;
+                });
+                setErrors(fieldErrors);
+                return;
+            }
             onSearch(searchData);
     };
 
@@ -56,16 +69,22 @@ export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
                     <div>
 
                         <input type="text" name="productName" id="termek_neve" placeholder="termék neve" ref={termekNeveRef} onChange={handleSearching} className="bg-transparent text-xl text-white  border-amber-50 border-2 sm:bg-amber-50 sm:text-black rounded-xl h-9 w-full placeholder-white sm:placeholder-black sm:rounded-lg px-4 py-5 focus:outline-none"/>
-                        <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
+                        <p className="text-rose-400 md:text-orange-300 text-sm pt-1 font-semibold">
+                            {errors.productName}
+                        </p>
                     </div>
                        
                     <div>
                         <input type="text" name="maker" id="termek_gyartoja" placeholder="termék gyártója" ref={termekGyartojaRef} onChange={handleSearching}  className="bg-transparent text-xl text-white  border-amber-50 border-2 rounded-xl sm:bg-amber-50 sm:text-black h-9 w-full placeholder-white sm:placeholder-black sm:rounded-lg px-4 py-5 focus:outline-none" />
-                        <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
+                        <p className="text-rose-400 md:text-orange-300 text-sm pt-1 font-semibold">
+                            {errors.maker}
+                        </p>
                     </div>
                     <div>
                         <KategoriakSelect options={termekKategoriak} ref={kategoriakRef} OnChange={handleSearching}/>
-                        <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
+                        <p className="text-rose-400 md:text-orange-300 text-sm pt-1 font-semibold">
+                            {errors.category}
+                        </p>
                     </div>
                     
                 </div>
@@ -75,29 +94,33 @@ export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
                     <label className="block text-3xl text-slate-100 mb-2">Termék ára:</label>
 
                     <div className="flex gap-4 max-w-full">
-                        <div>
+                        <div className="flex-1">
                             <TextInput
                                 inp_type="number"
                                 inp_name="priceFrom"
                                 inp_id="artol"
                                 inp_placeholder="-tól"
-                                inp_className="md:text-black placeholder-white  bg-amber-50 w-full rounded-lg h-10 px-3 bg-transparent text-white border-2 border-white md:bg-white md:placeholder-black "
+                                inp_className="text-white md:text-black placeholder-white  bg-amber-50 w-full rounded-lg h-10 px-3 bg-transparent text-white border-2 border-white md:bg-white md:placeholder-black "
                                 ref={priceFrom}
                                 OnChange={handleSearching}
                             />
-                            <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
+                            <p className="text-rose-400 md:text-orange-300 text-sm pt-1 font-semibold">
+                            {errors.priceFrom}
+                            </p>
                         </div>
-                        <div>
+                        <div className="flex-1">
                             <TextInput
                                 inp_type="number"
                                 inp_name="priceTo"
                                 inp_id="arig"
                                 inp_placeholder="-ig"
-                                inp_className="md:text-black placeholder-white  bg-amber-50 w-full rounded-lg h-10 px-3 bg-transparent text-white border-2 border-white md:bg-white md:placeholder-black"
+                                inp_className="text-white md:text-black placeholder-white  bg-amber-50 w-full rounded-lg h-10 px-3 bg-transparent text-white border-2 border-white md:bg-white md:placeholder-black"
                                 ref={priceTo}
                                 OnChange={handleSearching}
                             />
-                            <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
+                             <p className="text-rose-400 md:text-orange-300 text-sm pt-1 font-semibold">
+                                {errors.priceTo}
+                            </p>
                         </div>   
 
                     </div>

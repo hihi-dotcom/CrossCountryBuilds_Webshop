@@ -24,9 +24,9 @@ export default function AdminErrorPage(){
     }
     return(
         <>
-            <main>
+            <main className="min-h-screen flex items-center justify-center">
                 <section>
-                        <div id="admin_err_cont">
+                        <div id="admin_err_cont" className="text-center py-5 text-white mx-auto px-4">
                             <h1>{errCode}</h1>
                             <p>{errMessage}</p>
                             <h3 className="text-lg font-bold">A hiba technikai részletei: </h3>

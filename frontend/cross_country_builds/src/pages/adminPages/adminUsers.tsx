@@ -15,7 +15,21 @@ export default function UsersDashboard(){
                         link3_to="/admin/products"
                         link3_innerText="Termékek Dashboard"
                     />
+                    <div id="kereses" className="rounded-xl py-2 px-3 border-2 text-black mt-15 border-black flex flex-col h-fit ">
+                        <h2 className="text-2xl text-center">User keresés (név alapján)</h2>
+                        <div className="flex flex-row">
+                            <div id="kereso-mezo" className="w-full py-3 text-lg pr-4">
+                                <label htmlFor="productname" className="text-base px-2">Adj meg felhasználónevet: </label>
+                                <input type="text" name="productname" id="productname" className="text-black border-black border-2 bg-white rounded-xl placeholder:px-2 h-10" placeholder="a felhasználónév"/>
+                            </div>
+                            <div id="kereses-gomb" className=" flex items-center justify-center pr-4">
+                                <button type="submit" className=" text-lg bg-[#08415c] text-white px-3 py-2 rounded-lg    hover:font-bold">Keresés!</button>
+                            </div>
+                        </div>
+                    </div>
                </div>
+
+
 
                <div className="md:col-span-3 bg-white p-6 rounded-xl shadow-sm border mt-15 border-gray-200">
                     <div className="flex justify-start items-center mb-6">
@@ -39,13 +53,13 @@ export default function UsersDashboard(){
                                     <td className="py-3 px-2 bg-blue-100 text-blue-700 rounded text-base font-bold">user</td>
                                     <td className="py-3 px-2 text-right flex flex-col md:flex-row">
                                         <div className="flex flex-col md:flex-row justify-end items-center gap-2">
-                                            {/* Szerkesztés gomb - Szürke/Sötét */}
+                                            {/* 
                                             <button className="flex items-center justify-center gap-1 bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95">
                                                 <EditIcon sx={{ fontSize: 18 }} />
                                                 <span className="md:hidden lg:inline">Szerkesztés</span>
-                                            </button>
+                                            </button>*/}
 
-                                            {/* Törlés gomb - Piros */}
+                                            
                                             <button className="flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95">
                                                 <TrashIcon sx={{ fontSize: 18 }} />
                                                 <span className="md:hidden lg:inline">Törlés</span>

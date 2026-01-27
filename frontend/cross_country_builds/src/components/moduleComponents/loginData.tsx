@@ -1,6 +1,7 @@
 import { FormField } from "../formFieldComponents/textField";
 
 import ArrowRightIcon from "@mui/icons-material/ArrowRightAltRounded"
+
 import { useRef,} from "react";
 import {Link, Form, useActionData, useNavigation} from "react-router-dom";
 import BackToWebShopButton from "../buttonComponents/backtoWebshopButton";
@@ -25,7 +26,7 @@ export default function LoginModule(){
                             input_placeholder="felhasználónév"
                             ref={userNameRef}
                         />
-                         {actionData?.errors?.username && (<p className="text-red-600 text-lg">
+                         {actionData?.errors?.username && (<p className="text-rose-400 sm:text-amber-300 text-lg">
                             {actionData.errors.username}
                          </p>)}
 
@@ -36,7 +37,7 @@ export default function LoginModule(){
                             input_placeholder="jelszó"
                             ref={passwordRef}
                         />
-                        {actionData?.errors?.password && (<p className="text-red-600 text-lg">
+                        {actionData?.errors?.password && (<p className="text-rose-400 sm:text-amber-300 text-lg">
                             {actionData.errors.password}
                          </p>)}
                         
@@ -45,7 +46,7 @@ export default function LoginModule(){
                             <Link to={"/getnewpass"} className=" bg-[#cc2936] text-center  hover:border-white border-2 border-transparent p-2 md:p-3 hover:font-bold rounded-2xl  md:text-xl  w-full sm:w-auto">Elfelejtettem a jelszavam</Link>
                         </div>
                         <div className="flex flex-col">
-                            {actionData?.serverError && (<p className="text-red-600 text-2xl pt-3 font-semibold">
+                            {actionData?.serverError && (<p className="text-rose-400 sm:text-amber-300 text-2xl pt-3 font-semibold">
                             {actionData.serverError}
                          </p>)}
                         </div>

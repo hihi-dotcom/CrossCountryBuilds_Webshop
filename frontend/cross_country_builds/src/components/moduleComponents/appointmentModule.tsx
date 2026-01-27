@@ -34,7 +34,7 @@ export default function AppointmentModule(){
                     <div id="free-datetimes" className="flex flex-col  m-5 h-fit  bg-[#f1bf98] rounded-2xl py-4 px-4 md:py-5 md:px-4 xl:py-6 xl:px-5 shadow-2xl">
                         <h2 className="text-2xl text-black ">Válassz szabad időpontjaink közül!</h2>
                         <SelectforDatetime datetimes={test_free_datetimes}/>
-                        {actionData?.errors?.appointmentDate && (<p className="text-red-600 text-lg pt-3 font-semibold">{actionData.errors.appointmentDate}</p>)}
+                        {actionData?.errors?.appointmentDate[0] && (<p className="text-red-600 text-lg pt-3 font-semibold">{actionData.errors.appointmentDate[0]}</p>)}
                     </div>
                     <div className="max-w-lg text-lg bg-[#cc2936] shadow-2xl h-fit p-5 rounded-2xl m-5">
                         <h2 className="text-4xl">Fontos!</h2>
@@ -45,8 +45,8 @@ export default function AppointmentModule(){
                     <div className="max-w-lg text-lg  shadow-2xl h-fit p-5 rounded-2xl m-5 bg-[#4b5a62]">
                         
                         <textarea id="message" name="message" rows={4} className="bg-white border border-black text-heading text-lg rounded-base text-black focus:ring-brand focus:border-brand block w-full p-3.5 shadow-xs placeholder:text-body placeholder:text-black placeholder:text-lg" placeholder="Mesélj a problémáról...."></textarea>
-                        {actionData?.errors?.message && (
-                            <p className="text-red-500 text-2xl pt-3 font-semibold">{actionData.errors.message}</p>
+                        {actionData?.errors?.message[0] && (
+                            <p className="text-orange-400 text-2xl pt-3 font-semibold">{actionData.errors.message[0]}</p>
                         )}
                         
                     </div>

@@ -1,5 +1,6 @@
+import CloseIcon from "@mui/icons-material/Close";
 export default function AdminLogoutButton(){
     return(
-        <button type="submit" className="shadow-2xl block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent">Kilépés</button>
+        <button type="submit" className=" hidden shadow-2xl md:block py-2 px-3 text-heading border-2 border-transparent hover:border-white  hover:font-bold bg-[#cc2936] text-white rounded-xl"><CloseIcon className="pr-1 flex items-center "/>Kilépés</button>
     );
 }
