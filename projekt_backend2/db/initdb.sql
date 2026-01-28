@@ -184,8 +184,243 @@ begin
         (p_uid);
 end$$
 
-create procedure 
+create procedure get_users()
+begin
+    select 
+        id,
+        name as username,
+        email,
+        shipping_address,
+        billing_address
+    from Visitors;
+end$$
+
+create procedure delete_user(
+    in p_id int
+)
+begin
+    delete from Visitors where id = p_id;
+end$$
+
+create procedure get_users_unbooked_dates()
+begin
+    select 
+        d.Visitor_id,
+        v.name,
+        v.email,
+        d.title,
+        d.import_date,
+        d.description
+    from Dates d
+    join Visitors v on d.Visitor_id = v.id
+    where d.import_date is null;
+end$$
+
+create procedure admin_update_date(
+    in p_visitor_id int,
+    in p_pickup_date date,
+    in p_title varchar(64),
+    in p_price int
+)
+begin
+    update Dates 
+    set pickup_date = p_pickup_date,
+        title = p_title
+    where Visitor_id = p_visitor_id;
+end$$
+
+create procedure get_all_products()
+begin
+    select
+        id,
+        name,
+        category,
+        manufacturer,
+        description,
+        picture,
+        price,
+        quantity
+    from Products;
+end$$
+create procedure get_product_by_id(
+    in p_id int
+)
+begin
+    select
+        id,
+        name,
+        category,
+        manufacturer,
+        description,
+        picture,
+        price,
+        quantity
+    from Products
+    where id = p_id;
+end$$
+create procedure insert_product(
+    in p_name varchar(64),
+    in p_category varchar(64),
+    in p_manufacturer varchar(64),
+    in p_description varchar(128),
+    in p_picture varchar(64),
+    in p_price int,
+    in p_quantity int
+)
+begin
+    insert into Products (name, category, manufacturer, description, picture, price, quantity)
+    values (p_name, p_category, p_manufacturer, p_description, p_picture, p_price, p_quantity);
+end$$
+create procedure delete_product(
+    in p_id int
+)
+begin
+    delete from Products where id = p_id;
+end$$
+
+create procedure get_available_dates()
+begin
+    select 
+        Visitor_id,
+        title,
+        import_date,
+        description
+    from Dates
+    where import_date is null;
+end$$
+
+create procedure book_appointment(
+    in p_visitor_id int,
+    in p_import_date datetime,
+    in p_description varchar(255)
+)
+begin
+    update Dates set
+        import_date = p_import_date,
+        description = p_description
+    where Visitor_id = p_visitor_id and import_date is null;
+end$$
+
+create procedure get_pending_appointments()
+begin
+    select 
+        d.Visitor_id,
+        v.name as username,
+        d.import_date,
+        d.description as problem_description,
+        d.pickup_date,
+        d.title as service_type
+    from Dates d
+    join Visitors v on d.Visitor_id = v.id
+    where d.pickup_date is null;
+end$$
+
+create procedure admin_update_appointment(
+    in p_visitor_id int,
+    in p_pickup_date date,
+    in p_title varchar(64),
+    in p_price int
+)
+begin
+    update Dates set
+        pickup_date = p_pickup_date,
+        title = p_title
+    where Visitor_id = p_visitor_id;
+end$$
+
+create procedure add_available_date(
+    in p_visitor_id int,
+    in p_title varchar(64)
+)
+begin
+    insert into Dates (Visitor_id, title) 
+    values (p_visitor_id, p_title);
+end$$
+
+create procedure get_orders_for_admin()
+begin
+    select 
+        o.id as order_id,
+        o.Visitor_id,
+        o.shipping_method,
+        o.payment_method,
+        o.order_status as status
+    from Orders o
+    order by o.id desc;
+end$$
+
+create procedure update_order_status(
+    in p_order_id int,
+    in p_status varchar(64)
+)
+begin
+    update Orders set order_status = p_status where id = p_order_id;
+end$$
+
+create procedure delete_order(
+    in p_order_id int
+)
+begin
+    delete from Products_Orders where Order_id = p_order_id;
+    delete from Orders where id = p_order_id;
+end$$
 
 
+create procedure delete_appointment(
+    in p_id int
+)
+begin
+    delete from Dates where id = p_id;
+end$$
+
+create procedure delete_user_by_email(
+    in p_email varchar(64)
+)
+begin
+    delete from Visitors where email = p_email;
+end$$
+
+create procedure get_appointments()
+begin
+    select 
+        id,
+        Visitor_id,
+        title,
+        import_date,
+        pickup_date,
+        description
+    from Dates
+    where import_date is not null;
+end$$
+
+CREATE PROCEDURE update_product(
+    IN p_id INT,
+    IN p_name VARCHAR(64),
+    IN p_category VARCHAR(64),
+    IN p_manufacturer VARCHAR(64),
+    IN p_description VARCHAR(128),
+    IN p_price INT,
+    IN p_quantity INT
+)
+BEGIN
+    UPDATE Products SET 
+        name = p_name,
+        category = p_category,
+        manufacturer = p_manufacturer,
+        description = p_description,
+        price = p_price,
+        quantity = p_quantity
+    WHERE id = p_id;
+END$$
+
+CREATE PROCEDURE get_orders_by_user(
+    IN p_user_id INT
+)
+BEGIN
+    SELECT o.*, po.Product_id, po.quantity 
+    FROM Orders o
+    LEFT JOIN Products_Orders po ON o.id = po.Order_id
+    WHERE o.Visitor_id = p_user_id;
+END$$
 
 delimiter ;
