@@ -1,50 +1,82 @@
+import AuthService from "./AuthService";
+import type BookCreds from "../models/models_for_services/datetime_models";
+import type FinalizeCreds from "../models/models_for_services/datetime_models";
 import type FreeDate from "../models/models_for_services/datetime_models";
 
 class DateTimeService{
     async gettingFreeDates(){
-        const resp = await fetch("http://localhost:3000/appointments");
+        const resp = await AuthService._request("http://localhost:3000/freeappointments");
 
         const respData = await resp.json();
 
         return respData;
     };
 
-    async ArrangeDateTime(datearrangement: {appointmentDate:string, description: string}){
-        const response = await fetch("http://localhost:3000/appointment", {
-            method: "POST",
-            headers: {
-                'Content-Type':'application/json'
-            },
-            body: JSON.stringify(datearrangement)
-        });
-        return await response.json();
-    };
+    async bookAServiceDate(id: number, data:BookCreds){
+   
+        const response = await AuthService._request(`appointment/${id}`,{
+            method: "PATCH",
 
-    async DeleteDateTime(id: number){
-        const response = await fetch(`http://localhost:3000/appointment/${id}`, {
-            method: "DELETE",
-            headers: {
-                'Content-Type':'application/json'
-            }
+            body: JSON.stringify(data)
         });
 
-        return await response.json();
+        const resp = await response.json();
+
+        return {
+            ok: response.ok,
+            message: resp.message
+        };
     };
 
-
-    async addNewDateTime(free: FreeDate){
-        const response = await fetch('http://localhost:3000/date',{
-            method: 'POST',
-            headers: {
-                'Content-Type':'application/json'
-            },
-            body: JSON.stringify(free)
+    async finalizeService(id:number, data:FinalizeCreds){
+        const response = await AuthService._request(`appointment/${id}`, {
+            method: "PATCH",
+            body: JSON.stringify(data)
         });
 
         const respData = await response.json();
 
-        return respData;
+        return{
+            ok: response.ok,
+            message: respData.message
+        }
+    };
+
+    async createFreeService(data:FreeDate){
+        const response = await AuthService._request(`newappointment`, {
+            method: "POST",
+            body: JSON.stringify(data)
+        });
+
+        const respData = await response.json();
+
+        return{
+            ok: response.ok,
+            message: respData.message
+        }
+    };
+
+    async deleteService(id:number){
+        const response = await AuthService._request(`appointment/${id}`, {
+            method: "DELETE"
+        });
+
+        const respData = await response.json();
+
+        return {
+            ok: response.ok,
+            message: respData.message
+        };
+    };
+
+    async getAppointmentsforAdmin(){
+        const response = await AuthService._request(`appointments`, {
+            method: "GET"
+        });
+
+        return await response.json();
     }
+    
 }
 
 export default new DateTimeService();

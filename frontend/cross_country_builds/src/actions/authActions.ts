@@ -44,11 +44,11 @@ export async function registerAction({ request }: {request: Request}) {
     const regResult = await AuthService.registration(result.data);
     if(!regResult.ok){
         return {
-            serverError: "A regisztráció sajnos nem sikerült. Próbálkozz más adatokkal!"
+            serverError:  "A regisztráció sajnos nem sikerült. Próbálkozz más adatokkal!"
         }
     }
 
-    return redirect("/login");
+    return redirect("/");
 };
 
 export async function logoutAction(){

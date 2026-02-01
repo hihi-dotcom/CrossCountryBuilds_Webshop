@@ -1,46 +1,68 @@
+import AuthService from "./AuthService";
 import type ProductCreds from "../models/models_for_services/product_models";
 
-class ProductService{
+const API_URL = "http://localhost:3000/api";
 
-    async createNewProduct(product: ProductCreds){
-        const response = await fetch('http://localhost:3000/product', {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(product)
-        });
+class ProductService {
 
-        return await response.json();
+    async getProducts(limit: number = 25, offset: number = 0) {
+        const response = await fetch(`${API_URL}/products?limit=${limit}&offset=${offset}`);
+        const data = await response.json();
+        
+     
+        return {
+            ok: response.ok,
+            products: data.product, 
+            total: data.total,
+            hasMore: data.hasMore
+        };
     }
 
 
-    async getProductbyId(id: number){
-        const response = await fetch(`http://localhost:3000/product/${id}`);
+    async getProductById(id: number) {
+        const response = await fetch(`${API_URL}/product/${id}`);
+        const data = await response.json();
+        
+        
+        return data.length > 0 ? data[0] : null;
+    }
 
-        const respData = await response.json();
 
-        return respData;
-    };
 
-    async getProducts(){
-        const response = await fetch(`http://localhost:3000/products`);
+    async getAdminProducts() {
+        const response = await AuthService._request("products");
+        if (!response.ok) throw new Error("Hiba a termékek lekérésekor!");
+        return await response.json();
+    }
 
-        const respData = await response.json();
+    async createNewProduct(Indata:any) {
 
-        return respData;
-    };
-
-    async deletProductById(id:number){
-        const response = await fetch(`http://localhost:3000/product/${id}`, {
-            method: "DELETE",
-            headers: {
-                'Content-Type':'application/json'
-            }
+        const response = await AuthService._request("product", {
+            method: "POST",
+            body: Indata
         });
 
-        return await response.json();
-    };
-};
+        const data = await response.json();
+
+        return {
+            ok: response.ok,
+            message: data.message,
+            id: data.id
+        };
+    }
+
+    async deleteProductById(id: number) {
+        const response = await AuthService._request(`product/${id}`, {
+            method: "DELETE"
+        });
+
+        const data = await response.json();
+
+        return {
+            ok: response.ok,
+            message: data.message
+        };
+    }
+}
 
 export default new ProductService();

@@ -18,9 +18,11 @@ class AuthService {
         const url =`${API_url}${endpoint}`;
         const token = this.getToken();
 
-        const headers: Record<string, string> = {
-            'Content-Type': 'application/json'
-        };
+        const headers: Record<string, string> = { ...options.headers as Record<string, string> };
+
+        if(!(options.body instanceof FormData)){
+            headers['Content-Type'] = 'application/json';
+        }
 
         if(token){
             headers['Authorization'] = `Bearer ${token}`
