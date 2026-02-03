@@ -1,5 +1,5 @@
 export default interface FreeDate{
-    datetime: string
+ appointmentDate: string
 }
 
 

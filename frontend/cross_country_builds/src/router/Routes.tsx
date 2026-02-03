@@ -29,6 +29,9 @@ import AuthService from "../services/AuthService";
 import ProtectRouteUser from "../pages/protects/ProtectiveRouteUser";
 import PublicOnlyRoute from "../pages/protects/ProtectPublicOnly";
 import { serviceDateTimeAction } from "../actions/serviceActions";
+import { getPassEmailAction, createPassAction } from "../actions/passwordActions";
+import { MakeOrder } from "../actions/orderActions";
+import { createProductAction } from "../actions/productActions";
 
 const rootLoader = async () => {
     return await AuthService.gettingCurrentUser();
@@ -53,8 +56,8 @@ const routes = [
                         children: [
                             { path: "login", action: loginAction, element: <LogInPage /> },
                             { path: "signup", action: registerAction, element: <RegistrationPage /> },
-                            { path: "getnewpass", element: <GetNewPasswordPage /> },
-                            { path: "createnewpass", element: <CreateNewPasswordPage /> },
+                            { path: "getnewpass",/*action: getPassEmailAction ,*/element: <GetNewPasswordPage /> },
+                            { path: "createnewpass",/*action: createPassEmailAction ,*/ element: <CreateNewPasswordPage /> },
                         ]
                     },
                    
@@ -66,7 +69,7 @@ const routes = [
                         element: <ProtectRouteUser />,
                         children: [
                             { path: "mydata", element: <MyDataPage /> },
-                            { path: "orderData", element: <OrderDataPage /> },
+                            { path: "orderData",/*action: MakeOrder ,*/  element: <OrderDataPage /> },
                             { path: "orderend", element: <EndofOrderPage /> },
                             { path: "cart", element: <CartPage /> },
                             { path: "appointment",
@@ -88,10 +91,36 @@ const routes = [
         loader: rootLoader, 
         errorElement: <AdminErrorPage />,
         children: [
-            { index: true, element: <UsersDashboard /> },
-            { path: "orders", element: <OrdersDashboard /> },
-            { path: "dates", element: <AppointmentDashboard /> },
-            { path: "products", element: <ProductDashboard /> }
+            { 
+                index: true, 
+                element: <UsersDashboard />,
+                
+                /*loader: async() => {
+                    return await UserService.getNormalUsers();
+                }*/
+            },
+            { 
+                path: "orders", 
+                element: <OrdersDashboard />,
+                /*loader: async() => {
+                    return await OrderService.getOrdersforAdmin();
+                }*/
+            },
+            { 
+                path: "dates", 
+                element: <AppointmentDashboard />,
+                /*loader: async() => {
+                    return await DateTimeService.getAppointmentsforAdmin();
+                }*/
+            },
+            { 
+                path: "products", 
+                element: <ProductDashboard />,
+                /*action: createProductAction ,*/
+                /*loader: async() => {
+                    return await ProductService.getAdminProducts();
+                }*/ 
+            }
         ]
     }
 ];

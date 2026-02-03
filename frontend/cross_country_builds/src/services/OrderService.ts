@@ -2,7 +2,7 @@ import type {OrderCreds, UpdateStatCreds}  from "../models/models_for_services/o
 import AuthService from "./AuthService";
 
 class OrderService{
-    async MakingOrder(order: OrderCreds){
+    async MakingOrder(order:any){
         const response = await AuthService._request(`order`, {
             method: "POST",
             body: JSON.stringify(order)
@@ -50,8 +50,12 @@ class OrderService{
         const response = await AuthService._request(`orders`, {
             method: "GET"
         });
-
-        return await response.json();
+        const responseData = await response.json()
+        if(!response.ok){
+            
+            throw new Error(responseData.message || "Hiba a megrendelések lekérésekor! ");
+        }
+        return await responseData;
     }
 };
 

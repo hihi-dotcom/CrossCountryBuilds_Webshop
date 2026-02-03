@@ -12,7 +12,7 @@ class DateTimeService{
         return respData;
     };
 
-    async bookAServiceDate(id: number, data:BookCreds){
+    async bookAServiceDate(id: number, data:any){
    
         const response = await AuthService._request(`appointment/${id}`,{
             method: "PATCH",
@@ -42,7 +42,7 @@ class DateTimeService{
         }
     };
 
-    async createFreeService(data:FreeDate){
+    async createFreeService(data:{appointmentDate:string}){
         const response = await AuthService._request(`newappointment`, {
             method: "POST",
             body: JSON.stringify(data)
@@ -73,8 +73,11 @@ class DateTimeService{
         const response = await AuthService._request(`appointments`, {
             method: "GET"
         });
-
-        return await response.json();
+        const respD = await response.json();
+        if(!response.ok){
+            throw new Error(respD.message || "Hiba a szervizidőpontok lekérésekor! ");
+        }
+        return await respD;
     }
     
 }

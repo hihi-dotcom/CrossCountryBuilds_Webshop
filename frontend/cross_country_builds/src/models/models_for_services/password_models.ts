@@ -4,6 +4,6 @@ export interface ForgotCreds{
 
 
 export interface NewPassCreds{
-    password:string,
-    newPassword: string
+    newPassword:string,
+    confirmPassword: string
 }

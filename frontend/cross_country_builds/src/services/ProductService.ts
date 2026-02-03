@@ -31,8 +31,11 @@ class ProductService {
 
     async getAdminProducts() {
         const response = await AuthService._request("products");
-        if (!response.ok) throw new Error("Hiba a termékek lekérésekor!");
-        return await response.json();
+        const respD = await response.json();
+        if (!response.ok){
+            throw new Error(respD.message || "Hiba a termékek lekérésekor! ");
+        } 
+        return respD;
     }
 
     async createNewProduct(Indata:any) {
@@ -44,6 +47,9 @@ class ProductService {
 
         const data = await response.json();
 
+        if(!response.ok){
+            throw new Error(data.message || "Hiba a termék feltöltése közben! ")
+        }
         return {
             ok: response.ok,
             message: data.message,

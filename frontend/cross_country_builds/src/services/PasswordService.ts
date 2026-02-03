@@ -22,7 +22,7 @@ class PasswordService{
          const response = await fetch("http://localhost:3000/api/createnewpass", {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({token,data })
+            body: JSON.stringify({token,...data })
         });
 
         const respData = await response.json();

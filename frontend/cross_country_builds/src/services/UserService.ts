@@ -31,10 +31,10 @@ class UserService{
 
     async getNormalUsers() {
         const response = await AuthService._request('users');
-        
+        const responseData = await response.json();
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Hiba a lekérés során.");
+           
+            throw new Error(responseData.message || "Hiba a felhasználók lekérése során.");
         }
 
         return await response.json();
