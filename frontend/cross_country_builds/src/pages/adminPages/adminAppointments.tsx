@@ -2,12 +2,13 @@ import AdminSidebar from "../../components/adminComponents/Admin_OrdersSidebar";
 import SaveIcon from "@mui/icons-material/Save";
 import { useState } from "react";
 import { Form } from "react-router-dom";
+import DateTimeService from "../../services/DateTimeService";
 
 
 export default function AppointmentDashboard(){
 
-
-      const [services, setServices] = useState([
+    const [error, setError] = useState("");
+    const [services, setServices] = useState([
         {
         id: 1,
         username: "Zsolti a béka",
@@ -17,6 +18,21 @@ export default function AppointmentDashboard(){
         bringback_date: ""
         }
     ]);
+
+    async function handleDeleteAppointment(id:number){
+        try{
+                    const deleteResult = await DateTimeService.deleteService(id);
+                    if(deleteResult.ok){
+                        //setServices(prev => prev.filter(p => p.id !== id))
+                    }
+                    else{
+        
+                    }
+        }
+        catch(error){
+        
+        }
+    }
 
 
     return(
@@ -79,6 +95,7 @@ export default function AppointmentDashboard(){
                             </div>
                         </div>
                         <div className="overflow-x-auto">
+                            {error && <div className="text-red-500 bg-red-200 p-2 rounded">{error}</div>}
                             <table className="w-full text-left border-collapse">
                                 <thead>
                                     <tr className="border-b-2 border-gray-100 text-gray-500 text-base">

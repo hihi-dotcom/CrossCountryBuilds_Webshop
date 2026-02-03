@@ -32,6 +32,7 @@ import { serviceDateTimeAction } from "../actions/serviceActions";
 import { getPassEmailAction, createPassAction } from "../actions/passwordActions";
 import { MakeOrder } from "../actions/orderActions";
 import { createProductAction } from "../actions/productActions";
+import { createEmptyAppointmentAction } from "../actions/serviceActions";
 
 const rootLoader = async () => {
     return await AuthService.gettingCurrentUser();
@@ -109,6 +110,7 @@ const routes = [
             { 
                 path: "dates", 
                 element: <AppointmentDashboard />,
+                /*action: createEmptyAppointmentAction*/
                 /*loader: async() => {
                     return await DateTimeService.getAppointmentsforAdmin();
                 }*/

@@ -1,8 +1,25 @@
 import AdminSidebar from "../../components/adminComponents/Admin_OrdersSidebar";
 import TrashIcon from "@mui/icons-material/DeleteOutlineOutlined"
-import EditIcon from "@mui/icons-material/Edit"
+import { useState } from "react";
+import UserService from "../../services/UserService";
 
 export default function UsersDashboard(){
+    const [users, setUsers] = useState([]);
+    const [error, setError] = useState("");
+    async function handleDeleteUser(id:number){
+            try{
+                const deleteResult = await UserService.deleteUserbyId(id);
+                if(deleteResult.ok){
+                    //setUsers(prev => prev.filter(p => p.id !== id))
+                }
+                else{
+    
+                }
+            }
+            catch(error){
+    
+            }
+    }
     return(
         <>
             <main className="min-h-screen py-6 px-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -37,6 +54,7 @@ export default function UsersDashboard(){
                     </div>
 
                     <div className="overflow-x-auto">
+                        {error && <div className="text-red-500 bg-red-200 p-2 rounded">{error}</div>}
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="border-b-2 border-gray-100 text-gray-500 text-sm uppercase">

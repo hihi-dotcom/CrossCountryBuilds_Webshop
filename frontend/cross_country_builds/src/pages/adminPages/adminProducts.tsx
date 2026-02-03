@@ -1,11 +1,29 @@
 import AdminSidebar from "../../components/adminComponents/Admin_OrdersSidebar";
 import TrashIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import EditIcon from "@mui/icons-material/Edit";
 import menoBringa from "../../assets/letöltés.jpg";
 import { Form } from "react-router-dom";
-
+import { useState } from "react";
+import ProductService from "../../services/ProductService";
+import type Product from "../../models/product";
 
 export default function ProductDashboard(){
+
+    const [products, setProducts] = useState<Product[]>([]);
+    const [error, setError] = useState("");
+    async function handleDeleteProduct(id:number){
+        try{
+            const deleteResult = await ProductService.deleteProductById(id);
+            if(deleteResult.ok){
+                setProducts(prev => prev.filter(p => p.id !== id))
+            }
+            else{
+
+            }
+        }
+        catch(error){
+
+        }
+    }
     return(
         <>
             <main className="min-h-screen py-6 px-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -76,6 +94,7 @@ export default function ProductDashboard(){
                     </div>
 
                     <div className="overflow-x-auto">
+                        {error && <div className="text-red-500 bg-red-200 p-2 rounded">{error}</div>}
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="border-b-2 border-gray-100 text-gray-500 text-sm uppercase">
