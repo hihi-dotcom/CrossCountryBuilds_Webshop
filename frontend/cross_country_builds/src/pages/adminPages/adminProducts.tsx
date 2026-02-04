@@ -1,14 +1,14 @@
 import AdminSidebar from "../../components/adminComponents/Admin_OrdersSidebar";
 import TrashIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import menoBringa from "../../assets/letöltés.jpg";
-import { Form } from "react-router-dom";
-import { useState } from "react";
+import { Form, useLoaderData } from "react-router-dom";
+import { useState, useRef } from "react";
 import ProductService from "../../services/ProductService";
 import type Product from "../../models/product";
 
 export default function ProductDashboard(){
-
-    const [products, setProducts] = useState<Product[]>([]);
+    const initProducts = useLoaderData();
+    const [products, setProducts] = useState<Product[]>(initProducts);
     const [error, setError] = useState("");
     async function handleDeleteProduct(id:number){
         try{
@@ -23,6 +23,18 @@ export default function ProductDashboard(){
         catch(error){
 
         }
+    }
+    const productNameRef = useRef<HTMLInputElement>(null);
+    function handleSearchforProduct(){
+        const searchedUser =  productNameRef.current?.value 
+
+        if(!searchedUser){
+            setProducts(initProducts);
+            return;
+        }
+
+        const filteredUsers = initProducts.filter((user:any) => user.username.includes(searchedUser));
+        setProducts(filteredUsers);
     }
     return(
         <>
@@ -41,10 +53,10 @@ export default function ProductDashboard(){
                         <div className="flex flex-row">
                             <div id="kereso-mezo" className="w-full py-3 text-lg pr-2">
                                 <label htmlFor="productname" className="px-2">Add meg a termék nevét:</label>
-                                <input type="text" name="productname" id="productname" className="text-black border-black border-2 bg-white rounded-xl placeholder:px-2 h-10" placeholder="a termék neve"/>
+                                <input type="text" name="productname" id="productname" className="text-black border-black border-2 bg-white rounded-xl placeholder:px-2 h-10" placeholder="a termék neve" ref={productNameRef} onChange={handleSearchforProduct}/>
                             </div>
                             <div id="kereses-gomb" className=" flex items-center justify-center">
-                                <button type="submit" className=" text-lg bg-[#08415c] text-white px-2 py-2 rounded-lg    hover:font-bold">Keresés!</button>
+                                <button type="submit" className=" text-lg bg-[#08415c] text-white px-2 py-2 rounded-lg    hover:font-bold" onClick={handleSearchforProduct}>Keresés!</button>
                             </div>
                         </div>
                     </div>

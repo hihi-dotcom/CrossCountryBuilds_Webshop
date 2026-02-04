@@ -20,7 +20,8 @@ import ProductDashboard from "../pages/adminPages/adminProducts";
 import AdminErrorPage from "../pages/errorPages/AdminErrorPage";
 
 import ProtectRouteAdmin from "../pages/protects/saferouteforadmin";
-
+import UserService from "../services/UserService";
+import DateTimeService from "../services/DateTimeService";
 
 import Contacts from "../pages/ContactsPageOnlyMobile";
 
@@ -96,9 +97,9 @@ const routes = [
                 index: true, 
                 element: <UsersDashboard />,
                 
-                /*loader: async() => {
+                loader: async() => {
                     return await UserService.getNormalUsers();
-                }*/
+                }
             },
             { 
                 path: "orders", 
@@ -111,9 +112,9 @@ const routes = [
                 path: "dates", 
                 element: <AppointmentDashboard />,
                 /*action: createEmptyAppointmentAction*/
-                /*loader: async() => {
+                loader: async() => {
                     return await DateTimeService.getAppointmentsforAdmin();
-                }*/
+                }
             },
             { 
                 path: "products", 

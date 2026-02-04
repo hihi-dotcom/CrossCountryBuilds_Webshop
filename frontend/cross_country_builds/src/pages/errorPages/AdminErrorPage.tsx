@@ -7,7 +7,8 @@ export default function AdminErrorPage(){
     let errMessage:string = "Váratlan hiba történt a rendszerben!";
     let errCode:number | string = "Hiba";
     let errDetails: string | undefined;
-
+    
+    console.error("Loader hiba:", err);
     if(isRouteErrorResponse(err)){
         errCode = err.status;
         errMessage = err.statusText || "Még nem ismert hiba!";
