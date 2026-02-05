@@ -6,26 +6,37 @@ import BackToWebShopButton from "../buttonComponents/backtoWebshopButton";
 export default function AppointmentModule(){
     const actionData = useActionData();
 
-    const test_free_datetimes = [
-        {
-            time: "2025. 12. 24. 14:00"
-        },
-        {
-            time: "2025. 12. 10. 10:00"
-        },
-        {
-            time: "2025. 12. 08. 09:00"
-        },
-        {
-            time: "2025. 11. 24. 08:00"
-        },
-        {
-            time: "2025. 12. 04. 15:00"
-        },
-        {
-            time: "2026. 01. 24. 17:30"
-        },
-    ];
+        interface FreeAppointment {
+            id: number;
+            time: string;
+        }
+
+        const test_free_datetimes: FreeAppointment[] = [
+            {
+                id: 101,
+                time: "2025. 12. 24. 14:00"
+            },
+            {
+                id: 102,
+                time: "2025. 12. 10. 10:00"
+            },
+            {
+                id: 103,
+                time: "2025. 12. 08. 09:00"
+            },
+            {
+                id: 104,
+                time: "2025. 11. 24. 08:00"
+            },
+            {
+                id: 105,
+                time: "2025. 12. 04. 15:00"
+            },
+            {
+                id: 106,
+                time: "2026. 01. 24. 17:30"
+            },
+        ];
     return(
         <>
             <h3 className="text-3xl text-center sm:text-start sm:text-4xl my-5 sm:ml-6 sm:my-10 ">Foglalj időpontot hozzánk!</h3>

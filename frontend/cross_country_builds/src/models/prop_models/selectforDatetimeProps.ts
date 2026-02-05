@@ -1,3 +1,3 @@
 export default interface SelectDateTimeProps{
-    datetimes: {time: string}[]
+    datetimes: { id:number, time: string}[]
 };

@@ -1,28 +1,38 @@
+import type { ForgotCreds,NewPassCreds } from "../models/models_for_services/password_models";
+
+
 class PasswordService{
 
-    async sendPasswordBackEmail(email: string) {
-        const response = await fetch("http://localhost:3000/recovery", {
+    async forgotPass(data:ForgotCreds){
+        const response = await fetch("http://localhost:3000/api/getnewpass", {
             method: "POST",
-            headers: {
-                'Content-Type':'application/json'
-            },
-            body: JSON.stringify(email)
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
         });
 
-         return await response.json();
+        const respData = await response.json();
+
+        return {
+            ok: response.ok,
+            message: respData.message
+        };
     };
 
-    async createNewPassword(password: string){
-        const response = await fetch("http://localhost:3000/recovery", {
+    async createNewPass(token:string, data:NewPassCreds) {
+         const response = await fetch("http://localhost:3000/api/createnewpass", {
             method: "PATCH",
-            headers: {
-                'Content-Type':'application/json'
-            },
-            body: JSON.stringify(password)
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({token,...data })
         });
 
-        return await response.json();
-    };
+        const respData = await response.json();
+
+        return {
+            ok: response.ok,
+            message: respData.message
+        };
+        
+    }
 };
 
 export default new PasswordService();

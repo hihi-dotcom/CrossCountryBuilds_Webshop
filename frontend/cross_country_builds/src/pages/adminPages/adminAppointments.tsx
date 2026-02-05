@@ -1,23 +1,51 @@
 import AdminSidebar from "../../components/adminComponents/Admin_OrdersSidebar";
 import SaveIcon from "@mui/icons-material/Save";
-import { useState } from "react";
-import { Form } from "react-router-dom";
-
+import { useState, useRef, useEffect } from "react";
+import { Form, useLoaderData } from "react-router-dom";
+import DateTimeService from "../../services/DateTimeService";
+import TrashIcon from "@mui/icons-material/DeleteOutlineOutlined"
 
 export default function AppointmentDashboard(){
+    const initAppointments = useLoaderData();
+    const [error, setError] = useState("");
+    const [services, setServices] = useState(initAppointments);
 
+    useEffect(() => {
+        setServices(initAppointments);
+    }, [initAppointments]);
 
-      const [services, setServices] = useState([
-        {
-        id: 1,
-        username: "Zsolti a béka",
-        service_date: "2024-05-20T10:00",
-        problem_description: "Defekt és fékcsere",
-        service_price: null,
-        bringback_date: ""
+    async function handleDeleteAppointment(id:number){
+        try{
+                    const deleteResult = await DateTimeService.deleteService(id);
+                    if(deleteResult.ok){
+                        setServices((prev:any) => prev.filter((p:any) => p.id !== id));
+                        setError(deleteResult.message || "A felhasználó törlése nem sikerült! ");
+                    }
+                    else{
+                        setError("Váratlan hiba történt a törlés közben! ");
+                    console.log(error);
+                    }
         }
-    ]);
+        catch(error){
+        
+        }
+    }
 
+    const usrNameRef = useRef<HTMLInputElement>(null);
+    const AppointmentStatusRef = useRef<HTMLSelectElement>(null);
+    function handleSearchingAppointment(){
+        const searchedUsr = usrNameRef.current?.value;
+        const appointStat = AppointmentStatusRef.current?.value;
+
+        if(!searchedUsr || !appointStat){
+            setServices(initAppointments);
+            return;
+        }
+
+        const filteredServices = initAppointments.filter((service:any) => service.customer_name.includes(searchedUsr) && service.status.includes(appointStat));
+
+        setServices(filteredServices);
+    }
 
     return(
         <>
@@ -36,17 +64,17 @@ export default function AppointmentDashboard(){
                         <div className="flex flex-col">
                             <div id="kereso-mezo" className="w-full py-3 text-lg pr-4">
                                 <label htmlFor="productname" className="text-base">Adj meg felhasználónevet: </label>
-                                <input type="text" name="productname" id="productname" className="text-black border-black border-2 bg-white rounded-xl px-2 h-10 w-full" placeholder="a felhasználónév"/>
+                                <input type="text" name="productname" id="productname" className="text-black border-black border-2 bg-white rounded-xl px-2 h-10 w-full" placeholder="a felhasználónév" ref={usrNameRef} onChange={handleSearchingAppointment}/>
                             </div>
                             <div id="allapotok" className=" py-3 text-lg pr-4 flex flex-col">
                                 <label htmlFor="service-status">Adj meg egy állapotot!</label>
-                                <select name="service-status" id="service-status" className="border-2 w-full border-black rounded-lg">
+                                <select name="service-status" id="service-status" className="border-2 w-full border-black rounded-lg" ref={AppointmentStatusRef} onChange={handleSearchingAppointment}>
                                     <option value="folyamatban">folyamatban</option>
                                     <option value="kesz">kész</option>
                                 </select>
                             </div>
                             <div id="kereses-gomb" className=" flex items-center justify-center pr-4">
-                                <button type="submit" className=" text-lg bg-[#08415c] text-white px-3 py-2 rounded-lg    hover:font-bold">Keresés!</button>
+                                <button type="submit" onClick={handleSearchingAppointment} className=" text-lg bg-[#08415c] text-white px-3 py-2 rounded-lg    hover:font-bold">Keresés!</button>
                             </div>
                         </div>
                     </div>
@@ -71,7 +99,7 @@ export default function AppointmentDashboard(){
                            
                             <div className="flex items-center bg-amber-100 text-amber-700 px-2 py-1 sm:px-3 sm:py-1.2 rounded-full border border-amber-200">
                             <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider">
-                                {services.filter(s => !s.bringback_date).length}
+                                {services.filter((s:any) => !s.bringback_date).length}
                             </span>
                             <span className="ml-1 text-[10px] md:text-xs font-bold uppercase tracking-wider hidden sm:inline">
                                 folyamatban
@@ -79,7 +107,8 @@ export default function AppointmentDashboard(){
                             </div>
                         </div>
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
+                            {error && <div className="text-red-500 bg-red-200 p-2 rounded">{error}</div>}
+                            <table className="w-full text-left border-collapse text-black">
                                 <thead>
                                     <tr className="border-b-2 border-gray-100 text-gray-500 text-base">
                                         <th className="py-3 px-2">Ügyfél</th>
@@ -91,8 +120,22 @@ export default function AppointmentDashboard(){
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 text-base">
-                                    {services.map((s) => (
-                                        <tr key={s.id} className="hover:bg-blue-50/30 transition-colors"></tr>
+                                    {services.map((s:any) => (
+                                        <tr key={s.id} className="hover:bg-blue-50/30 transition-colors">
+                                            <td className="py-4 px-2">{s.customer_name}</td>
+                                            <td className="py-4 px-2">{s.service_date}</td>
+                                            <td className="py-4 px-2">{s.problem_description}</td>
+                                            <td className="py-4 px-2">
+                                                <input type="number"  className="w-24 border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 outline-none" defaultValue={s.service_price || "---"}/>
+                                            </td>
+                                            <td className="py-4 px-2">
+                                                <input type="datetime-local" defaultValue={s.bringback_date}  className="border border-gray-300 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-blue-500 outline-none"/>
+                                            </td>
+                                            <td className="py-4 px-2 text-center flex gap-3 flex-row">
+                                                <button className="text-white bg-blue-600 hover:bg-blue-900 rounded-lg py-2 px-2">Kész!</button>
+                                                <button className="text-white bg-red-500 py-2 px-3 rounded-lg">Törlés</button>
+                                            </td>
+                                        </tr>
                                     ))}
                                 </tbody>
                             </table>

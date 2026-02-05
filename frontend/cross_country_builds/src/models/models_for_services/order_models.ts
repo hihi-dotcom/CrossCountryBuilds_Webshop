@@ -1,4 +1,5 @@
-import type Product from "../product"
+import type CartItem from "../cartItem"
+
 
 export interface OrderCreds{
     name: string, 
@@ -7,6 +8,10 @@ export interface OrderCreds{
     billingAddr: string,
     payingMethod: string,
     deliveryMethod: string,
-    products: Product[],
+    products: CartItem[],
     total: number
+}
+
+export interface UpdateStatCreds{
+    status: string
 }

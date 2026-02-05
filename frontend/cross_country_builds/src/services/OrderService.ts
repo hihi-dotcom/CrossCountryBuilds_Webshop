@@ -1,31 +1,61 @@
-import type {OrderCreds}  from "../models/models_for_services/order_models"
+import type {OrderCreds, UpdateStatCreds}  from "../models/models_for_services/order_models"
+import AuthService from "./AuthService";
 
 class OrderService{
-    async MakingOrder(order: OrderCreds){
-        const resp = await fetch("http://localhost:3000/order", {
+    async MakingOrder(order:any){
+        const response = await AuthService._request(`order`, {
             method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
             body: JSON.stringify(order)
         });
 
-        const respData = resp.json();
+        const respData = await response.json();
 
-        return respData;
+        return{
+            ok: response.ok,
+            message: respData.message,
+            
+        }
     };
 
-    async deleteOrderbyId(id: number){
-        const resp = await fetch(`http://localhost:3000/order/${id}`,{
-            method: "DELETE",
-            headers:{
-                'Content-Type': 'application/json'
-            }
+    async UpdateOrderStat(id: number,data:UpdateStatCreds){
+        const response = await AuthService._request(`order/${id}`, {
+            method: "PATCH",
+            body: JSON.stringify(data)
         });
 
-        const respData = await resp.json();
+        const respData = await response.json();
 
-        return respData;
+        return{
+            ok: response.ok,
+            message: respData.message
+        }
+    }
+
+
+    async deleteOrderbyId(id: number){
+
+        const response = await AuthService._request(`order/${id}`, {
+            method: "DELETE"
+        });
+      
+        const respData = await response.json();
+
+        return {
+            ok: response.ok,
+            message: respData.message
+        };
+    };
+
+    async getOrdersforAdmin(){
+        const response = await AuthService._request(`orders`, {
+            method: "GET"
+        });
+        const responseData = await response.json()
+        if(!response.ok){
+            
+            throw new Error(responseData.message || "Hiba a megrendelések lekérésekor! ");
+        }
+        return await responseData;
     }
 };
 

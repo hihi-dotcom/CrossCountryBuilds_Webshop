@@ -2,9 +2,12 @@ import AdminSidebar from "../../components/adminComponents/Admin_OrdersSidebar";
 import { Form } from "react-router-dom";
 import { useState } from "react";
 import TrashIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import CheckIcon from "@mui/icons-material/Check";
+import OrderService from "../../services/OrderService";
 
 export default function OrdersDashboard(){
          const [loadingId, setLoadingId] = useState(null);
+         const [error, setError] = useState("");
           const [orders, setOrders] = useState([
             {
             u_id: 2,
@@ -21,6 +24,22 @@ export default function OrdersDashboard(){
             
             }
         ]);
+
+
+        async function handleDeleteAppointment(id:number){
+            try{
+                const deleteResult = await OrderService.deleteOrderbyId(id);
+                if(deleteResult.ok){
+                    //setOrders(prev => prev.filter(p => p.id !== id))
+                }
+                else{
+                
+                }
+            }
+            catch(error){
+                
+            }
+        }
     return(
         <>
             <main className="min-h-screen py-6 px-4 grid grid-cols-1 lg:grid-cols-4 gap-6 bg-gray-50">
@@ -52,6 +71,7 @@ export default function OrdersDashboard(){
                             */}
                         </div>
                         <div className="w-full overflow-x-auto shadow-inner rounded-lg">
+                            {error && <div className="text-red-500 bg-red-200 p-2 rounded">{error}</div>}
                             <table className="min-w-full md:w-full table-auto text-left border-collapse">
                                 <thead>
                                     <tr className="border-b-2 border-gray-100 text-gray-500 text-sm uppercase">
@@ -110,6 +130,11 @@ export default function OrdersDashboard(){
                                                 <button className="flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95">
                                                     <TrashIcon sx={{ fontSize: 18 }} />
                                                     <span className="md:hidden lg:inline">Törlés</span>
+                                                </button>
+
+                                                <button className="flex items-center justify-center gap-1 bg-black hover:shadow-2xl text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95">
+                                                    <CheckIcon sx={{ fontSize: 18 }} />
+                                                    <span className="md:hidden lg:inline">Lezárás</span>
                                                 </button>
                                             </td>
                                             

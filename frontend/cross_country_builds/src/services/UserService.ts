@@ -1,13 +1,19 @@
+import AuthService from "./AuthService";
+
+
 class UserService{
     async deleteUserbyId(id: number){
-        const response = await fetch(`http://localhost:3000/user/${id}`,{
+        const response = await AuthService._request(`user/${id}`,{
             method: "DELETE",
-            headers:{
-                'Content-Type': 'application/json'
-            },
+            
         });
 
-        return await response.json();
+        const data = await response.json();
+
+        return {
+            ok: response.ok,
+            message: data.message 
+        };
     };
 
     async deleteUserbyEmail(email: string){
@@ -19,11 +25,21 @@ class UserService{
         });
 
         return await response.json();
-    }
+    };
 
-    async getUsers(){
-        const response = await fetch(`http://localhost:3000/users`);
-        const respData = await response.json();
-        return respData;
+   
+
+    async getNormalUsers() {
+        const response = await AuthService._request('users');
+        const responseData = await response.json();
+        if (!response.ok) {
+           
+            throw new Error(responseData.message || "Hiba a felhasználók lekérése során.");
+        }
+
+        return await responseData;
     }
-}
+};
+
+
+export default new UserService();

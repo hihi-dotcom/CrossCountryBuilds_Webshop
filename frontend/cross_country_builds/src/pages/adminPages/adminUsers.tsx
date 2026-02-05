@@ -1,11 +1,52 @@
 import AdminSidebar from "../../components/adminComponents/Admin_OrdersSidebar";
 import TrashIcon from "@mui/icons-material/DeleteOutlineOutlined"
-import EditIcon from "@mui/icons-material/Edit"
+import { useEffect, useRef, useState } from "react";
+import UserService from "../../services/UserService";
+import { useLoaderData } from "react-router-dom";
+import type Guest from "../../models/guest";
 
 export default function UsersDashboard(){
+
+    const initUsers = useLoaderData();
+    const [users, setUsers] = useState<Guest[]>(initUsers);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        setUsers(initUsers);
+    }, [initUsers])
+
+    const UsernameRef = useRef<HTMLInputElement>(null);
+    async function handleDeleteUser(id:number){
+            try{
+                setError("");
+                const deleteResult = await UserService.deleteUserbyId(id);
+                if(deleteResult.ok){
+                    setUsers(prev => prev.filter(p => p.id !== id))
+                }
+                else{
+                    setError(deleteResult.message || "A felhasználó törlése nem sikerült! ");
+                }
+            }
+            catch(error){
+                setError("Váratlan hiba történt a törlés közben! ");
+                console.log(error);
+            }
+    }
+
+    function handleSearchforUser(){
+        const searchedUser =  UsernameRef.current?.value 
+
+        if(!searchedUser){
+            setUsers(initUsers);
+            return;
+        }
+
+        const filteredUsers = initUsers.filter((user:any) => user.username.includes(searchedUser));
+        setUsers(filteredUsers);
+    }
     return(
         <>
-            <main className="min-h-screen py-6 px-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <main className="min-h-screen py-6 px-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
                <div className="lg:col-span-1">
                     <AdminSidebar 
                         link1_to="/admin/orders"
@@ -15,15 +56,15 @@ export default function UsersDashboard(){
                         link3_to="/admin/products"
                         link3_innerText="Termékek Dashboard"
                     />
-                    <div id="kereses" className="rounded-xl py-2 px-3 border-2 text-black mt-15 border-black flex flex-col h-fit ">
+                    <div id="kereses" className="rounded-xl py-2 pr-2  border-2 text-black mt-15 border-black flex flex-col h-fit ">
                         <h2 className="text-2xl text-center">User keresés (név alapján)</h2>
                         <div className="flex flex-row">
-                            <div id="kereso-mezo" className="w-full py-3 text-lg pr-4">
-                                <label htmlFor="productname" className="text-base px-2">Adj meg felhasználónevet: </label>
-                                <input type="text" name="productname" id="productname" className="text-black border-black border-2 bg-white rounded-xl placeholder:px-2 h-10" placeholder="a felhasználónév"/>
+                            <div id="kereso-mezo" className="w-full py-3  px-1 text-lg">
+                                <label htmlFor="productname" className="text-base">Adj meg felhasználónevet: </label>
+                                <input type="text" name="productname" id="productname" className="text-black border-black border-2 bg-white rounded-xl px-2 h-10" placeholder="a felhasználónév" onChange={handleSearchforUser} ref={UsernameRef}/>
                             </div>
-                            <div id="kereses-gomb" className=" flex items-center justify-center pr-4">
-                                <button type="submit" className=" text-lg bg-[#08415c] text-white px-3 py-2 rounded-lg    hover:font-bold">Keresés!</button>
+                            <div id="kereses-gomb" className=" flex items-center justify-center">
+                                <button type="submit" onClick={handleSearchforUser} className=" text-lg bg-[#08415c] text-white px-2 py-2 rounded-lg    hover:font-bold">Keresés!</button>
                             </div>
                         </div>
                     </div>
@@ -37,6 +78,7 @@ export default function UsersDashboard(){
                     </div>
 
                     <div className="overflow-x-auto">
+                        {error && <div className="text-red-500 bg-red-200 p-2 rounded">{error}</div>}
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="border-b-2 border-gray-100 text-gray-500 text-sm uppercase">
@@ -47,26 +89,24 @@ export default function UsersDashboard(){
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-500 text-black text-base">
-                                <tr className="hover:bg-blue-50/50 transition-colors">
-                                    <td className="py-3 px-2">Zsolti a béka</td>
-                                    <td className="py-3 px-2">zsolti.beka@gmail.com</td>
-                                    <td className="py-3 px-2 bg-blue-100 text-blue-700 rounded text-base font-bold">user</td>
+                                {users.map((user) => ( 
+                                <tr className="hover:bg-blue-50/50 transition-colors" key={user.id}>
+                                    <td className="py-3 px-2">{user.username}</td>
+                                    <td className="py-3 px-2">{user.email}</td>
+                                    <td className="py-3 px-2 bg-blue-100 text-blue-700 rounded text-base font-bold">{user.role}</td>
                                     <td className="py-3 px-2 text-right flex flex-col md:flex-row">
                                         <div className="flex flex-col md:flex-row justify-end items-center gap-2">
-                                            {/* 
-                                            <button className="flex items-center justify-center gap-1 bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95">
-                                                <EditIcon sx={{ fontSize: 18 }} />
-                                                <span className="md:hidden lg:inline">Szerkesztés</span>
-                                            </button>*/}
-
-                                            
-                                            <button className="flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95">
+                                            <button onClick={() => handleDeleteUser(user.id)} className="flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white text-base px-3 py-3 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95">
                                                 <TrashIcon sx={{ fontSize: 18 }} />
                                                 <span className="md:hidden lg:inline">Törlés</span>
                                             </button>
                                         </div>
                                     </td>
                                 </tr>
+                                )
+                                   
+                                )}
+                                
                             </tbody>
                         </table>
 
