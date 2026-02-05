@@ -1,0 +1,6 @@
+podman run --name webshop \
+  -e POSTGRES_DB=webshop \
+  -e POSTGRES_USER=webshop-root \
+  -e POSTGRES_PASSWORD=1234 \
+  -p 5432:5432 \
+  -d postgres:latest

@@ -12,6 +12,10 @@ const DBConnP = {
     password: "1234"
 }
 
+const args = process.argv.slice(2)
+const initdb = args.includes("--initdb")
+
+
 const app = exp()
 app.use(exp.json())
 app.use(cors())
@@ -43,8 +47,156 @@ app.get("/api/user", auth, get_user)
 app.patch("/api/user", auth, update_user)
 app.post("/order", auth, order)
 app.get("/orders", auth, get_orders_for_admin)
- 
-app.listen(PORT, () => { console.log(`Webserver started! Listening on port ${PORT}`) })
+
+/** 
+ * @param {string} toRun 
+ */
+async function Runinitdb(toRun) {
+    if (!initdb) return
+    const conn = await sql.createConnection(DBConnP)
+    try {
+        await conn.query(toRun)
+    } catch (err) {
+        console.error("An unrecovarable error has happend: ")
+        console.error("At: ")
+        console.error(toRun)
+        console.error(err)
+        process.exit(1)
+    } finally {
+        conn.end()
+    }
+}
+
+Runinitdb(`
+create table Admins (
+    email varchar(64) not null unique,
+    username varchar(64) not null,
+    password varchar(255) not null
+)
+`)
+
+Runinitdb(`
+create table Products (
+    id int auto_increment,
+    name varchar(64) not null unique,
+    category varchar(64),
+    manufacturer varchar(64),
+    description varchar(128),
+    picture varchar(64),
+    price int not null,
+    quantity int default 0,
+    primary key(id)
+)
+`)
+
+Runinitdb(`
+create table Visitors (
+    id int auto_increment,
+    name varchar(100) not null,
+    shipping_address varchar(255),
+    billing_address varchar(255),
+    email varchar(64) not null unique,
+    password varchar(255) not null,
+    primary key(id)
+)
+`)
+
+Runinitdb(`
+create table Dates (
+    Visitor_id int,
+    title varchar(64) not null,
+    import_date date,
+    pickup_date date,
+    description varchar(128),
+    foreign key(Visitor_id) references Visitors(id)
+)
+`)
+
+Runinitdb(`
+create table Orders (
+    id int auto_increment,
+    Visitor_id int,
+    shipping_method varchar(128),
+    payment_method varchar(128),
+    order_status varchar(64),
+    foreign key(Visitor_id) references Visitors(id),
+    primary key(id)
+)
+`)
+
+Runinitdb(`
+create table Products_Orders (
+    Product_id int,
+    Order_id int,
+    quantity int not null,
+    foreign key(Order_id) references Orders(id),
+    foreign key(Product_id) references Products(id)
+)
+`)
+
+Runinitdb(`
+create function encrypt(p_password varchar(255))
+returns varchar(255) deterministic
+begin
+    return sha2(concat(p_password, 'cxvyz'), 256);
+end
+`)
+
+Runinitdb(`
+create trigger create_Visitors
+before insert on Visitors
+for each row
+begin
+    set new.password = encrypt(new.password);
+end
+`)
+
+Runinitdb(`
+create trigger update_Visitors
+before update on Visitors
+for each row
+begin
+    if new.password is not null and old.password <> new.password then
+        set new.password = encrypt(new.password);
+    end if;
+end
+`)
+
+Runinitdb(`
+create procedure termekek(
+    in p_from int, 
+    in p_to int,
+    in p_name varchar(64),
+    in p_category varchar(64),
+    in p_manufacturer varchar(64),
+    in p_from_price int,
+    in p_to_price int
+)
+begin
+    declare v_limit int;
+    declare v_offset int;
+
+    set v_limit = p_to - p_from + 1;
+    set v_offset = p_from;
+
+    select
+        name as név,
+        category as kategória,
+        manufacturer as gyártó,
+        description as leírás,
+        picture as kép,
+        price as ár,
+        quantity as mennyiség
+    from Products
+    where 
+        (p_name is null or name = p_name) and
+        (p_category is null or category = p_category) and
+        (p_manufacturer is null or manufacturer = p_manufacturer) and
+        (p_from_price is null or p_from_price = 0 or price >= p_from_price) and
+        (p_to_price is null or p_to_price = 0 or price <= p_to_price)
+    limit v_limit offset v_offset;
+end
+`)
 
 /**
  * @type {import("express").Handler}
@@ -101,6 +253,25 @@ async function order(req, res) {
     }
 }
 
+Runinitdb(`
+create function login(
+    p_email varchar(64),
+    p_password varchar(255)
+)
+returns int
+reads sql data
+begin
+    declare uid int default 0;
+    select id
+        into uid
+    from Visitors
+    where
+        email = p_email and
+        password = encrypt(p_password);
+    return uid;
+end
+`)
+
 /** 
  * @type {import("express").Handler}
  */
@@ -136,6 +307,18 @@ async function auth(req, res, next) {
     next()
 }
 
+Runinitdb(`
+create procedure registration(
+    in p_name varchar(64),
+    in p_email varchar(64),
+    in p_password varchar(255)
+)
+begin
+    insert into Visitors (name, email, password) values
+        (p_name, p_email, p_password);
+end
+`)
+
 /**
  * @type {import("express").Handler}
  */
@@ -160,6 +343,21 @@ async function registration(req, res) {
     res.status(201).json({token}) 
 }
 
+Runinitdb(`
+create procedure get_user( 
+    in p_id int 
+)
+begin
+    select  
+        name as username,
+        email,
+        shipping_address,
+        billing_address
+    from Visitors
+    where id = p_id;
+end
+`)
+
 /**
  * @type {import("express").Handler}
  */
@@ -169,8 +367,32 @@ async function get_user(req, res) {
     const [row] = await conn.query("call get_user(?)", 
         [req.uid]
     )
+    conn.end()
     res.json(row[0])
 }
+
+Runinitdb(`
+create procedure update_user(
+    in p_id int,
+    in p_name varchar(100),
+    in p_shipping_address varchar(255),
+    in p_billing_address varchar(255),
+    in p_email varchar(64),
+    in p_password varchar(255)
+)
+begin
+    update Visitors set
+        name = coalesce(p_name, name),
+        shipping_address = coalesce(p_shipping_address, shipping_address),
+        billing_address = coalesce(p_billing_address, billing_address),
+        password = coalesce(p_password, password)
+    where id = p_id;
+
+    if p_email is not null and p_email <> (select email from Visitors where id = p_id) then
+        update Visitors set email = p_email where id = p_id;
+    end if;
+end
+`)
 
 /**
  * @type {import("express").Handler}
@@ -183,11 +405,26 @@ async function update_user(req, res) {
         await conn.query("call update_user(?,?,?,?,?,?)",
             [req.uid, username, delivery_address, billing_address, email, password]
         )
+        res.status(202).send("Resource changed")
     } catch {
-        return res.status(409).send("Email is already in use.")
+        res.status(409).send("Email is already in use.")
+    } finally {
+        conn.end()
     }
-    res.status(202).send("Resource changed")
 }
+
+Runinitdb(`
+create procedure get_users()
+begin
+    select 
+        id,
+        name as username,
+        email,
+        shipping_address,
+        billing_address
+    from Visitors;
+end
+`)
 
 /**
  * @type {import("express").Handler}
@@ -204,6 +441,15 @@ async function get_users(req, res) {
         conn.end()
     }
 }
+
+Runinitdb(`
+create procedure delete_user(
+    in p_id int
+)
+begin
+    delete from Visitors where id = p_id;
+end
+`)
 
 /**
  * @type {import("express").Handler}
@@ -222,6 +468,25 @@ async function delete_user(req, res) {
         conn.end()
     }
 }
+
+Runinitdb(`
+create procedure get_product_by_id(
+    in p_id int
+)
+begin
+    select
+        id,
+        name,
+        category,
+        manufacturer,
+        description,
+        picture,
+        price,
+        quantity
+    from Products
+    where id = p_id;
+end
+`)
 
 /**
  * @type {import("express").Handler}
@@ -242,6 +507,22 @@ async function get_product_by_id(req, res) {
         conn.end()
     }
 }
+
+Runinitdb(`
+create procedure insert_product(
+    in p_name varchar(64),
+    in p_category varchar(64),
+    in p_manufacturer varchar(64),
+    in p_description varchar(128),
+    in p_picture varchar(64),
+    in p_price int,
+    in p_quantity int
+)
+begin
+    insert into Products (name, category, manufacturer, description, picture, price, quantity)
+    values (p_name, p_category, p_manufacturer, p_description, p_picture, p_price, p_quantity);
+end
+`)
 
 /**
  * @type {import("express").Handler}
@@ -267,6 +548,15 @@ async function create_product(req, res) {
     }
 }
 
+Runinitdb(`
+create procedure delete_product(
+    in p_id int
+)
+begin
+    delete from Products where id = p_id;
+end
+`)
+
 /**
  * @type {import("express").Handler}
  */
@@ -284,6 +574,19 @@ async function delete_product(req, res) {
     }
 }
 
+Runinitdb(`
+create procedure get_available_dates()
+begin
+    select 
+        Visitor_id,
+        title,
+        import_date,
+        description
+    from Dates
+    where import_date is null;
+end
+`)
+
 /**
  * @type {import("express").Handler}
  */
@@ -299,6 +602,20 @@ async function get_appointments(req, res) {
         conn.end()
     }
 }
+
+Runinitdb(`
+create procedure book_appointment(
+    in p_visitor_id int,
+    in p_import_date datetime,
+    in p_description varchar(255)
+)
+begin
+    update Dates set
+        import_date = p_import_date,
+        description = p_description
+    where Visitor_id = p_visitor_id and import_date is null;
+end
+`)
 
 /**
  * @type {import("express").Handler}
@@ -321,6 +638,22 @@ async function book_appointment(req, res) {
     }
 }
 
+Runinitdb(`
+create procedure get_pending_appointments()
+begin
+    select 
+        d.Visitor_id,
+        v.name as username,
+        d.import_date,
+        d.description as problem_description,
+        d.pickup_date,
+        d.title as service_type
+    from Dates d
+    join Visitors v on d.Visitor_id = v.id
+    where d.pickup_date is null;
+end
+`)
+
 /**
  * @type {import("express").Handler}
  */
@@ -336,6 +669,17 @@ async function get_pending_appointments(req, res) {
         conn.end()
     }
 }
+
+Runinitdb(`
+create procedure add_available_date(
+    in p_visitor_id int,
+    in p_title varchar(64)
+)
+begin
+    insert into Dates (Visitor_id, title) 
+    values (p_visitor_id, p_title);
+end
+`)
 
 /**
  * @type {import("express").Handler}
@@ -353,6 +697,21 @@ async function add_available_date(req, res) {
         conn.end()
     }
 }
+
+Runinitdb(`
+create procedure admin_update_appointment(
+    in p_visitor_id int,
+    in p_pickup_date date,
+    in p_title varchar(64),
+    in p_price int
+)
+begin
+    update Dates set
+        pickup_date = p_pickup_date,
+        title = p_title
+    where Visitor_id = p_visitor_id;
+end
+`)
 
 /**
  * @type {import("express").Handler}
@@ -374,6 +733,20 @@ async function admin_update_appointment(req, res) {
     }
 }
 
+Runinitdb(`
+create procedure get_orders_for_admin()
+begin
+    select 
+        o.id as order_id,
+        o.Visitor_id,
+        o.shipping_method,
+        o.payment_method,
+        o.order_status as status
+    from Orders o
+    order by o.id desc;
+end
+`)
+
 /**
  * @type {import("express").Handler}
  */
@@ -389,6 +762,16 @@ async function get_orders_for_admin(req, res) {
         conn.end()
     }
 }
+
+Runinitdb(`
+create procedure update_order_status(
+    in p_order_id int,
+    in p_status varchar(64)
+)
+begin
+    update Orders set order_status = p_status where id = p_order_id;
+end
+`)
 
 /**
  * @type {import("express").Handler}
@@ -408,6 +791,16 @@ async function update_order_status(req, res) {
     }
 }
 
+Runinitdb(`
+create procedure delete_order(
+    in p_order_id int
+)
+begin
+    delete from Products_Orders where Order_id = p_order_id;
+    delete from Orders where id = p_order_id;
+end
+`)
+
 /**
  * @type {import("express").Handler}
  */
@@ -425,6 +818,15 @@ async function delete_order(req, res) {
     }
 }
 
+Runinitdb(`
+create procedure delete_appointment(
+    in p_id int
+)
+begin
+    delete from Dates where id = p_id;
+end
+`)
+
 /**
  * @type {import("express").Handler}
  */
@@ -441,6 +843,15 @@ async function delete_appointment(req, res) {
         conn.end()
     }
 }
+
+Runinitdb(`
+create procedure delete_user_by_email(
+    in p_email varchar(64)
+)
+begin
+    delete from Visitors where email = p_email;
+end
+`)
 
 /**
  * @type {import("express").Handler}
@@ -494,6 +905,8 @@ async function get_user_by_id(req, res) {
     }
 }
 
+//already added
+
 /**
  * @type {import("express").Handler}
  */
@@ -528,6 +941,7 @@ async function get_orders_by_user(req, res) {
     }
 }
 
+
 /**
  * @type {import("express").Handler}
  */
@@ -542,6 +956,8 @@ async function delete_orders_by_user(req, res) {
         conn.end()
     }
 }
+
+//already added
 
 /**
  * @type {import("express").Handler}
@@ -561,3 +977,5 @@ async function change_password(req, res) {
         conn.end()
     }
 }
+
+app.listen(PORT, () => { console.log(`Webserver started! Listening on port ${PORT}`) })
