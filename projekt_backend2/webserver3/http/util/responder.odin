@@ -8,8 +8,8 @@ PROTOCOL : []u8 : {'H', 'T', 'T', 'P', '/', '1', '.', '1',}
 
 Response :: struct {
     status: int,
-    header: http.Header,
-    body: []u8
+    header: []string,
+    body: string
 }
 
 Send :: proc (conn: http.Conn, res: Response) -> (n: int, ok: bool) {
@@ -32,18 +32,15 @@ try_send :: proc (soc: net.TCP_Socket, res: Response) -> (n: int, err: net.TCP_S
  
     n += net.send_tcp(soc, transmute([]u8)status_to_reason_phrase(res.status)) or_return
     n += net.send_tcp(soc, {'\r', '\n'}) or_return
- 
-    for key, values in res.header {
-        for value in values {
-            n += net.send_tcp(soc, transmute([]u8)key) or_return
-            n += net.send_tcp(soc, {':'}) or_return
-            n += net.send_tcp(soc, transmute([]u8)value) or_return
-            n += net.send_tcp(soc, {'\r', '\n'}) or_return
-        }
+    
+    for header_line in res.header {
+        n += net.send_tcp(soc, transmute([]u8)header_line) or_return
+        n += net.send_tcp(soc, {'\r', '\n'}) or_return
     }
+    
     n += net.send_tcp(soc, {'\r', '\n'}) or_return
  
-    n += net.send_tcp(soc, res.body) or_return
+    n += net.send_tcp(soc, transmute([]u8)res.body) or_return
     return
 }
 

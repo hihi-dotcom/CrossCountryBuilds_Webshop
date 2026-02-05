@@ -5,13 +5,14 @@ import "core:time"
 import "core:log"
 import vmem "core:mem/virtual"
 
+import "core:fmt"
+
 TICK :: 100 * time.Millisecond
 TIMEOUT :: 5 * time.Second
 MAX_NEW_CONNECTIONS_IN_ONE_GO :: 100
 MAX_CONNECTIONS :: 1000
 HEADER_SIZE :: 1024 * 8
 MAX_NUMBER_OF_SAME_HEADERS :: 2
-
 
 Conn :: struct {
     soc: net.TCP_Socket,
@@ -30,9 +31,13 @@ Header :: map[string][MAX_NUMBER_OF_SAME_HEADERS]string
 Handler :: proc (conn: ^Conn)
 
 @(private = "file")
-Conns :: [dynamic]Conn
+Conns :: [dynamic]^Conn
 
-listen_and_serve :: proc (on_request: Handler, port: int) {
+@(private = "file")
+OnRequest: Handler
+
+listen_and_serve :: proc (port: int, on_request: Handler) {
+    OnRequest = on_request
     context.logger = log.create_console_logger()
     conns: Conns
     listener := create_listener(port)
@@ -45,8 +50,11 @@ listen_and_serve :: proc (on_request: Handler, port: int) {
             }
         }
 
-        listen(&conns, on_request, listener)
+
+        listen(&conns, listener)
+         fmt.println(len(conns))
         make_headers(&conns)
+        fmt.println(len(conns))
         serve(&conns)
     }
 
@@ -64,25 +72,36 @@ try_recv :: proc (conn: ^Conn, buf: []u8) -> (bytes_read: int, should_close_sock
     return n, false
 }
 
-reset_conn :: proc (conn: ^Conn, to_run: proc(^Conn)) {
+reset_conn :: proc (conn: ^Conn) {
+    old_soc := conn.soc
+    old_source := conn.source
+
+    tmp: [HEADER_SIZE]u8
+    leftover_slice := leftover_data_from_header_buf(conn^)
+    leftover_length := copy(tmp[:], leftover_slice)
+
     vmem.arena_destroy(&conn.arena)
-    conn^ = {}
-    conn.last_heard = time.now()
-    conn.to_run = to_run
+
+    init_conn(conn, old_soc, old_source)
+    conn.header_data.written_till += copy(conn.header_data.buf, tmp[:leftover_length])
+}
+
+leftover_data_from_header_buf :: proc (conn: Conn) -> ([]u8) {
+    return conn.header_data.buf[conn.header_data.used_till:conn.header_data.written_till]
 }
 
 @(private = "file")
 make_headers :: proc (conns: ^Conns) {
     for &conn, i in conns {
         if conn.header_data.done do continue
-        n, should_close := try_recv(&conn, conn.header_data.buf[conn.header_data.written_till:])
+        n, should_close := try_recv(conn, conn.header_data.buf[conn.header_data.written_till:])
         conn.header_data.written_till += n
         if should_close {
             delete_conn_from_conns(conns, i)
             continue
         } 
         if n == 0 do continue
-        if Parse(&conn) {
+        if Parse(conn) {
             delete_conn_from_conns(conns, i)
             continue
         } 
@@ -103,7 +122,7 @@ create_listener :: proc (port: int) -> (soc: net.TCP_Socket) {
 }
 
 @(private = "file")
-listen :: proc (conns: ^Conns, on_request: Handler, soc: net.TCP_Socket) {
+listen :: proc (conns: ^Conns, soc: net.TCP_Socket) {
     new_connections := 0
     for {
         if len(conns) > MAX_CONNECTIONS do return
@@ -111,36 +130,42 @@ listen :: proc (conns: ^Conns, on_request: Handler, soc: net.TCP_Socket) {
         defer new_connections += 1
 
         client, source, err := net.accept_tcp(soc)
-        set_blocking_err := net.set_blocking(client, false)
-
-        if set_blocking_err != nil do log.panic("Cannot set blocking of socket!", set_blocking_err)
         if err == .Would_Block do return
         if err != nil && err != .Would_Block do log.panic("There is an error with the listener socket: ", err)
         
+        set_blocking_err := net.set_blocking(client, false)
+        if set_blocking_err != nil do log.panic("Cannot set blocking of socket!", set_blocking_err)
 
-        new_conn: Conn
-
-        new_conn.to_run = on_request
-        new_conn.soc = client
-        new_conn.source = source
-        new_conn.last_heard = time.now()
-
-        arena_init_err := vmem.arena_init_growing(&new_conn.arena)
-        if arena_init_err != nil do log.panic("Could not initialise arena:", arena_init_err)
-        arena_allocator := vmem.arena_allocator(&new_conn.arena)
-        
-        new_conn.header_data.buf = make([]u8, HEADER_SIZE, arena_allocator)
-        new_conn.user_data = make(map[typeid]any, arena_allocator)
-        new_conn.header = make(map[string][MAX_NUMBER_OF_SAME_HEADERS]string, arena_allocator)
+        new_conn := new(Conn)
+        init_conn(new_conn, client, source)
 
         append(conns, new_conn)
     }
 }
 
 @(private = "file")
+init_conn :: proc (conn: ^Conn, soc: net.TCP_Socket, source: net.Endpoint) {
+    conn^ = {}
+
+    conn.to_run = OnRequest
+    conn.soc = soc
+    conn.source = source
+    conn.last_heard = time.now()
+
+    arena_init_err := vmem.arena_init_growing(&conn.arena)
+    if arena_init_err != nil do log.panic("Could not initialise arena:", arena_init_err)
+    arena_allocator := vmem.arena_allocator(&conn.arena)
+    
+    conn.header_data.buf = make([]u8, HEADER_SIZE, arena_allocator)
+    conn.user_data = make(map[typeid]any, arena_allocator)
+    conn.header = make(map[string][MAX_NUMBER_OF_SAME_HEADERS]string, arena_allocator)
+}
+
+@(private = "file")
 delete_conn_from_conns :: proc (conns: ^Conns, i: int) {
     net.close(conns[i].soc)
     vmem.arena_destroy(&conns[i].arena)
+    free(&conns[i])
     unordered_remove(conns, i)
 }
 
@@ -153,6 +178,6 @@ serve :: proc (conns: ^Conns) {
             continue
         }
         context.allocator = vmem.arena_allocator(&conn.arena) 
-        conn.to_run(&conn)
+        conn.to_run(conn)
     }
 }

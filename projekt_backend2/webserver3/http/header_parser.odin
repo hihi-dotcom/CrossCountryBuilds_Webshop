@@ -23,26 +23,26 @@ Parse :: proc(conn: ^Conn) -> (should_close_conn: bool) {
     return false
 }
 
-@(private="file")
+@(private = "file")
 KOrV :: enum {
     Key,
     Value
 }
 
-@(private="file")
+@(private = "file")
 Spans :: struct {
     key: StartAndEnd,
     value: StartAndEnd
 }
 
-@(private="file")
+@(private = "file")
 StartAndEnd :: struct {
     start: int,
     end: int
 }
 
 
-@(private="file")
+@(private = "file")
 not_the_first_line :: proc(conn: ^Conn, cursor: ^int) {
     which: KOrV = .Key
     hit := false
@@ -102,7 +102,7 @@ not_the_first_line :: proc(conn: ^Conn, cursor: ^int) {
     }
 }
 
-@(private="file")
+@(private = "file")
 first_line :: proc(conn: ^Conn, cursor: ^int, key: string) {
     hit := false
     start := 0
@@ -110,7 +110,8 @@ first_line :: proc(conn: ^Conn, cursor: ^int, key: string) {
         switch conn.header_data.buf[cursor^] {
             case ' ',  '\r', '\n', '\t':
                 if hit {
-                    conn.header[key] = string(conn.header_data.buf[start:cursor^])
+                    conn.header[key] = {}
+                    (&conn.header[key])[0] = string(conn.header_data.buf[start:cursor^])
                     return
                 }
             case:
@@ -122,7 +123,7 @@ first_line :: proc(conn: ^Conn, cursor: ^int, key: string) {
     }
 }
 
-@(private="file")
+@(private = "file")
 is_the_header_done :: proc(data: ^HeaderData) -> (is_there_an_error: bool) {
     line_break := 0
     for char, i in data.buf[:data.written_till] {
