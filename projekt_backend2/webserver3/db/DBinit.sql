@@ -97,18 +97,17 @@ EXECUTE FUNCTION pwd_encrypt_user_trigger();
 
 CREATE OR REPLACE FUNCTION userlogin(username VARCHAR(100), pwd VARCHAR(100))
 RETURNS INT AS $$
+DECLARE ok INT DEFAULT 0;
 BEGIN
-    DECLARE ok INT;
-    ok := 0;
     SELECT id INTO ok FROM Users WHERE Users.username = username AND Users.password =  pwd_encrypt_user(pwd);
     RETURN ok;
 END;
 $$ LANGUAGE plpgsql;
 
-INSERT INTO Users VALUES(
-    NULL, 'adamczirjak', 'adamczirjak@gmail.com', 'Titok123', 'user'
+INSERT INTO Users (username, email, password) VALUES (
+    'adamczirjak', 'adamczirjak@gmail.com', 'Titok123'
 );
 
-INSERT INTO Users VALUES(
-    null, 'haha', 'haha@bolyai.hu', 'Tiktok123', 'admin'
+INSERT INTO Users (username, email, password, role) VALUES (
+    'haha', 'haha@bolyai.hu', 'Tiktok123', 'admin'
 );

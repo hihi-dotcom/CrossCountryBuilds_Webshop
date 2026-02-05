@@ -5,8 +5,6 @@ import "core:time"
 import "core:log"
 import vmem "core:mem/virtual"
 
-import "core:fmt"
-
 TICK :: 100 * time.Millisecond
 TIMEOUT :: 5 * time.Second
 MAX_NEW_CONNECTIONS_IN_ONE_GO :: 100
@@ -37,10 +35,10 @@ Conns :: [dynamic]^Conn
 OnRequest: Handler
 
 listen_and_serve :: proc (port: int, on_request: Handler) {
-    OnRequest = on_request
     context.logger = log.create_console_logger()
-    conns: Conns
     listener := create_listener(port)
+    OnRequest = on_request
+    conns: Conns
 
     for {
         start := time.now()
@@ -50,14 +48,10 @@ listen_and_serve :: proc (port: int, on_request: Handler) {
             }
         }
 
-
         listen(&conns, listener)
-         fmt.println(len(conns))
         make_headers(&conns)
-        fmt.println(len(conns))
         serve(&conns)
     }
-
 }
 
 try_recv :: proc (conn: ^Conn, buf: []u8) -> (bytes_read: int, should_close_socket: bool) {
@@ -165,7 +159,7 @@ init_conn :: proc (conn: ^Conn, soc: net.TCP_Socket, source: net.Endpoint) {
 delete_conn_from_conns :: proc (conns: ^Conns, i: int) {
     net.close(conns[i].soc)
     vmem.arena_destroy(&conns[i].arena)
-    free(&conns[i])
+    free(conns[i])
     unordered_remove(conns, i)
 }
 
