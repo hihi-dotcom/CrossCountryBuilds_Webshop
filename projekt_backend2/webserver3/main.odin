@@ -8,20 +8,36 @@ import "core:time"
 
 import "http"
 import "http/util"
-import "http/pq"
+import "pool"
+import "pool/pq"
 
 main :: proc () {
-    conn := pq.connectdb("host=localhost port=5432 dbname=webshop user=webshop-root password=1234")
-    defer pq.finish(conn)
-    fmt.println(pq.status(conn))
+    pool.ConnectionString = "host=localhost port=5432 dbname=webshop user=webshop-root password=1234"
+    pool.prepare("getall", "select * from users", nil)
+    pool.init(3)
 
-    result := pq.exec(conn, "SELECT * from users")
+    ticket := -1
+    for ticket == -1 {
+        ticket = pool.exec("getall")
+        fmt.println("ticket loop")
+    }
 
-    fmt.println(pq.resultStatus(result))
-    fmt.println(pq.nfields(result))
-    fmt.println(pq.ntuples(result))
-    fmt.println(pq.fname(result, 1))
-    fmt.println(pq.fname(result, 2))
+    outerFor: for {
+        switch v in pool.poll(ticket) {
+            case pq.Result:
+                fmt.println(pq.resultStatus(v))
+                fmt.println(pq.nfields(v))
+                fmt.println(pq.ntuples(v))
+                fmt.println(pq.fname(v, 1))
+                fmt.println(pq.fname(v, 2))
+                fmt.println("hehe")
+                break outerFor
+            case:
+                fmt.println("loop")
+        }
+    }
+
+    
 }
 
 /*
@@ -49,4 +65,17 @@ http.listen_and_serve(30000, proc (conn: ^http.Conn) {
     })
 */
 
+/*
+conn := pq.connectdb("host=localhost port=5432 dbname=webshop user=webshop-root password=1234")
+    defer pq.finish(conn)
+    fmt.println(pq.status(conn))
 
+    result := pq.exec(conn, "SELECT * from users")
+
+    fmt.println(pq.resultStatus(result))
+    fmt.println(pq.nfields(result))
+    fmt.println(pq.ntuples(result))
+    fmt.println(pq.fname(result, 1))
+    fmt.println(pq.fname(result, 2))
+    fmt.println("hehe")
+*/

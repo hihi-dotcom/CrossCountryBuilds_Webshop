@@ -9,6 +9,13 @@ when ODIN_OS == .Windows {
 Conn :: distinct rawptr
 Result :: distinct rawptr
 
+Oid :: enum u32 {
+    Int4 = 23,
+    Text = 25,
+    Varchar = 1043,
+    Timestamp = 1114
+}
+
 ConnStatus :: enum i32 {
     Ok, Bad,
     Started, Made, Awaiting_Response, Auth_OK, Set_Env, 
@@ -32,8 +39,8 @@ ExecStatus :: enum i32 {
     Tuples_Chunk
 }
 
-@(default_calling_convention="c")
-@(link_prefix="PQ")
+
+@(default_calling_convention="c", link_prefix="PQ")
 foreign pq {
     connectdb :: proc (conninfo: cstring) -> Conn ---
     finish :: proc (conn: Conn) ---
@@ -50,4 +57,11 @@ foreign pq {
     clear :: proc(res: Result) ---
     cmdTuples :: proc(res: Result) -> cstring ---
     getisnull :: proc(res: Result, row: i32, col: i32) -> i32 ---
+    prepare :: proc(conn: Conn, stmtName: cstring, query: cstring, nParams: i32, paramTypes: [^]Oid) -> Result ---
+    execPrepared :: proc(conn: Conn, stmtName: cstring, nParams: i32, paramValues: [^]cstring, 
+        paramLengths: [^]i32, paramFormats: [^]i32, resultFormat: i32) -> Result ---
+    execParams :: proc(conn: Conn, command: cstring, nParams: i32, 
+        paramTypes: [^]Oid, paramValues: [^]cstring,
+        paramLengths: [^]i32, paramFormats: [^]i32, 
+        resultFormat: i32) -> Result ---
 }
