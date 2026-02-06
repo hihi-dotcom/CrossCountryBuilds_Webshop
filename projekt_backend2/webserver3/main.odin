@@ -10,15 +10,43 @@ import "http"
 import "http/util"
 import "pool"
 import "pool/pq"
+import res "pool/result"
 
 main :: proc () {
     pool.ConnectionString = "host=localhost port=5432 dbname=webshop user=webshop-root password=1234"
     pool.prepare("getall", "select * from users", nil)
+    pool.prepare("getone", "select * from users where username = $1", {.Varchar})
     pool.init(3)
 
     ticket := -1
     for ticket == -1 {
-        ticket = pool.exec("getall")
+        ticket = pool.exec("getone", "haha")
+        fmt.println("ticket loop")
+    }
+
+    for {
+        result, ok := pool.poll(ticket)
+        if ok {
+            fmt.println(res.unmarshal(result))
+            break
+        }
+        fmt.println("loop")
+    }
+}
+
+/*
+
+*/
+
+/*
+pool.ConnectionString = "host=localhost port=5432 dbname=webshop user=webshop-root password=1234"
+    pool.prepare("getall", "select * from users", nil)
+    pool.prepare("getone", "select * from users where username = $1", {.Varchar})
+    pool.init(3)
+
+    ticket := -1
+    for ticket == -1 {
+        ticket = pool.exec("getone", "hahaa")
         fmt.println("ticket loop")
     }
 
@@ -30,15 +58,12 @@ main :: proc () {
                 fmt.println(pq.ntuples(v))
                 fmt.println(pq.fname(v, 1))
                 fmt.println(pq.fname(v, 2))
-                fmt.println("hehe")
                 break outerFor
             case:
                 fmt.println("loop")
         }
     }
-
-    
-}
+*/ 
 
 /*
 http.listen_and_serve(30000, proc (conn: ^http.Conn) {

@@ -84,10 +84,10 @@ exec :: proc (name: cstring, params: ..any) -> (ticket: int) {
     return
 }
 
-poll :: proc (ticket: int) -> (maybe_result: Maybe(pq.Result)) {
-    if !chan.can_recv(Workers[ticket].result) do return
-    result, _ := chan.recv(Workers[ticket].result)
-    return result
+poll :: proc (ticket: int) -> (result: pq.Result, ready: bool) {
+    if !chan.can_recv(Workers[ticket].result) do return nil, false
+    tmp_result, _ := chan.recv(Workers[ticket].result)
+    return tmp_result, true
 }
 
 @(private)
