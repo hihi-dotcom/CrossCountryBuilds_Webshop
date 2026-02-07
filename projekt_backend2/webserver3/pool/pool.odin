@@ -43,7 +43,7 @@ Workers: [dynamic]^WorkerConn
 
 ConnectionString: cstring
 
-prepare :: proc (name: cstring, query: cstring, oids: []pq.Oid) {
+prepare :: proc (name: cstring, query: cstring, oids: []pq.Oid = nil) {
     append(&ToPrepare, Prepare{
         name = name,
         query = query,

@@ -1,10 +1,11 @@
 package util
 
 import "core:net"
+import "core:fmt"
 import "../../http"
 
 @(private="file")
-PROTOCOL : []u8 : {'H', 'T', 'T', 'P', '/', '1', '.', '1',}
+PROTOCOL : []u8 : {'H', 'T', 'T', 'P', '/', '1', '.', '1'}
 
 Response :: struct {
     status: int,
@@ -12,8 +13,19 @@ Response :: struct {
     body: string
 }
 
-Send :: proc (conn: http.Conn, res: Response) -> (n: int, ok: bool) {
-    written, err := try_send(conn.soc, res)
+simple_send :: proc (soc: net.TCP_Socket, status: int, message: string) {
+    res := Response{
+        status = status,
+        header = {
+            fmt.aprint("Content-Length:", len(message))
+        },
+        body = message
+    }
+    try_send(soc, res)
+}
+
+send :: proc (soc: net.TCP_Socket, res: Response) -> (n: int, ok: bool) {
+    written, err := try_send(soc, res)
     if err == nil {
         return written, true
     } else {

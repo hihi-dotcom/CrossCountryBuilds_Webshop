@@ -18,13 +18,14 @@ Conn :: struct {
     last_heard: time.Time,
     header: Header,
     header_data: HeaderData,
-    user_data: map[typeid]any,
+    user_data: UserData,
     to_run: Handler,
 
     arena: vmem.Arena
 }
 
 Header :: map[string][MAX_NUMBER_OF_SAME_HEADERS]string
+UserData :: map[typeid]rawptr
 
 Handler :: proc (conn: ^Conn)
 
@@ -71,8 +72,7 @@ reset_conn :: proc (conn: ^Conn) {
     old_source := conn.source
 
     tmp: [HEADER_SIZE]u8
-    leftover_slice := leftover_data_from_header_buf(conn^)
-    leftover_length := copy(tmp[:], leftover_slice)
+    leftover_length := copy_leftover_header_data(conn, tmp[:])
 
     vmem.arena_destroy(&conn.arena)
 
@@ -80,8 +80,10 @@ reset_conn :: proc (conn: ^Conn) {
     conn.header_data.written_till += copy(conn.header_data.buf, tmp[:leftover_length])
 }
 
-leftover_data_from_header_buf :: proc (conn: Conn) -> ([]u8) {
-    return conn.header_data.buf[conn.header_data.used_till:conn.header_data.written_till]
+copy_leftover_header_data :: proc (conn: ^Conn, dst: []u8) -> int {
+    n := copy(dst, conn.header_data.buf[conn.header_data.used_till:conn.header_data.written_till])
+    conn.header_data.used_till += n
+    return n
 }
 
 @(private = "file")
@@ -151,8 +153,8 @@ init_conn :: proc (conn: ^Conn, soc: net.TCP_Socket, source: net.Endpoint) {
     arena_allocator := vmem.arena_allocator(&conn.arena)
     
     conn.header_data.buf = make([]u8, HEADER_SIZE, arena_allocator)
-    conn.user_data = make(map[typeid]any, arena_allocator)
-    conn.header = make(map[string][MAX_NUMBER_OF_SAME_HEADERS]string, arena_allocator)
+    conn.user_data = make(UserData, arena_allocator)
+    conn.header = make(Header, arena_allocator)
 }
 
 @(private = "file")
