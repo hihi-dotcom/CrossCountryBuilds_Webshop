@@ -6,6 +6,7 @@ import "core:crypto/hash"
 import "core:encoding/base64"
 import "core:strconv"
 
+@(private)
 HASH_LENGTH :: 32
 
 sign :: proc (payload: string, valid_for: time.Duration, secret: string) -> (token: string) {

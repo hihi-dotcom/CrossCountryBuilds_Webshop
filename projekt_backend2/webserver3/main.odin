@@ -16,8 +16,13 @@ import "http"
 import "http/util"
 import "pool"
 import "pool/pq"
-import "token"
+import "./token"
+
+SECRET :: "'secret'"
 
 main :: proc () {
-    
+    tmp := token.sign("hello!", 5 * time.Hour, SECRET)
+    fmt.println(tmp)
+    fmt.println(token.verify(tmp, SECRET))
+    fmt.println(token.verify(strings.concatenate({tmp, "="}), SECRET))
 }
