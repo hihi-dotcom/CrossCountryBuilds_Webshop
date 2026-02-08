@@ -1,6 +1,7 @@
 package token
 
 import "core:time"
+import "core:crypto"
 import "core:crypto/hmac"
 import "core:crypto/hash"
 import "core:encoding/base64"
@@ -8,9 +9,12 @@ import "core:strconv"
 
 @(private)
 HASH_LENGTH :: 32
+@(private)
+TAG_B64_LENGTH := ((4 * HASH_LENGTH / 3) + 3) &~ 3
 
-sign :: proc (payload: string, valid_for: time.Duration, secret: string) -> (token: string) {
-    TAG_B64_LENGTH := ((4 * HASH_LENGTH / 3) + 3) &~ 3
+SECRET: string
+
+sign :: proc (payload: string, valid_for: time.Duration, secret: string = SECRET) -> (token: string) {
     PAYLOAD_B64_LENGTH := ((4 * len(payload) / 3) + 3) &~ 3
 
     secret_bytes := transmute([]u8)secret
@@ -27,33 +31,31 @@ sign :: proc (payload: string, valid_for: time.Duration, secret: string) -> (tok
     message := token_bytes[:len(place_for_time) + 1 + len(place_for_payload)]
 
     token_bytes[len(place_for_time)] = ':'
-    token_bytes[len(valid_till_string) + 1 + len(place_for_payload)] = '.'
+    token_bytes[len(valid_till_string) + 1 + len(place_for_payload)] = '|'
 
     copy(place_for_time, valid_till_string)
     copy(place_for_payload, base64.encode(transmute([]u8)payload))
     
-    tag_buffer: [32]u8
-    hmac.sum(hash.Algorithm.SHA256, tag_buffer[:], message, secret_bytes)
+    tag_buffer: [HASH_LENGTH]u8
+    hmac.sum(.SHA256, tag_buffer[:], message, secret_bytes)
 
     copy(place_for_tag, base64.encode(tag_buffer[:]))
 
     return string(token_bytes)
 }
 
-verify :: proc (token: string, secret: string) -> (payload: string, authentic: bool) {
-    TAG_B64_LENGTH := ((4 * HASH_LENGTH / 3) + 3) &~ 3
-
+verify :: proc (token: string, secret: string = SECRET) -> (payload: string, authentic: bool) {
     secret_bytes := transmute([]u8)secret
     token_bytes := transmute([]u8)token
 
-    if token[len(token) - TAG_B64_LENGTH - 1] != '.' do return
+    if token[len(token) - TAG_B64_LENGTH - 1] != '|' do return
 
     tag_b64 := token_bytes[len(token_bytes) - TAG_B64_LENGTH:]
     msg := token_bytes[:len(token_bytes) - TAG_B64_LENGTH - 1]
 
     tag_bytes := base64.decode(string(tag_b64))
 
-    if !hmac.verify(hash.Algorithm.SHA256, tag_bytes, msg, secret_bytes) do return
+    if !hmac.verify(.SHA256, tag_bytes, msg, secret_bytes) do return
 
     index_of_separator := 0
     for char, i in msg {
@@ -73,4 +75,10 @@ verify :: proc (token: string, secret: string) -> (payload: string, authentic: b
     payload = string(base64.decode(string(payload_b64)))
 
     return
+}
+
+create_secret :: proc () -> string {
+    buf := new([HASH_LENGTH]u8)
+    crypto.rand_bytes(buf[:])
+    return string(buf[:])
 }

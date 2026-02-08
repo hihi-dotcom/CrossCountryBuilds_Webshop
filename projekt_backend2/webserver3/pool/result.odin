@@ -12,7 +12,7 @@ Status :: enum {
     Bad
 }
 
-unmarshal :: proc (result: pq.Result) -> []map[string]string {
+unmarshal :: proc (result: Result) -> []map[string]string {
     nfields := pq.nfields(result)
     ntuples := pq.ntuples(result)
     
@@ -28,7 +28,7 @@ unmarshal :: proc (result: pq.Result) -> []map[string]string {
     return tuples
 }
 
-status :: proc (result: pq.Result) -> (status: Status, error_message: string) {
+status :: proc (result: Result) -> (status: Status, error_message: string) {
     pq_status := pq.resultStatus(result)
     #partial switch pq_status {
         case .Tuples_OK:

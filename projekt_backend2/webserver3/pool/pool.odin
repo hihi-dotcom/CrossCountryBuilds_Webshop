@@ -84,7 +84,7 @@ exec :: proc (name: cstring, params: ..any) -> (ticket: int) {
     return
 }
 
-poll :: proc (ticket: int) -> (result: pq.Result, ready: bool) {
+poll :: proc (ticket: int) -> (result: Result, ready: bool) {
     if !chan.can_recv(Workers[ticket].result) do return nil, false
     tmp_result, _ := chan.recv(Workers[ticket].result)
     return tmp_result, true
@@ -101,37 +101,28 @@ worker :: proc (t: ^thread.Thread) {
         log.panic("db worker", t.user_index, ":", "Cannot connect to database.")
     }
 
-    for prepare in ToPrepare { 
-        result := pq.prepare(
-            conn, 
-            prepare.name, 
-            prepare.query, 
-            i32(len(prepare.oids)),
-            len(prepare.oids) > 0 ? &prepare.oids[0] : nil
-        )
-        defer pq.clear(result)
-        status := pq.resultStatus(result)
-        if status != pq.ExecStatus.Command_OK {
-            log.panic("db worker", t.user_index, ":", "Failed to prepare quary :", prepare.name, "\n",
-                "\t Result status:", status, "\n",
-                "\t Result error message: ", pq.resultErrorMessage(result)
-            )
-        }
-    }
+    prepare_queryes(conn, t.user_index)
+
+    log.info("db worker", t.user_index, ":", "Started...")
 
     for {
+
         to_exec, ok := chan.recv(data.to_exec)
         if !ok {
-            log.info("\ndb worker", t.user_index, ":", "Channel closed, shuting down...")
+            log.info("db worker", t.user_index, ":", "Channel closed, shuting down...")
             break
         }
 
         if pq.status(conn) != .Ok {
             pq.reset(conn)
-            if pq.status(conn) != .Ok do time.sleep(5 * time.Second)
+            if pq.status(conn) != .Ok {
+                time.sleep(5 * time.Second)
+                continue
+            } 
+            prepare_queryes(conn, t.user_index)
             continue
         }
-        
+
         result := pq.execPrepared(
             conn, to_exec.name, 
             i32(len(to_exec.params)), 
@@ -139,8 +130,9 @@ worker :: proc (t: ^thread.Thread) {
             nil, nil, 0
         )
         ok = chan.send(data.result, result)
+
         if !ok {
-            log.info("\ndb worker", t.user_index, ":", "Channel closed, shuting down...")
+            log.info("db worker", t.user_index, ":", "Channel closed, shuting down...")
             break
         }
 
@@ -150,10 +142,15 @@ worker :: proc (t: ^thread.Thread) {
 
 @(private)
 delete_params :: proc (params: Params) {
-    for param in params {
-        delete_cstring(param)
+    fmt.println(51)
+    for param in params^ {
+         fmt.println(52)
+        //delete_cstring(param)
+         fmt.println(53)
     }
+     fmt.println(54)
     delete_dynamic_array(params^)
+     fmt.println(55)
 }
 
 @(private)
@@ -182,4 +179,25 @@ create_worker :: proc (user_index: int) {
     worker_conn.to_exec = chan.as_send(to_exec_chan)
 
     append(&Workers, worker_conn)
+}
+
+@(private)
+prepare_queryes :: proc (conn: pq.Conn, thread_index: int) {
+    for prepare in ToPrepare { 
+        result := pq.prepare(
+            conn, 
+            prepare.name, 
+            prepare.query, 
+            i32(len(prepare.oids)),
+            len(prepare.oids) > 0 ? &prepare.oids[0] : nil
+        )
+        defer pq.clear(result)
+        status := pq.resultStatus(result)
+        if status != pq.ExecStatus.Command_OK {
+            log.panic("db worker", thread_index, ":", "Failed to prepare quary :", prepare.name, "\n",
+                "\t Result status:", status, "\n",
+                "\t Result error message: ", pq.resultErrorMessage(result)
+            )
+        }
+    }
 }

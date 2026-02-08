@@ -44,15 +44,16 @@ static_body :: proc (conn: ^http.Conn, to_run_after: http.Handler) {
 try_get_body :: proc (conn: ^http.Conn) {
     state := cast(^StaticBodyState)conn.user_data[StaticBodyState]
 
-    n, should_close_socket := http.try_recv(conn, state.body^[state.written_till:])
-    if should_close_socket {
-        conn.to_run = nil
-        return
+    if state.written_till != len(state.body^) {
+        n, should_close_socket := http.try_recv(conn, state.body^[state.written_till:])
+        if should_close_socket {
+            util.simple_send(conn.soc, 400, "There was a problem reciving the body.")
+            conn.to_run = nil
+            return
+        }
+        state.written_till += n
+    } else {
+        conn.user_data[StaticBody] = state.body
+        conn.to_run = state.to_run_after
     }
-
-    state.written_till += n
-    if state.written_till != len(state.body) do return
-
-    conn.user_data[StaticBody] = state.body
-    conn.to_run = state.to_run_after
 }

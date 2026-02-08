@@ -5,11 +5,17 @@ import "core:time"
 import "core:log"
 import vmem "core:mem/virtual"
 
+@(private)
 TICK :: 100 * time.Millisecond
+@(private)
 TIMEOUT :: 5 * time.Second
+@(private)
 MAX_NEW_CONNECTIONS_IN_ONE_GO :: 100
+@(private)
 MAX_CONNECTIONS :: 1000
+@(private)
 HEADER_SIZE :: 1024 * 8
+@(private)
 MAX_NUMBER_OF_SAME_HEADERS :: 2
 
 Conn :: struct {
@@ -26,7 +32,6 @@ Conn :: struct {
 
 Header :: map[string][MAX_NUMBER_OF_SAME_HEADERS]string
 UserData :: map[typeid]rawptr
-
 Handler :: proc (conn: ^Conn)
 
 @(private = "file")
