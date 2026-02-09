@@ -5,7 +5,7 @@ import CallIcon from "@mui/icons-material/Call"
 
 export default function Contacts(){
     return(
-        <main className="flex flex-col gap-10  my-3 sm:hidden">
+        <section className="flex flex-col gap-10  my-3 sm:hidden">
             <h2 className="text-4xl text-center ">Elérhetőségeink</h2>
             <div id="cim" className=" inline-flex text-2xl">
                 <HomeIcon sx={{fontSize: 35}}/> <p> 1025 Budapest Huhu u. 28.</p>
@@ -19,6 +19,6 @@ export default function Contacts(){
             <div className="mx-auto">
                 <BackToWebShopButton/>
             </div>
-        </main>
+        </section>
     );
 }

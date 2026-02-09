@@ -4,9 +4,9 @@ import SignUpModule from "../components/moduleComponents/signUpmodule";
 export default function RegistrationPage(){
     return(
     <>
-        <main>
+        <section>
             <SignUpModule/>
-        </main>
+        </section>
        
     </>
     );

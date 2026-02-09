@@ -2,17 +2,36 @@ import OrderSendButton from "../buttonComponents/orderFinishButton";
 import SelectforOrder from "../htmlselectComponents/selectforOrderData";
 import { FormField } from "../formFieldComponents/textField";
 import { useCart } from "../custom_hooks/CartContext";
-import { Form, useActionData, useNavigation} from "react-router-dom"
-import { useRef } from "react";
+import { Form, useActionData, useNavigation, useRouteLoaderData, useSubmit} from "react-router-dom"
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function OrderDataModule(){
     const {totalPrice, cartItems} = useCart();
+    const userData = useRouteLoaderData("root") as {id:number, role: string} | null;
+
     const actionData = useActionData() as {error?: string};
     const navigation = useNavigation();
+    const submit = useSubmit();
     const isSubmitting = navigation.state === "submitting";
-
+    const [sameAddress, setSameAddress] = useState(true);
     
+    const handleSubmit = (event:any) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const shipping = formData.get("shippingAddr") as string;
+
+        if(sameAddress){
+            formData.set("billingAddr", shipping);
+        }
+        if(userData?.id){
+            formData.append("userId", userData.id.toString());
+        };
+        formData.append("cartProducts", JSON.stringify(cartItems));
+        formData.append("totalAmount", totalPrice.toString());
+
+        submit(formData, {method: "post"});
+    };
 
 
 
@@ -55,7 +74,7 @@ export default function OrderDataModule(){
     ];
     return(
         <>
-            <Form method="post" className="py-2">
+            <Form method="post" className="py-2" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 p-6 max-w-5xl gap-4 md:gap-8 mx-auto">
                     <div>
                         <FormField
@@ -88,7 +107,7 @@ export default function OrderDataModule(){
                         />
                         
                     </div>
-                    <div>
+                    {!sameAddress && (<div>
                         <FormField
                             input_name="billingAddr"
                             input_id="order-billingaddr"
@@ -97,7 +116,7 @@ export default function OrderDataModule(){
                             ref={orderBillingAddrRef}
                         />
                     
-                    </div>
+                    </div>)}
                     <div>
                         <SelectforOrder
                             name="paymentMethod"
@@ -125,7 +144,7 @@ export default function OrderDataModule(){
                     </div>
                     
                     <div className="flex flex-row items-center w-full gap-0.5 sm:gap-2 md:gap-5">
-                        <input id="default-checkbox" type="checkbox" value="" name="sameAddress" className="w-5 h-5   rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft"/>
+                        <input id="default-checkbox" type="checkbox" value="" name="sameAddress" className="w-5 h-5   rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft" checked={sameAddress} onChange={(e) => setSameAddress(e.target.checked)}/>
                         <p className="select-none ms-2 font-medium text-heading text-[21px] ">A szállítási és a számlázási cím megegyezik.</p>
                     </div>
                     {actionData?.error && (
@@ -143,4 +162,4 @@ export default function OrderDataModule(){
            
         </>
     );
-}
+};

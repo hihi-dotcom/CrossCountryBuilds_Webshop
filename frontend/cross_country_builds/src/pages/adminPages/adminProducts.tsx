@@ -38,7 +38,7 @@ export default function ProductDashboard(){
     }
     return(
         <>
-            <main className="min-h-screen py-6 px-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <section className="min-h-screen py-6 px-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
                <div className="lg:col-span-1">
                     <AdminSidebar 
                         link1_to="/admin/orders"
@@ -156,7 +156,7 @@ export default function ProductDashboard(){
 
                     </div>
                </div>        
-            </main>
+            </section>
         </>
     );
 }

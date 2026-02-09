@@ -25,7 +25,7 @@ export default function AdminErrorPage(){
     }
     return(
         <>
-            <main className="min-h-screen flex items-center justify-center">
+            <section className="min-h-screen flex items-center justify-center">
                 <section>
                         <div id="admin_err_cont" className="text-center py-5 text-white mx-auto px-4">
                             <h1>{errCode}</h1>
@@ -39,7 +39,7 @@ export default function AdminErrorPage(){
 
                         </div>
                 </section>
-            </main>
+            </section>
         </>
     );
 }

@@ -15,3 +15,14 @@ export async function createProductAction({request}: {request: Request}){
         return {serverError: error.message || "Hiba a termék feltöltése közben! "};
     }
 }
+
+export async function productLoader({params}:any){
+    const id = params.id;
+
+    const response = await ProductService.getProductById(Number(id));
+    if(!response){
+        throw new Response("A termék nem található", {status: 404});
+    };
+
+    return response;
+}

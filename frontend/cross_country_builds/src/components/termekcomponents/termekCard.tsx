@@ -21,8 +21,8 @@ export function Item({product, OnCart}: ProductProps){
     return(
     <>
         
-        <div className="bg-neutral-primary-soft block border border-default rounded-base shadow-xs w-60 rounded-lg overflow-hidden bg-[#106187]">
-            <img src={superBringa} alt="Eladó termék"/>
+        <div className="bg-neutral-primary-soft border border-default rounded-base shadow-xs w-60 rounded-lg overflow-hidden bg-[#106187] flex flex-col h-full">
+            <img src={product.imageUrl} alt="Eladó termék" className="h-48 object-cover w-full "/>
             <h2 className="termekneve font-semibold my-4 mx-2">{product.name}</h2>
             <div className="termekdetails m-3">
                    <h4 className="termekkategoria text-lg">Kategória: {product.category} </h4>
