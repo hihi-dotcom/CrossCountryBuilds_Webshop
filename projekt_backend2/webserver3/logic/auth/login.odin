@@ -25,31 +25,28 @@ login_query :: proc (conn: ^http.Conn) {
 
     as := new(BodyAs)
     json.unmarshal(body, as)
+
     if as.password == "" || as.username == "" {
         util.stop(conn, 400, "Missing paramter.")
         return
     }
     conn.user_data[BodyAs] = as
-    pool.query_mw(conn, login_verify, "get_user_id_role_and_password_by_username", as.username)
-    fmt.println(1)
+    pool.query_mw(conn, login_verify, "get_user_id_role_and_password_by_username", "testuser")
+    fmt.println( as.username)
 }
 
 @(private = "file")
 login_verify :: proc (conn: ^http.Conn) {
-    fmt.println(2)
     as := cast(^BodyAs)conn.user_data[BodyAs]
     resutl := cast(pool.Result)conn.user_data[pool.Result]
-    fmt.println(3)
     
     status, errMsg := pool.status(resutl)
     if status != .TuplesOK {
         log.error(errMsg)
-        util.reset(conn, 401, "Bad username or password.")
+        util.reset(conn, 500, "Internal server error.")
         return
     }
     data := pool.unmarshal(resutl)
-    fmt.println(4)
-    util.reset(conn, 200, "test")
     fmt.println(data)
-    
+    util.reset(conn, 200, "test")
 }

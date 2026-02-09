@@ -1,6 +1,6 @@
 package pool
 
-import "core:fmt"
+import "core:strings"
 import "core:thread"
 import "core:sync/chan"
 import "core:log"
@@ -64,7 +64,7 @@ init :: proc (n_threads: int) {
     assert(len(Workers) == n_threads, "Worker creation failed.") 
 }
 
-exec :: proc (name: cstring, params: ..any) -> (ticket: int) {
+exec :: proc (name: cstring, params: []string) -> (ticket: int) {
     ticket = -1
     for worker_conn, i in Workers {
         if !chan.can_send(worker_conn.to_exec) do continue
@@ -73,7 +73,7 @@ exec :: proc (name: cstring, params: ..any) -> (ticket: int) {
         ticket = i
 
         for param in params {
-            append(cstring_params, fmt.caprint(param))
+            append(cstring_params, strings.clone_to_cstring(param))
         }
 
         chan.send(worker_conn.to_exec, ToExec{
@@ -106,7 +106,6 @@ worker :: proc (t: ^thread.Thread) {
     log.info("db worker", t.user_index, ":", "Started...")
 
     for {
-
         to_exec, ok := chan.recv(data.to_exec)
         if !ok {
             log.info("db worker", t.user_index, ":", "Channel closed, shuting down...")
@@ -125,8 +124,8 @@ worker :: proc (t: ^thread.Thread) {
 
         result := pq.execPrepared(
             conn, to_exec.name, 
-            i32(len(to_exec.params)), 
-            len(to_exec.params) > 0 ? &to_exec.params[0] : nil, 
+            i32(len(to_exec.params^)), 
+            len(to_exec.params^) > 0 ? &(to_exec.params^[0]) : nil, 
             nil, nil, 0
         )
         ok = chan.send(data.result, result)
@@ -135,22 +134,7 @@ worker :: proc (t: ^thread.Thread) {
             log.info("db worker", t.user_index, ":", "Channel closed, shuting down...")
             break
         }
-
-        delete_params(to_exec.params)
     }
-}
-
-@(private)
-delete_params :: proc (params: Params) {
-    fmt.println(51)
-    for param in params^ {
-         fmt.println(52)
-        //delete_cstring(param)
-         fmt.println(53)
-    }
-     fmt.println(54)
-    delete_dynamic_array(params^)
-     fmt.println(55)
 }
 
 @(private)

@@ -3,6 +3,8 @@ package pool
 import "core:strings"
 import "./pq"
 
+import "core:fmt"
+
 Result :: pq.Result
 
 Status :: enum {
