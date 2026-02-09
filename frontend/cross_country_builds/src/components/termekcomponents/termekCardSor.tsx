@@ -32,7 +32,7 @@ export function Products({filteredItems}: {filteredItems: Product[]}){
             )}
            
             <div className="w-full">
-                <div className="grid grid-cols-1  md:grid-cols-2  xl:grid-cols-3  gap-6 justify-items-center">
+                <div className="grid grid-cols-1  md:grid-cols-2  xl:grid-cols-3  gap-6 justify-items-center items-stretch">
                     {displayProducts.map(bikeP => <Item  product={bikeP} key={bikeP.id} OnCart={() => openModal()}/>)}
                 </div>
             </div>

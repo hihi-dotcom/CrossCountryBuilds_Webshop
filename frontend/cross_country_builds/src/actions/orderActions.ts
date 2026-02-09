@@ -14,7 +14,8 @@ export async function MakeOrder({ request }: {request: Request}){
     };
 
     const shippingAddr = data.shippingAddr as string;
-    const billingAddr = data.sameAddress === "" ? shippingAddr : (data.billingAddr as string);
+    const isSameAddress = data.sameAddress === "on" || data.sameAddress === "";
+    const billingAddr = isSameAddress ? shippingAddr : (data.billingAddr as string);
     const cartProd = JSON.parse(data.cartProducts as string);
     const totalAmount = Number(data.totalAmount);
     const userId = Number(data.userId);
@@ -23,7 +24,7 @@ export async function MakeOrder({ request }: {request: Request}){
         Daddress: shippingAddr,
         Baddress: billingAddr,
         pMethod: data.paymentMethod,
-        dMethod: data.deliveryMethod,
+        dMethod: data.shippingMethod,
         total_amount: totalAmount,
        products: cartProd.map((item: any) => ({
             id: item.id,
@@ -39,6 +40,7 @@ export async function MakeOrder({ request }: {request: Request}){
                 ServerError: orderResult.message || "Váratlan hiba történt a rendelés leadásakor!"
             }
         }
+        localStorage.removeItem('bike-cart');
         return redirect("/orderend");
     }
     catch(error:any){

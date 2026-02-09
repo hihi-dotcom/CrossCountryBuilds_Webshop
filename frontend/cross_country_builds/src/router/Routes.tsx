@@ -32,6 +32,7 @@ import PublicOnlyRoute from "../pages/protects/ProtectPublicOnly";
 import { serviceDateTimeAction } from "../actions/serviceActions";
 import { getPassEmailAction, createPassAction } from "../actions/passwordActions";
 import { MakeOrder } from "../actions/orderActions";
+import { productLoader } from "../actions/productActions";
 import { createProductAction } from "../actions/productActions";
 import { createEmptyAppointmentAction } from "../actions/serviceActions";
 
@@ -65,13 +66,13 @@ const routes = [
                    
 
                     { path: "contacts", element: <Contacts /> },
-                    { path: "product/:id", element: <ProductPage /> },
+                    { path: "product/:id",loader:productLoader, element: <ProductPage /> },
 
                     {
                         element: <ProtectRouteUser />,
                         children: [
                             { path: "mydata", element: <MyDataPage /> },
-                            { path: "orderData",/*action: MakeOrder ,*/  element: <OrderDataPage /> },
+                            { path: "orderData",action: MakeOrder ,  element: <OrderDataPage /> },
                             { path: "orderend", element: <EndofOrderPage /> },
                             { path: "cart", element: <CartPage /> },
                             { path: "appointment",

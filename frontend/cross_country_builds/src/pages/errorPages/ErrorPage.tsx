@@ -15,7 +15,7 @@ export default function ErrorPage(){
     }
 
     return(
-        <main className="min-h-screen flex items-center justify-center">
+        <section className="min-h-screen flex items-center justify-center">
             <section>
                 <div className="text-center py-5 text-white mx-auto px-4">
                     <h1 className="text-5xl pb-8 font-bold">{error_title}</h1>
@@ -27,6 +27,6 @@ export default function ErrorPage(){
                     </div>
                 </div>
             </section>
-        </main>
+        </section>
     );
 }

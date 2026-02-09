@@ -11,7 +11,7 @@ export default function CartPage(){
     const hasItems = cartItems && cartItems.length > 0;
     return(
     <>
-        <main className="min-h-screen py-10 px-12 ">
+        <section className="min-h-screen py-10 px-12 ">
             <BacktoTheWebShopSection children={"Elfelejtettél valamit? Itt még visszatérhetsz a webshophoz"}/>
             <div className="flex flex-col max-w-4xl mx-start gap-y-8">
                 <h2 className="text-4xl font-medium mb-3">A kosarad tartalma: </h2>
@@ -36,7 +36,7 @@ export default function CartPage(){
                 </div>
           
              
-        </main>
+        </section>
        
     </>
 

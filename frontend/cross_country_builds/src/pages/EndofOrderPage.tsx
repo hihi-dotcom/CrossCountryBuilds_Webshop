@@ -5,10 +5,10 @@ import BacktoTheWebShopSection from "../components/moduleComponents/backToTheWeb
 export default function EndofOrderPage(){
     return(
         <>
-            <main>
+            <section>
                 <EndofOrderModule/>
                 <BacktoTheWebShopSection children={"Más is megtetszett? Itt visszatérhetsz a webshophoz"}/>
-            </main>
+            </section>
         </>
     );
 }

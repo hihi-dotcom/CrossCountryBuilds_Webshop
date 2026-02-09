@@ -42,7 +42,7 @@ export default function OrdersDashboard(){
         }
     return(
         <>
-            <main className="min-h-screen py-6 px-4 grid grid-cols-1 lg:grid-cols-4 gap-6 bg-gray-50">
+            <section className="min-h-screen py-6 px-4 grid grid-cols-1 lg:grid-cols-4 gap-6 bg-gray-50">
                 <div className="lg:col-span-1">
                     <AdminSidebar 
                         link1_to="/admin/dates"
@@ -146,7 +146,7 @@ export default function OrdersDashboard(){
                         </div>
                     </div>
 
-            </main>
+            </section>
         </>
     );
 }

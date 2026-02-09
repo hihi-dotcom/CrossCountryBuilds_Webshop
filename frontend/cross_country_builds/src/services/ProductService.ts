@@ -5,7 +5,7 @@ const API_URL = "http://localhost:3000/api";
 
 class ProductService {
 
-    async getProducts(limit: number = 25, offset: number = 0) {
+    async getProducts(limit: number = 15, offset: number = 0) {
         const response = await fetch(`${API_URL}/products?limit=${limit}&offset=${offset}`);
         const data = await response.json();
         
