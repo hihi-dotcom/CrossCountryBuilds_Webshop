@@ -14,7 +14,9 @@ Status :: enum {
     Bad
 }
 
-unmarshal :: proc (result: Result) -> []map[string]string {
+StrMap :: []map[string]string
+
+unmarshal :: proc (result: Result) -> StrMap {
     nfields := pq.nfields(result)
     ntuples := pq.ntuples(result)
     

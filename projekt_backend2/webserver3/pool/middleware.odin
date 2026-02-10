@@ -14,15 +14,15 @@ QueryState :: struct {
 }
 
 query_mw :: proc (conn: ^http.Conn, to_run_after: http.Handler, prepared_name: cstring, params: []string) {
+    params_copy := make([]string, len(params))
+    copy(params_copy, params)
+
     query_state := new(QueryState)
     query_state.to_run_after = to_run_after
     query_state.ticket = -1
     query_state.prepared_name = prepared_name
-    query_state.params = params
+    query_state.params = params_copy
     conn.user_data[QueryState] = query_state
-
-    fmt.println(params, "params1!! ")
-    fmt.println(query_state.params, "params1!! ")
     
     conn.to_run = try_get_pool_thread
 }
@@ -30,7 +30,6 @@ query_mw :: proc (conn: ^http.Conn, to_run_after: http.Handler, prepared_name: c
 @(private = "file")
 try_get_pool_thread :: proc (conn: ^http.Conn) {
     state := cast(^QueryState)conn.user_data[QueryState]
-    fmt.println(state.params, "paraaams+++++++++")
 
     state.ticket = exec(state.prepared_name, state.params)
     if state.ticket == -1 do return

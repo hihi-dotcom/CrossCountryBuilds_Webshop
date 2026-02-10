@@ -64,6 +64,7 @@ verify :: proc (password: string, hashed: string) -> bool {
     hashed_bytes := (transmute([]u8)hashed)
     password_bytes := transmute([]u8)password
 
+    if len(hashed) != (ALG_TAG_STRING_LENGTH + 1 + ITERATIONS_STRING_LEHGTH + 1 + SALT_B64_LENGTH + 1 + HASH_B64_LENGTH) do return false
     place_for_salt := hashed_bytes[ALG_TAG_STRING_LENGTH + 1 + ITERATIONS_STRING_LEHGTH + 1:ALG_TAG_STRING_LENGTH + 1 + ITERATIONS_STRING_LEHGTH + 1 + SALT_B64_LENGTH]
 
     old_salt := base64.decode(string(place_for_salt))
