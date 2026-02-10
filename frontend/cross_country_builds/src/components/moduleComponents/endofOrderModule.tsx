@@ -1,4 +1,5 @@
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
+import { useCart } from "../custom_hooks/CartContext";
 
 export default function EndofOrderModule(){
     return(

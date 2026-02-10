@@ -47,7 +47,7 @@ class OrderService{
     };
 
     async getOrdersforAdmin(){
-        const response = await AuthService._request(`orders`, {
+        const response = await AuthService._request(`admin/orders`, {
             method: "GET"
         });
         const responseData = await response.json()

@@ -14,7 +14,7 @@ export async function MakeOrder({ request }: {request: Request}){
     };
 
     const shippingAddr = data.shippingAddr as string;
-    const isSameAddress = data.sameAddress === "on" || data.sameAddress === "";
+    const isSameAddress = data.sameAddress === "on";
     const billingAddr = isSameAddress ? shippingAddr : (data.billingAddr as string);
     const cartProd = JSON.parse(data.cartProducts as string);
     const totalAmount = Number(data.totalAmount);
@@ -44,7 +44,7 @@ export async function MakeOrder({ request }: {request: Request}){
         return redirect("/orderend");
     }
     catch(error:any){
-        return {serverError: error.message || "Váratlan hiba történt a rendelés leadásakor! "}
+        return {ServerError: error.message || "Váratlan hiba történt a rendelés leadásakor! "}
     }
    
 }

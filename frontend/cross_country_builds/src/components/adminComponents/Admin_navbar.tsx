@@ -25,7 +25,7 @@ export default function Admin_Navbar(){
                 <div className="w-full md:block md:w-auto" id="navbar-default">
                 <ul className="font-medium flex flex-row items-center justify-end flex-1 p-4 md:p-0 md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0">
                     <li className="hidden md:flex items-center">
-                        <p>Welcome Admin!</p>
+                        <p>Üdv Admin!</p>
                     </li>
                     <li>
                         <Form method="post" action="/logout">

@@ -22,11 +22,12 @@ import AdminErrorPage from "../pages/errorPages/AdminErrorPage";
 import ProtectRouteAdmin from "../pages/protects/saferouteforadmin";
 import UserService from "../services/UserService";
 import DateTimeService from "../services/DateTimeService";
-
+import ProductService from "../services/ProductService";
 import Contacts from "../pages/ContactsPageOnlyMobile";
 
 import { loginAction, registerAction, logoutAction } from "../actions/authActions";
 import AuthService from "../services/AuthService";
+import OrderService from "../services/OrderService";
 import ProtectRouteUser from "../pages/protects/ProtectiveRouteUser";
 import PublicOnlyRoute from "../pages/protects/ProtectPublicOnly";
 import { serviceDateTimeAction } from "../actions/serviceActions";
@@ -105,9 +106,9 @@ const routes = [
             { 
                 path: "orders", 
                 element: <OrdersDashboard />,
-                /*loader: async() => {
-                    return await OrderService.getOrdersforAdmin();
-                }*/
+                loader: async() => {
+                   return await OrderService.getOrdersforAdmin();
+                }
             },
             { 
                 path: "dates", 
@@ -120,10 +121,10 @@ const routes = [
             { 
                 path: "products", 
                 element: <ProductDashboard />,
-                /*action: createProductAction ,*/
-                /*loader: async() => {
+                action: createProductAction ,
+                loader: async() => {
                     return await ProductService.getAdminProducts();
-                }*/ 
+                } 
             }
         ]
     }
