@@ -10,7 +10,7 @@ export default function OrderDataModule(){
     const {totalPrice, cartItems} = useCart();
     const userData = useRouteLoaderData("root") as {id:number, role: string} | null;
 
-    const actionData = useActionData() as {error?: string};
+    const actionData = useActionData() as {error?: string, ServerError?: string};
     const navigation = useNavigation();
     const submit = useSubmit();
     const isSubmitting = navigation.state === "submitting";
@@ -24,6 +24,7 @@ export default function OrderDataModule(){
         if(sameAddress){
             formData.set("billingAddr", shipping);
         }
+        formData.set("sameAddress", sameAddress ? "on" : "off");
         if(userData?.id){
             formData.append("userId", userData.id.toString());
         };
@@ -138,6 +139,7 @@ export default function OrderDataModule(){
                         />
                         
                     </div>
+
                     <div>
                         <h2 className="text-4xl py-2">Fizetendő összesen: </h2>
                         <p className="text-4xl">{totalPrice.toLocaleString()} Ft</p>
@@ -147,6 +149,12 @@ export default function OrderDataModule(){
                         <input id="default-checkbox" type="checkbox" value="" name="sameAddress" className="w-5 h-5   rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft" checked={sameAddress} onChange={(e) => setSameAddress(e.target.checked)}/>
                         <p className="select-none ms-2 font-medium text-heading text-[21px] ">A szállítási és a számlázási cím megegyezik.</p>
                     </div>
+                                        
+                    {actionData?.ServerError && (
+                        <div className="md:col-span-2 p-4 bg-red-100 border border-red-400 text-red-700 font-bold rounded-xl text-center animate-pulse">
+                            {actionData.ServerError}
+                        </div>
+                    )}
                     {actionData?.error && (
                         <div className="md:col-span-2 text-red-500 font-bold rounded text-center">
                             {actionData.error}

@@ -30,7 +30,7 @@ class UserService{
    
 
     async getNormalUsers() {
-        const response = await AuthService._request('users');
+        const response = await AuthService._request('admin/users');
         const responseData = await response.json();
         if (!response.ok) {
            

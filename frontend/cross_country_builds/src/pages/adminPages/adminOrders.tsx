@@ -1,15 +1,22 @@
 import AdminSidebar from "../../components/adminComponents/Admin_OrdersSidebar";
-import { Form } from "react-router-dom";
+import { Form, useLoaderData } from "react-router-dom";
 import { useState } from "react";
 import TrashIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import CheckIcon from "@mui/icons-material/Check";
 import OrderService from "../../services/OrderService";
+import AdminProductModal from "../../components/modalComponents/adminModalComponents/adminProductsModal";
+import DeleteModal from "../../components/modalComponents/adminModalComponents/AreyouSureDeleteModal";
 
 export default function OrdersDashboard(){
-         const [loadingId, setLoadingId] = useState(null);
+         const initOrders = useLoaderData();
+         const [orders, setOrders] = useState<any[]>(initOrders || []);
+         const [loadingId, setLoadingId] = useState<number | null>(null);
          const [error, setError] = useState("");
-          const [orders, setOrders] = useState([
+         const [selectedOrderItems, setSelectedOrderItems] = useState<any[] | null>(null);
+         const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+        /*  const [orders, setOrders] = useState([
             {
+            id:1,
             u_id: 2,
            d_method: "házhoz szállítás",
             p_method: "utánvét készpénzzel",
@@ -23,25 +30,88 @@ export default function OrdersDashboard(){
             status: "kész"
             
             }
-        ]);
+        ]);*/
 
+        async function handleUpdateStatus(id:number, newStatus: string) {
+            setLoadingId(id);
+            setError("");
+            try{
+                const result = await OrderService.UpdateOrderStat(id, {status: newStatus});
 
-        async function handleDeleteAppointment(id:number){
+                if(result.ok){
+                   setOrders((prev:any) => 
+                        prev.map((order:any) =>
+                            order.id === id ? {...order, status: newStatus } : order 
+                        )
+                    );
+                   
+                }
+                else{
+                    setError(result.message || "Hiba történt a státusz frissítésekor!")
+                }
+            }
+            catch(err){
+                setError("Hálozati hiba a státusz frissítés közben!" + err);
+                console.log(err);
+            }
+            finally{
+                setLoadingId(null);
+            }
+        }
+
+        async function handleDeleteOrder(id:number){
             try{
                 const deleteResult = await OrderService.deleteOrderbyId(id);
                 if(deleteResult.ok){
-                    //setOrders(prev => prev.filter(p => p.id !== id))
+                    setOrders(prev => prev.filter((order) => order.id !== id))
+                    setDeleteTargetId(null)
                 }
                 else{
-                
+                    setError(deleteResult.message || "A megrendelés törlése!");
                 }
             }
             catch(error){
-                
+                setError("Váratlan hiba történt a megrendelés törlése közben!");
+                console.log(error);
             }
         }
     return(
         <>
+            <AdminProductModal
+                isOpen={selectedOrderItems !== null} 
+                onClose={() => setSelectedOrderItems(null)}
+            >
+                <div className="w-full max-w-md">
+                    <h3 className="text-xl font-bold mb-6 border-b pb-2">Megrendelt termékek</h3>
+                    <div className="space-y-4">
+                        {selectedOrderItems?.map((item:any) => (
+                            <div key={item.id} className="flex justify-between items-center p-4 rounded-xl">
+                                <div className="flex flex-col text-left border-r-2 border-black px-8">
+                                    <span className="font-bold">{item.p_name}</span>
+                                    
+                                </div>
+                                <div className="text-lg font-bold text-black px-8">
+                                    {item.p_price} Ft
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </AdminProductModal>
+            <DeleteModal isOpen={deleteTargetId !== null} 
+                onClose={() => setDeleteTargetId(null)}>
+                    <>
+                        <h2 className="text-2xl font-bold">
+                            Biztosan törölni akarod, ezt a rendelést?
+                        </h2>
+                        <div className="flex gap-4">
+                            <button className="bg-red-600 hover:bg-red-800 text-white  hover:font-bold rounded-xl transition-colors py-3 px-4 "
+                            onClick={() => deleteTargetId && handleDeleteOrder(deleteTargetId)}>
+                                Igen, töröld a rendelést!
+                            </button>
+                        </div>
+                    </>
+            </DeleteModal>
             <section className="min-h-screen py-6 px-4 grid grid-cols-1 lg:grid-cols-4 gap-6 bg-gray-50">
                 <div className="lg:col-span-1">
                     <AdminSidebar 
@@ -88,46 +158,25 @@ export default function OrdersDashboard(){
                                 </thead>
                                 <tbody className="divide-y px-2 divide-gray-100 text-base text-black">
                                     {orders.map((s) => (
-                                        <tr key={s.u_id} className="hover:bg-blue-50/30 transition-colors divide-gray-600">
-                                              <td className="py-4 px-2 font-medium w-fit">#{s.u_id}</td>
-                                              <td className="py-4 px-2">{s.d_method}</td>
-                                              <td className="py-4 px-2">{s.p_method}</td>
-                                              <td className="py-4 px-2 font-semibold">{s.total_amount.toLocaleString()} Ft</td>
+                                        <tr key={s.id}  className={loadingId === s.id ? "opacity-50" : ""}>
+                                              <td className="py-4 px-2 font-medium w-fit">{s.customer_name}</td>
+                                              <td className="py-4 px-2">{s.delivery_Method}</td>
+                                              <td className="py-4 px-2">{s.payment_Method}</td>
+                                              <td className="py-4 px-2 font-semibold">{Number(s.total_amount).toLocaleString()} Ft</td>
                                             <td className="py-4 px-2">
-                                                <details className="cursor-pointer">
-                                                    <summary className="text-blue list-none">
-                                                        <span className="flex items-center gap-1">
-                                                            {s.items.length} termék megtekintése
-                                                           
-                                                            <span className="group-open:rotate-180 transition-transform">▼</span>
-                                                        </span>
-                                                    </summary>
-                                                    <div className="p-3 bg-gray-50 rounded-lg mt-2 shadow-inner text-xs border border-gray-100 min-w-[200px]">
-                                                        {s.items.map((item, index) => (
-                                                            <div key={index} className="flex justify-between border-b last:border-0 py-2 border-gray-200">
-                                                                <div className="flex flex-col">
-                                                                    <span className="font-bold text-gray-800">{item.p_name}</span>
-                                                                   
-                                                                </div>
-                                                                <span className="font-semibold text-gray-700">{item.p_price.toLocaleString()} Ft</span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </details>
+                                               <button onClick={() => setSelectedOrderItems(s.items)}  className="bg-blue-600 hover:bg-blue-800 text-white hover:font-bold py-2 px-3  flex flex-col md:flex-row items-center gap-1 transition-colors rounded-xl">
+                                                <span>{s.items?.length || 0} termék</span>
+                                                <span className="text-sm">(megtekintése)</span>
+                                               </button>
                                             </td>
                                             <td className="py-4 px-2">
-                                                <select 
-                                                    value={orders[0].status} 
-                                                   
-                                                   
-                                                    
-                                                >
+                                                <select value={s.status}  onChange={(e) => handleUpdateStatus(s.id, e.target.value)}  >
                                                     <option value="pending">Függőben</option>
                                                     <option value="processing">Feldolgozás alatt</option>
                                                 </select>
                                             </td>
-                                            <td className="py-3 px-2 text-right flex flex-col md:flex-row">
-                                                <button className="flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95">
+                                            <td className="py-3 px-2 text-right flex flex-col gap-4">
+                                                <button className="flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95" onClick={() => setDeleteTargetId(s.id)}>
                                                     <TrashIcon sx={{ fontSize: 18 }} />
                                                     <span className="md:hidden lg:inline">Törlés</span>
                                                 </button>

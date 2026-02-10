@@ -4,12 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import UserService from "../../services/UserService";
 import { useLoaderData } from "react-router-dom";
 import type Guest from "../../models/guest";
+import DeleteModal from "../../components/modalComponents/adminModalComponents/AreyouSureDeleteModal";
 
 export default function UsersDashboard(){
 
     const initUsers = useLoaderData();
     const [users, setUsers] = useState<Guest[]>(initUsers);
     const [error, setError] = useState("");
+    const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
     useEffect(() => {
         setUsers(initUsers);
@@ -21,7 +23,8 @@ export default function UsersDashboard(){
                 setError("");
                 const deleteResult = await UserService.deleteUserbyId(id);
                 if(deleteResult.ok){
-                    setUsers(prev => prev.filter(p => p.id !== id))
+                    setUsers(prev => prev.filter(p => p.id !== id));
+                    setDeleteTargetId(null);
                 }
                 else{
                     setError(deleteResult.message || "A felhasználó törlése nem sikerült! ");
@@ -46,6 +49,17 @@ export default function UsersDashboard(){
     }
     return(
         <>
+            <DeleteModal isOpen={deleteTargetId !== null} 
+                onClose={() => setDeleteTargetId(null)}>
+                    <h2 className="text-2xl font-bold">Biztosan törölni akarod ezt a felhasználót?</h2>
+                    <p className=" text-lg opacity-90"> Ez a művelet végleges, nem vonható vissza.</p>
+                <div className="flex gap-4">
+                    <button className="bg-red-600 hover:bg-red-800 text-white  hover:font-bold rounded-xl transition-colors py-3 px-4 "
+                    onClick={() => deleteTargetId && handleDeleteUser(deleteTargetId)}>
+                        Igen, töröld ezt a felhasználót!
+                    </button>
+                </div>
+            </DeleteModal>
             <section className="min-h-screen py-6 px-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
                <div className="lg:col-span-1">
                     <AdminSidebar 
@@ -96,7 +110,7 @@ export default function UsersDashboard(){
                                     <td className="py-3 px-2 bg-blue-100 text-blue-700 rounded text-base font-bold">{user.role}</td>
                                     <td className="py-3 px-2 text-right flex flex-col md:flex-row">
                                         <div className="flex flex-col md:flex-row justify-end items-center gap-2">
-                                            <button onClick={() => handleDeleteUser(user.id)} className="flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white text-base px-3 py-3 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95">
+                                            <button onClick={() => setDeleteTargetId(user.id)} className="flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white text-base px-3 py-3 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95">
                                                 <TrashIcon sx={{ fontSize: 18 }} />
                                                 <span className="md:hidden lg:inline">Törlés</span>
                                             </button>

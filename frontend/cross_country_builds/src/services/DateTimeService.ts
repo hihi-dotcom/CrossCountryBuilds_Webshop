@@ -70,7 +70,7 @@ class DateTimeService{
     };
 
     async getAppointmentsforAdmin(){
-        const response = await AuthService._request(`appointments`, {
+        const response = await AuthService._request(`admin/appointments`, {
             method: "GET"
         });
         const respD = await response.json();

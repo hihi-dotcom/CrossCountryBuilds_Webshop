@@ -4,7 +4,7 @@ export default interface Product{
     category: string;
     maker: string;
     description: string;
-    imageUrl: string;
+    picUrl: string;
     price: number;
-    num_of_products: number
+    stock_number: number
 }

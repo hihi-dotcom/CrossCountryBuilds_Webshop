@@ -30,7 +30,7 @@ class ProductService {
 
 
     async getAdminProducts() {
-        const response = await AuthService._request("products");
+        const response = await AuthService._request("admin/products");
         const respD = await response.json();
         if (!response.ok){
             throw new Error(respD.message || "Hiba a termékek lekérésekor! ");
