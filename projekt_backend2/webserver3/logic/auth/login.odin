@@ -1,5 +1,6 @@
 package auth
 
+import "core:c"
 import "../../pool"
 import "../../http"
 import "../../http/util"
@@ -9,8 +10,6 @@ import "../../token"
 import "core:encoding/json"
 import "core:strconv"
 import "core:time"
-
-import "core:log"
 import "core:fmt"
 
 @(private = "file")
@@ -60,8 +59,6 @@ login_verify :: proc (conn: ^http.Conn) {
         return
     }
 
-    fmt.println(data)
-
     username, password, id, role, ok := proc(data: pool.StrMap) -> (username: string, password: string, id: int, role: string, ok: bool){
         username = data[0]["username"] or_return
         password = data[0]["password"] or_return
@@ -88,11 +85,12 @@ login_verify :: proc (conn: ^http.Conn) {
         return
     }
 
-    util.send(conn.soc, util.Response{
+    util.static_send(conn.soc, util.Response{
         status = 200,
         header = {
             "content-type:application/json"
         },
         body = string(resopnse_body)
     })
+    http.reset_conn(conn)
 }
