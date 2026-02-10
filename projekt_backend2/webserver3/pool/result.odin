@@ -40,9 +40,6 @@ status :: proc (result: Result) -> (status: Status, error_message: string) {
         case .Command_OK:
             pq.clear(result)
             return .CommandOK, ""
-        case .Empty_Query:
-            pq.clear(result)
-            return .EmptyQuery, ""
         case:
             error := strings.clone_from_cstring(pq.resultErrorMessage(result))
             pq.clear(result)

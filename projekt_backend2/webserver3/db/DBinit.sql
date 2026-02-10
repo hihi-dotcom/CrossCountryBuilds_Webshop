@@ -27,9 +27,9 @@ CREATE TABLE Products (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     category VARCHAR(50),
-    maker VARCHAR(50),
+    manufacturer VARCHAR(50),
     price INT NOT NULL,
-    stock_number INT DEFAULT 0,
+    stock INT DEFAULT 0,
     pic_url VARCHAR(200),
     description TEXT
 );
