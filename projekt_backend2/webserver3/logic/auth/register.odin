@@ -78,7 +78,7 @@ register_token :: proc (conn: ^http.Conn) {
 
     new_user := pool.unmarshal(result)
 
-    token := token.sign(fmt.aprint(new_user[0]["id"], "$", new_user[0]["role"]), 5 * time.Hour)
+    token := token.sign(fmt.aprint(new_user[0]["id"], "$", new_user[0]["role"], sep = ""), 5 * time.Hour)
     resopnse_body, marshal_err := json.marshal(Token{token=token})
     if marshal_err != nil {
         util.stop(conn, 500, "Marshal error.")

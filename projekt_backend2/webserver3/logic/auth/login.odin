@@ -1,6 +1,5 @@
 package auth
 
-import "core:c"
 import "../../pool"
 import "../../http"
 import "../../http/util"
@@ -78,7 +77,7 @@ login_verify :: proc (conn: ^http.Conn) {
         return
     }
 
-    token := token.sign(fmt.aprint(id, "$", role), 5 * time.Hour)
+    token := token.sign(fmt.aprint(id, "$", role, sep = ""), 5 * time.Hour)
     resopnse_body, marshal_err := json.marshal(Token{token=token})
     if marshal_err != nil {
         util.stop(conn, 500, "Marshal error.")
