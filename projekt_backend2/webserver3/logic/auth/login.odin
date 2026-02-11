@@ -4,15 +4,22 @@ import "../../pool"
 import "../../http"
 import "../../http/util"
 import mw "../../http/middleware"
+import "../../passwd"
+import "../../token"
 import "core:encoding/json"
-
-import "core:log"
+import "core:strconv"
+import "core:time"
 import "core:fmt"
 
 @(private = "file")
 BodyAs :: struct {
     username: string,
     password: string
+}
+
+@(private = "file")
+Token :: struct {
+    token: string
 }
 
 login :: proc (conn: ^http.Conn) {
@@ -31,8 +38,7 @@ login_query :: proc (conn: ^http.Conn) {
         return
     }
     conn.user_data[BodyAs] = as
-    pool.query_mw(conn, login_verify, "get_user_id_role_and_password_by_username", "testuser")
-    fmt.println( as.username)
+    pool.query_mw(conn, login_verify, "get_user_id_role_and_password_by_username", {"testuser"})
 }
 
 @(private = "file")
@@ -42,11 +48,48 @@ login_verify :: proc (conn: ^http.Conn) {
     
     status, errMsg := pool.status(resutl)
     if status != .TuplesOK {
-        log.error(errMsg)
-        util.reset(conn, 500, "Internal server error.")
+        util.stop(conn, 500, "Internal server error. 1")
         return
     }
+
     data := pool.unmarshal(resutl)
-    fmt.println(data)
-    util.reset(conn, 200, "test")
+    if len(data) == 0 {
+        util.reset(conn, 401, "Wrong password or username.")
+        return
+    }
+
+    username, password, id, role, ok := proc(data: pool.StrMap) -> (username: string, password: string, id: int, role: string, ok: bool){
+        username = data[0]["username"] or_return
+        password = data[0]["password"] or_return
+        role = data[0]["role"] or_return
+        id_string := data[0]["id"] or_return
+        id = strconv.parse_int(id_string) or_return
+        ok = true
+        return 
+    } (data) 
+    if !ok  {
+        util.stop(conn, 500, "Internal server error. 2")
+        return
+    }
+
+    if !passwd.verify(as.password, password) {
+        util.reset(conn, 401, "Wrong password or username.")
+        return
+    }
+
+    token := token.sign(fmt.aprint(id, "$", role, sep = ""), 5 * time.Hour)
+    resopnse_body, marshal_err := json.marshal(Token{token=token})
+    if marshal_err != nil {
+        util.stop(conn, 500, "Marshal error.")
+        return
+    }
+
+    util.static_send(conn.soc, util.Response{
+        status = 200,
+        header = {
+            "content-type:application/json"
+        },
+        body = string(resopnse_body)
+    })
+    http.reset_conn(conn)
 }

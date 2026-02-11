@@ -14,7 +14,9 @@ Status :: enum {
     Bad
 }
 
-unmarshal :: proc (result: Result) -> []map[string]string {
+StrMap :: []map[string]string
+
+unmarshal :: proc (result: Result) -> StrMap {
     nfields := pq.nfields(result)
     ntuples := pq.ntuples(result)
     
@@ -38,9 +40,6 @@ status :: proc (result: Result) -> (status: Status, error_message: string) {
         case .Command_OK:
             pq.clear(result)
             return .CommandOK, ""
-        case .Empty_Query:
-            pq.clear(result)
-            return .EmptyQuery, ""
         case:
             error := strings.clone_from_cstring(pq.resultErrorMessage(result))
             pq.clear(result)

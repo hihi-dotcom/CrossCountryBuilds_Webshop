@@ -1,5 +1,6 @@
 package pool
 
+import "core:odin/ast"
 import "core:strings"
 import "core:thread"
 import "core:sync/chan"
@@ -7,6 +8,8 @@ import "core:log"
 import "core:time"
 
 import "./pq"
+
+import "core:fmt"
 
 @(private)
 WorkerData :: struct {
@@ -44,10 +47,13 @@ Workers: [dynamic]^WorkerConn
 ConnectionString: cstring
 
 prepare :: proc (name: cstring, query: cstring, oids: []pq.Oid = nil) {
+    oids_copy := make([]pq.Oid, len(oids))
+    copy(oids_copy, oids)
+
     append(&ToPrepare, Prepare{
         name = name,
         query = query,
-        oids = oids
+        oids = oids_copy
     })
 }
 
@@ -80,6 +86,7 @@ exec :: proc (name: cstring, params: []string) -> (ticket: int) {
             name = name,
             params = cstring_params
         })
+        break
     }
     return
 }

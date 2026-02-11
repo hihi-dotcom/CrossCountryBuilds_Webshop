@@ -27,11 +27,23 @@ main :: proc () {
     token.SECRET = token.create_secret()
     logic.prepare()
 
-    http.listen_and_serve(PORT, proc (conn: ^http.Conn) {
+    mp: map[string]string
+    mp["hehe"] = "hehe"
+    fmt.println(mp["heheheh"])
+    fmt.println(mp["hehe"])
+}
+
+/*
+http.listen_and_serve(PORT, proc (conn: ^http.Conn) {
         fmt.println(conn.source, ":", conn.header["method"][0], conn.header["path"][0])
         path, params := util.query_parameter(conn.header["path"][0])
 
-        auth.login(conn)
+        if path == "/api/login" do auth.login(conn)
+        if path == "/api/register" do auth.register(conn)
+        
+
+
+        
         /*
         switch path {
             case:
@@ -41,8 +53,4 @@ main :: proc () {
         }
         */
     })
-}
-
-/*
-
 */

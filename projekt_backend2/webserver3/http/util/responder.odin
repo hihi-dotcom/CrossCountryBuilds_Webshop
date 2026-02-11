@@ -16,15 +16,12 @@ Response :: struct {
 simple_send :: proc (soc: net.TCP_Socket, status: int, message: string) {
     res := Response{
         status = status,
-        header = {
-            fmt.aprint("Content-Length:", len(message))
-        },
         body = message
     }
     try_send(soc, res)
 }
 
-send :: proc (soc: net.TCP_Socket, res: Response) -> (n: int, ok: bool) {
+static_send :: proc (soc: net.TCP_Socket, res: Response) -> (n: int, ok: bool) {
     written, err := try_send(soc, res)
     if err == nil {
         return written, true
@@ -49,6 +46,9 @@ try_send :: proc (soc: net.TCP_Socket, res: Response) -> (n: int, err: net.TCP_S
         n += net.send_tcp(soc, transmute([]u8)header_line) or_return
         n += net.send_tcp(soc, {'\r', '\n'}) or_return
     }
+
+    n += net.send_tcp(soc, transmute([]u8)fmt.aprint("Content-Length:", len(res.body))) or_return
+    n += net.send_tcp(soc, {'\r', '\n'}) or_return
     
     n += net.send_tcp(soc, {'\r', '\n'}) or_return
  
