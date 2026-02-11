@@ -18,7 +18,7 @@ class OrderService{
     };
 
     async UpdateOrderStat(id: number,data:UpdateStatCreds){
-        const response = await AuthService._request(`order/${id}`, {
+        const response = await AuthService._request(`order?id=${id}`, {
             method: "PATCH",
             body: JSON.stringify(data)
         });
@@ -34,7 +34,7 @@ class OrderService{
 
     async deleteOrderbyId(id: number){
 
-        const response = await AuthService._request(`order/${id}`, {
+        const response = await AuthService._request(`order?id=${id}`, {
             method: "DELETE"
         });
       

@@ -3,7 +3,7 @@ import AuthService from "./AuthService";
 
 class UserService{
     async deleteUserbyId(id: number){
-        const response = await AuthService._request(`user/${id}`,{
+        const response = await AuthService._request(`user?id=${id}`,{
             method: "DELETE",
             
         });

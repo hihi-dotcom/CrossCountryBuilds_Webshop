@@ -20,7 +20,7 @@ class ProductService {
 
 
     async getProductById(id: number) {
-        const response = await fetch(`${API_URL}/product/${id}`);
+        const response = await fetch(`${API_URL}/product?id=${id}`);
         const data = await response.json();
         
         

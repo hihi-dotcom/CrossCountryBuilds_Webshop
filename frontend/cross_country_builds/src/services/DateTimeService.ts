@@ -14,7 +14,7 @@ class DateTimeService{
 
     async bookAServiceDate(id: number, data:any){
    
-        const response = await AuthService._request(`appointment/${id}`,{
+        const response = await AuthService._request(`appointment?id=${id}`,{
             method: "PATCH",
 
             body: JSON.stringify(data)
