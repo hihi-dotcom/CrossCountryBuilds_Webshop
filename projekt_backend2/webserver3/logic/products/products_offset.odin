@@ -13,12 +13,13 @@ Offset :: int
 
 @(private)
 Product :: struct {
+    id: string,
     name: string,
     category: string,
-    manufacturer: string,
+    maker: string,
     price: string,
-    stock: string,
-    pic_url: string,
+    stock_number: string,
+    picUrl: string,
     description: string
 }
 
@@ -64,11 +65,12 @@ products_more_query :: proc (conn: ^http.Conn) {
     for table, i in tables {
        products[i].category = table["category"]
        products[i].description = table["description"]
-       products[i].manufacturer = table["manufacturer"]
+       products[i].maker = table["manufacturer"]
        products[i].name = table["name"]
-       products[i].pic_url = table["pic_url"]
+       products[i].picUrl = table["pic_url"]
        products[i].price = table["price"]
-       products[i].stock = table["stock"]
+       products[i].stock_number = table["stock"]
+       products[i].id = table["id"]
     }
     conn.user_data[^[]Product] = products
 

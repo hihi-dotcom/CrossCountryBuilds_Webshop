@@ -7,6 +7,8 @@ import "core:encoding/json"
 import mw "../../http/middleware"
 import "../../pool/pool_mw"
 
+//needed multipart form data handler
+
 @(private = "file")
 JsonResponse :: struct {
     id: string 
@@ -27,7 +29,7 @@ product_adder :: proc (conn: ^http.Conn) {
     }
 
     pool_mw.query(conn, product_adder_check, "product_add", 
-        {as.name, as.category, as.manufacturer, as.price, as.stock, as.pic_url, as.description})
+        {as.name, as.category, as.maker, as.price, as.stock_number, as.picUrl, as.description})
 }
 
 @(private = "file")
