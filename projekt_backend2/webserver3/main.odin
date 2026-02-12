@@ -37,16 +37,8 @@ main :: proc () {
         if path == "/api/user" do auth.user(conn)
         if path == "/api/order" do order.order_status(conn, params)
         
-
         
-        /*
-        switch path {
-            case:
-            case:
-                util.simple_send(conn.soc, 404, "Not found.")
-                conn.to_run = nil
-        }
-        */
+        
     })
 }
 
