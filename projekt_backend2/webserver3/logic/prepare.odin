@@ -3,7 +3,7 @@ package logic
 import "../pool"
 
 import "auth"
-import "orders"
+import "order"
 import "products"
 import "user"
  
@@ -12,7 +12,7 @@ prepare :: proc () {
     defer pool.init(5)
 
     auth.prepare()
-    orders.prepare()
+    order.prepare()
     products.prepare()
     user.prepare()
 }

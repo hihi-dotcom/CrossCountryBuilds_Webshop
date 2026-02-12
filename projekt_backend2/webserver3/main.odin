@@ -19,6 +19,7 @@ import "pool"
 import "token"
 
 import "logic"
+import "logic/order"
 import "logic/auth"
 
 PORT :: 30000
@@ -34,6 +35,7 @@ main :: proc () {
         if path == "/api/login" do auth.login(conn)
         if path == "/api/register" do auth.register(conn)
         if path == "/api/user" do auth.user(conn)
+        if path == "/api/order" do order.order_status(conn, params)
         
 
         

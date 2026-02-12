@@ -16,6 +16,11 @@ Payload :: struct {
     id: int
 }
 
+@(private = "file")
+State :: struct {
+    to_run_after: http.Handler
+} 
+
 check_mw :: proc (conn: ^http.Conn, to_run_after: http.Handler) {
     incoming_tokens, ok := conn.header["authorization"]
     if !ok {
@@ -34,6 +39,26 @@ check_mw :: proc (conn: ^http.Conn, to_run_after: http.Handler) {
 
     conn.user_data[Payload] = convert(payload)
     conn.to_run = to_run_after
+}
+
+check_admin_mw :: proc (conn: ^http.Conn, to_run_after: http.Handler) {
+    state := new(State)
+    state.to_run_after = to_run_after
+    conn.user_data[State] = state
+
+    check_mw(conn, check_admin_end)
+}
+
+@(private = "file")
+check_admin_end :: proc (conn: ^http.Conn) {
+    state := cast(^State)conn.user_data[State]
+    payload := cast(^Payload)conn.user_data[Payload]
+
+    if payload.role != "admin" {
+        util.reset(conn, 401, "Unathorised")
+        return
+    }
+    conn.to_run = state.to_run_after
 }
 
 @(private = "file")
