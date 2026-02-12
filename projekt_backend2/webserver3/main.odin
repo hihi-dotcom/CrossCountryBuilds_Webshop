@@ -24,24 +24,17 @@ import "logic/auth"
 PORT :: 30000
 
 main :: proc () {
-    token.SECRET = token.create_secret()
+    token.SECRET = "hehe" //token.create_secret()
     logic.prepare()
 
-    mp: map[string]string
-    mp["hehe"] = "hehe"
-    fmt.println(mp["heheheh"])
-    fmt.println(mp["hehe"])
-}
-
-/*
-http.listen_and_serve(PORT, proc (conn: ^http.Conn) {
+    http.listen_and_serve(PORT, proc (conn: ^http.Conn) {
         fmt.println(conn.source, ":", conn.header["method"][0], conn.header["path"][0])
         path, params := util.query_parameter(conn.header["path"][0])
 
         if path == "/api/login" do auth.login(conn)
         if path == "/api/register" do auth.register(conn)
+        if path == "/api/user" do auth.user(conn)
         
-
 
         
         /*
@@ -53,4 +46,9 @@ http.listen_and_serve(PORT, proc (conn: ^http.Conn) {
         }
         */
     })
+}
+
+/*
+
+    
 */

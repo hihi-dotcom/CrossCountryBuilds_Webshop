@@ -1,9 +1,7 @@
-package pool
+package pool_mw
 
-import "../http"
-import "./pq"
-
-import "core:fmt"
+import "../../http"
+import "../../pool"
 
 @(private = "file")
 QueryState :: struct {
@@ -13,7 +11,7 @@ QueryState :: struct {
     params: []string
 }
 
-query_mw :: proc (conn: ^http.Conn, to_run_after: http.Handler, prepared_name: cstring, params: []string) {
+query :: proc (conn: ^http.Conn, to_run_after: http.Handler, prepared_name: cstring, params: []string = {}) {
     params_copy := make([]string, len(params))
     copy(params_copy, params)
 
@@ -31,7 +29,7 @@ query_mw :: proc (conn: ^http.Conn, to_run_after: http.Handler, prepared_name: c
 try_get_pool_thread :: proc (conn: ^http.Conn) {
     state := cast(^QueryState)conn.user_data[QueryState]
 
-    state.ticket = exec(state.prepared_name, state.params)
+    state.ticket = pool.exec(state.prepared_name, state.params)
     if state.ticket == -1 do return
 
     conn.to_run = try_get_result
@@ -41,10 +39,10 @@ try_get_pool_thread :: proc (conn: ^http.Conn) {
 try_get_result :: proc (conn: ^http.Conn) {
     state := cast(^QueryState)conn.user_data[QueryState]
 
-    result, ready := poll(state.ticket)
+    result, ready := pool.poll(state.ticket)
     if !ready do return
 
-    conn.user_data[Result] = result
+    conn.user_data[pool.Result] = result
     conn.to_run = state.to_run_after
     state.to_run_after(conn)
 }

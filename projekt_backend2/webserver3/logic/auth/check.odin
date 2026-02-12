@@ -17,9 +17,9 @@ Payload :: struct {
 }
 
 check_mw :: proc (conn: ^http.Conn, to_run_after: http.Handler) {
-    incoming_tokens, ok := conn.header["Authorization"]
+    incoming_tokens, ok := conn.header["authorization"]
     if !ok {
-        util.simple_send(conn.soc, 401, "Unathorised")
+        util.reset(conn, 401, "Unathorised")
         return
     }
 
@@ -28,7 +28,7 @@ check_mw :: proc (conn: ^http.Conn, to_run_after: http.Handler) {
 
     payload, authentic := token.verify(incoming_token)
     if !authentic {
-        util.simple_send(conn.soc, 401, "Token expired")
+        util.reset(conn, 401, "Token expired")
         return
     }
 

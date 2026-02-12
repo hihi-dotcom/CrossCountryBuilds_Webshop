@@ -1,6 +1,7 @@
 package auth
 
 import "../../pool"
+import "../../pool/pool_mw"
 import "../../http"
 import "../../http/util"
 import mw "../../http/middleware"
@@ -38,7 +39,7 @@ login_query :: proc (conn: ^http.Conn) {
         return
     }
     conn.user_data[BodyAs] = as
-    pool.query_mw(conn, login_verify, "get_user_id_role_and_password_by_username", {"testuser"})
+    pool_mw.query(conn, login_verify, "get_user_id_role_and_password_by_username", {as.username})
 }
 
 @(private = "file")

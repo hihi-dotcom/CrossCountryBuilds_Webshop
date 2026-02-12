@@ -4,6 +4,7 @@ import "../../pool"
 import "../../http"
 import "../../http/util"
 import "core:encoding/json"
+import "../../pool/pool_mw"
 import "core:strconv"
 import "core:log"
 
@@ -43,7 +44,7 @@ products_range :: proc (conn: ^http.Conn, params: util.QueryParameter) {
     heap_offset := new(int)
     heap_offset^ = offset
     conn.user_data[^Offset] = heap_offset
-    pool.query_mw(conn, products_more_query, "products_range", {limit_string, offset_string})
+    pool_mw.query(conn, products_more_query, "products_range", {limit_string, offset_string})
 }
 
 @(private = "file")
@@ -71,7 +72,7 @@ products_more_query :: proc (conn: ^http.Conn) {
     }
     conn.user_data[^[]Product] = products
 
-    pool.query_mw(conn, products_no_more_query, "products_count", {})
+    pool_mw.query(conn, products_no_more_query, "products_count", {})
 }
 
 @(private = "file")

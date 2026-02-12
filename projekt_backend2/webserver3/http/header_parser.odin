@@ -89,9 +89,6 @@ not_the_first_line :: proc(conn: ^Conn, cursor: ^int) {
                             }
                         }
                     case ' ', ':', '\t': continue
-                    case 'A'..='Z':
-                        conn.header_data.buf[cursor^] += 32
-                        fallthrough
                     case: 
                         if !hit {
                             spans.value.start = cursor^

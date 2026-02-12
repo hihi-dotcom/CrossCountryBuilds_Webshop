@@ -57,6 +57,7 @@ listen_and_serve :: proc (port: int, on_request: Handler) {
         listen(&conns, listener)
         make_headers(&conns)
         serve(&conns)
+        free_all(context.temp_allocator)
     }
 }
 

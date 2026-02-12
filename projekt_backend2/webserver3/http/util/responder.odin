@@ -13,6 +13,17 @@ Response :: struct {
     body: string
 }
 
+simple_json_send :: proc (soc: net.TCP_Socket, status: int, message: string) {
+    res := Response{
+        status = status,
+        header = {
+            "content-type:application/json"
+        },
+        body = message
+    }
+    try_send(soc, res)
+}
+
 simple_send :: proc (soc: net.TCP_Socket, status: int, message: string) {
     res := Response{
         status = status,

@@ -4,9 +4,10 @@ import "../../pool"
 import "../../http"
 import "../../http/util"
 import "core:encoding/json"
+import "../../pool/pool_mw"
 
 products_all :: proc (conn: ^http.Conn) {
-    pool.query_mw(conn, product_responseformulator, "all_products", {})
+    pool_mw.query(conn, product_responseformulator, "all_products", {})
 }
 
 product_responseformulator :: proc (conn: ^http.Conn) {

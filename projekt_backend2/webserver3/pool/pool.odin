@@ -9,8 +9,6 @@ import "core:time"
 
 import "./pq"
 
-import "core:fmt"
-
 @(private)
 WorkerData :: struct {
     to_exec: chan.Chan(ToExec, .Recv),
@@ -43,6 +41,8 @@ Params :: ^[dynamic]cstring
 ToPrepare: [dynamic]Prepare
 @(private)
 Workers: [dynamic]^WorkerConn
+@(private)
+Pinned: [dynamic]bool
 
 ConnectionString: cstring
 
@@ -65,36 +65,61 @@ init :: proc (n_threads: int) {
     
     for i in 0..<n_threads {
         create_worker(i)
+        append(&Pinned, false)
     }
 
     assert(len(Workers) == n_threads, "Worker creation failed.") 
 }
 
-exec :: proc (name: cstring, params: []string) -> (ticket: int) {
+pin :: proc () -> (ticket: int) {
     ticket = -1
     for worker_conn, i in Workers {
-        if !chan.can_send(worker_conn.to_exec) do continue
-
-        cstring_params := new([dynamic]cstring)
+        if !chan.can_send(worker_conn.to_exec) || Pinned[i] do continue
+        Pinned[i] = true
         ticket = i
-
-        for param in params {
-            append(cstring_params, strings.clone_to_cstring(param))
-        }
-
-        chan.send(worker_conn.to_exec, ToExec{
-            name = name,
-            params = cstring_params
-        })
         break
     }
     return
+}
+
+release :: proc (ticket: int) {
+    Pinned[ticket] = false
+}
+
+exec :: proc (name: cstring, params: []string) -> (ticket: int) {
+    ticket = -1
+    for worker_conn, i in Workers {
+        if !chan.can_send(worker_conn.to_exec) || Pinned[i] do continue
+        ticket = i
+        send_work(worker_conn, name, params)
+        break
+    }
+    return
+}
+
+exec_pinned :: proc (name: cstring, params: []string, ticket: int) {
+    worker_conn := Workers[ticket]
+    send_work(worker_conn, name, params)
 }
 
 poll :: proc (ticket: int) -> (result: Result, ready: bool) {
     if !chan.can_recv(Workers[ticket].result) do return nil, false
     tmp_result, _ := chan.recv(Workers[ticket].result)
     return tmp_result, true
+}
+
+@(private)
+send_work :: proc(worker_conn: ^WorkerConn, name: cstring, params: []string) {
+    cstring_params := new([dynamic]cstring)
+
+    for param in params {
+        append(cstring_params, strings.clone_to_cstring(param))
+    }
+
+    chan.send(worker_conn.to_exec, ToExec{
+        name = name,
+        params = cstring_params
+    })
 }
 
 @(private)
