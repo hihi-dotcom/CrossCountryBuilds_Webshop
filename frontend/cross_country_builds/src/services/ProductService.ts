@@ -58,7 +58,7 @@ class ProductService {
     }
 
     async deleteProductById(id: number) {
-        const response = await AuthService._request(`product/${id}`, {
+        const response = await AuthService._request(`product?id=${id}`, {
             method: "DELETE"
         });
 

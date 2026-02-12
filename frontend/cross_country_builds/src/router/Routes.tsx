@@ -30,7 +30,7 @@ import AuthService from "../services/AuthService";
 import OrderService from "../services/OrderService";
 import ProtectRouteUser from "../pages/protects/ProtectiveRouteUser";
 import PublicOnlyRoute from "../pages/protects/ProtectPublicOnly";
-import { serviceDateTimeAction } from "../actions/serviceActions";
+import { appointmentLoader, serviceDateTimeAction } from "../actions/serviceActions";
 import { getPassEmailAction, createPassAction } from "../actions/passwordActions";
 import { MakeOrder } from "../actions/orderActions";
 import { productLoader } from "../actions/productActions";
@@ -78,6 +78,7 @@ const routes = [
                             { path: "cart", element: <CartPage /> },
                             { path: "appointment",
                                 action: serviceDateTimeAction,
+                                loader: appointmentLoader,
                             element: <DateTimePage /> },
                         ]
                     },
@@ -113,7 +114,7 @@ const routes = [
             { 
                 path: "dates", 
                 element: <AppointmentDashboard />,
-                /*action: createEmptyAppointmentAction*/
+                action: createEmptyAppointmentAction,
                 loader: async() => {
                     return await DateTimeService.getAppointmentsforAdmin();
                 }

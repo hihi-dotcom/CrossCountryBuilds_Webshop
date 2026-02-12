@@ -55,4 +55,22 @@ export async function createEmptyAppointmentAction({request}: {request: Request}
             serverError: error.message || "Az időpont létrehozása sikertelen volt!"
         }
     }
+};
+
+
+export async function appointmentLoader(){
+    try{
+        const dates = await DateTimeService.gettingFreeDates();
+
+        if (dates && !Array.isArray(dates)) {
+            return []; 
+        }
+        
+        return dates || [];
+    }
+    catch(error){
+        console.log("Hiba a szabad szervizidőpontok betöltésekor:", error);
+        //throw new Error("Hiba a szabad időpontok betöltése közben");
+        return [];
+    }
 }
