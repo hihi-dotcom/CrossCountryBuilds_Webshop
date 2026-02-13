@@ -3,11 +3,12 @@ import SaveIcon from "@mui/icons-material/Save";
 import { useState, useRef, useEffect } from "react";
 import { Form, useLoaderData } from "react-router-dom";
 import DateTimeService from "../../services/DateTimeService";
-import TrashIcon from "@mui/icons-material/DeleteOutlineOutlined"
+import TrashIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
 export default function AppointmentDashboard(){
     const initAppointments = useLoaderData();
     const [error, setError] = useState("");
+    const [loadingId, setLoadingId] = useState<number | null>(0);
     const [services, setServices] = useState(initAppointments);
 
     useEffect(() => {
@@ -27,7 +28,7 @@ export default function AppointmentDashboard(){
                     }
         }
         catch(error){
-        
+            throw new Error("Hiba az időpont törlése közben!")
         }
     }
 
@@ -45,6 +46,38 @@ export default function AppointmentDashboard(){
         const filteredServices = initAppointments.filter((service:any) => service.customer_name.includes(searchedUsr) && service.status.includes(appointStat));
 
         setServices(filteredServices);
+    }
+
+    async function handleUpdate(e:any, id:number){
+        const appointmentRow = e.currentTarget.closest("tr");
+
+        if(!appointmentRow){
+            return;
+        }
+
+        const formData = new FormData(appointmentRow as any);
+
+        const dataForUpdate = {
+            service_id: formData.get("service_name") as string,
+            price: Number(formData.get("price")),
+            bringBackDate: formData.get("bringBackDate") as string
+        };
+        setLoadingId(id);
+        try{
+            const result = await DateTimeService.finalizeService(id, dataForUpdate);
+
+            if(result.ok){
+                setServices((prev:any) => prev.map((s:any) => (s.id === id ? {...s, ...dataForUpdate, service_price: dataForUpdate.price, bringback_date: dataForUpdate.bringBackDate} : s)));
+
+                alert("A szerviz lezárása sikeres volt!");
+            }
+        }
+        catch(error){
+            console.log("Hiba a szerviz lezárása közben!" + error);
+        }
+        finally{
+            setLoadingId(null);
+        }
     }
 
     return(
@@ -121,19 +154,25 @@ export default function AppointmentDashboard(){
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 text-base">
                                     {services.map((s:any) => (
+                                        
                                         <tr key={s.id} className="hover:bg-blue-50/30 transition-colors">
-                                            <td className="py-4 px-2">{s.customer_name}</td>
-                                            <td className="py-4 px-2">{s.service_date}</td>
+                                            <td className="py-4 px-2">{s.customer_name || "Szabad"}</td>
+                                            <td className="py-4 px-2">{new Date(s.service_date).toLocaleString('hu-HU', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
                                             <td className="py-4 px-2">{s.problem_description}</td>
                                             <td className="py-4 px-2">
-                                                <input type="number"  className="w-24 border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 outline-none" defaultValue={s.service_price || "---"}/>
+                                                <input type="number" name="price"  className="w-24 border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 outline-none" disabled={!(!!s.customer_name) || !!s.bringback_date} defaultValue={s.service_price || "---"}/>
                                             </td>
                                             <td className="py-4 px-2">
-                                                <input type="datetime-local" defaultValue={s.bringback_date}  className="border border-gray-300 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-blue-500 outline-none"/>
+                                                <input type="datetime-local" name="bringBackDate" defaultValue={s.bringback_date ? s.bringback_date.substring(0, 16) : ""} disabled={!(!!s.customer_name) || !!s.bringback_date}  className="border border-gray-300 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-blue-500 outline-none"/>
                                             </td>
                                             <td className="py-4 px-2 text-center flex gap-3 flex-row">
-                                                <button className="text-white bg-blue-600 hover:bg-blue-900 rounded-lg py-2 px-2">Kész!</button>
-                                                <button className="text-white bg-red-500 py-2 px-3 rounded-lg">Törlés</button>
+                                                {!!s.customer_name && !(!!s.bringback_date) &&(
+                                                    <>
+                                                        <button  onClick={(e) => handleUpdate(e, s.id)}  className="text-white bg-blue-600 hover:bg-blue-900 rounded-lg py-2 px-2">Kész!</button>
+                                                    </>
+                                                )}
+                                                
+                                                <button onClick={() => handleDeleteAppointment(s.id)} className="text-white bg-red-500 py-2 px-3 rounded-lg">Törlés</button>
                                             </td>
                                         </tr>
                                     ))}

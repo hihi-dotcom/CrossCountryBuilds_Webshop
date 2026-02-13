@@ -5,7 +5,7 @@ import type FreeDate from "../models/models_for_services/datetime_models";
 
 class DateTimeService{
     async gettingFreeDates(){
-        const resp = await AuthService._request("http://localhost:3000/freeappointments");
+        const resp = await AuthService._request("freeappointments");
 
         const respData = await resp.json();
 
@@ -28,8 +28,8 @@ class DateTimeService{
         };
     };
 
-    async finalizeService(id:number, data:FinalizeCreds){
-        const response = await AuthService._request(`appointment/${id}`, {
+    async finalizeService(id:number, data:{service_id:string, price:number, bringBackDate: string}){
+        const response = await AuthService._request(`appointment?id=${id}`, {
             method: "PATCH",
             body: JSON.stringify(data)
         });
@@ -57,7 +57,7 @@ class DateTimeService{
     };
 
     async deleteService(id:number){
-        const response = await AuthService._request(`appointment/${id}`, {
+        const response = await AuthService._request(`appointment?id=${id}`, {
             method: "DELETE"
         });
 

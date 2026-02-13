@@ -1,17 +1,13 @@
-import { use } from "react";
+import { use, useState } from "react";
 import SelectforDatetime from "../htmlselectComponents/selectforDateTime";
-import { Form, useActionData } from "react-router-dom";
+import { Form, useActionData, useLoaderData } from "react-router-dom";
 import BackToWebShopButton from "../buttonComponents/backtoWebshopButton";
 
 export default function AppointmentModule(){
+    const freedates = useLoaderData() as any[] || [];;
     const actionData = useActionData();
-
-        interface FreeAppointment {
-            id: number;
-            time: string;
-        }
-
-        const test_free_datetimes: FreeAppointment[] = [
+    console.log(freedates);
+        const test_free_datetimes: any[] = [
             {
                 id: 101,
                 time: "2025. 12. 24. 14:00"
@@ -39,12 +35,13 @@ export default function AppointmentModule(){
         ];
     return(
         <>
-            <h3 className="text-3xl text-center sm:text-start sm:text-4xl my-5 sm:ml-6 sm:my-10 ">Foglalj időpontot hozzánk!</h3>
+      <h3 className="text-3xl text-center sm:text-start sm:text-4xl my-5 sm:ml-6 sm:my-10 "> Foglalj időpontot hozzánk!</h3>
             <Form method="post">
                 <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 w-full mx-auto">
                     <div id="free-datetimes" className="flex flex-col  m-5 h-fit  bg-[#f1bf98] rounded-2xl py-4 px-4 md:py-5 md:px-4 xl:py-6 xl:px-5 shadow-2xl">
-                        <h2 className="text-2xl text-black ">Válassz szabad időpontjaink közül!</h2>
-                        <SelectforDatetime datetimes={test_free_datetimes}/>
+                               {freedates.length > 0 && (<h2 className="text-2xl text-black ">Válassz szabad időpontjaink közül!</h2>)}
+                        {freedates.length > 0 ? (<SelectforDatetime datetimes={freedates}/>) : (<p className="text-amber-900 text-xl font-bold">Jelenleg nincs szabad időpontunk, érdeklődni a mobilszámunkon lehet!</p>)}
+                      
                         {actionData?.errors?.appointmentDate[0] && (<p className="text-red-600 text-lg pt-3 font-semibold">{actionData.errors.appointmentDate[0]}</p>)}
                     </div>
                     <div className="max-w-lg text-lg bg-[#cc2936] shadow-2xl h-fit p-5 rounded-2xl m-5">
@@ -63,7 +60,7 @@ export default function AppointmentModule(){
                     </div>
 
                     <div className="flex w-fit mx-auto mt-10">
-                        <button type="submit" className="py-5 px-4  bg-[#116992] h-fit text-xl rounded-lg hover:border-2 hover:border-white hover:font-bold">Beküldés!</button>
+                        <button type="submit" className="py-5 px-4  bg-[#116992] h-fit text-xl rounded-lg hover:border-2 hover:border-white hover:font-bold" disabled={freedates.length === 0}>Beküldés!</button>
                     </div>
                 </div>
             </Form>
