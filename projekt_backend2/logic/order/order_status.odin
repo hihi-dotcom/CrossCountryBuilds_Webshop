@@ -39,7 +39,7 @@ order_start_update :: proc (conn: ^http.Conn) {
 
     as := new(BodyAs)
     json.unmarshal(body^, as)
-    if as.status == "" && qp["id"] != "" {
+    if as.status == "" || qp["id"] == "" {
         util.stop(conn, 400, "Missing parameters.")
         return
     }
@@ -60,7 +60,7 @@ order_status_finish :: proc (conn: ^http.Conn) {
     util.static_send(conn.soc, {
         status = 200,
         header = {
-            "content-type:appliaction/json"
+            "content-type:application/json"
         }, 
         body = `{"message": "Status updated successfully"}`
     })

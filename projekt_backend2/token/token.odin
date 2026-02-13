@@ -44,11 +44,11 @@ sign :: proc (payload: string, valid_for: time.Duration, secret: string = SECRET
     return string(token_bytes)
 }
 
-verify :: proc (token: string, secret: string = SECRET) -> (payload: string, authentic: bool) {
+verify :: proc (tokenn: string, secret: string = SECRET) -> (payload: string, authentic: bool) {
     secret_bytes := transmute([]u8)secret
-    token_bytes := transmute([]u8)token
+    token_bytes := transmute([]u8)tokenn
 
-    if token[len(token) - TAG_B64_LENGTH - 1] != '|' do return
+    if tokenn[len(tokenn) - TAG_B64_LENGTH - 1] != '|' do return
 
     tag_b64 := token_bytes[len(token_bytes) - TAG_B64_LENGTH:]
     msg := token_bytes[:len(token_bytes) - TAG_B64_LENGTH - 1]

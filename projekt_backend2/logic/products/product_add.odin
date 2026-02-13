@@ -6,6 +6,7 @@ import "../../http/util"
 import "core:encoding/json"
 import mw "../../http/middleware"
 import "../../pool/pool_mw"
+import "../auth"
 
 //needed multipart form data handler
 
@@ -15,7 +16,9 @@ JsonResponse :: struct {
 }
 
 product_add :: proc (conn: ^http.Conn) {
-    mw.application_json(conn, product_adder)
+    auth.check_admin_mw(conn, proc (conn: ^http.Conn) {
+        mw.application_json(conn, product_adder)
+    })
 }
 
 @(private = "file")

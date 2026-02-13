@@ -20,7 +20,7 @@ product_by_id_result :: proc (conn: ^http.Conn) {
     result := cast(pool.Result)conn.user_data[pool.Result]
 
     status, _ := pool.status(result)
-    if status != nil {
+    if status != .TuplesOK {
         util.stop(conn, 500, "Unable to get product.")
         return
     }
@@ -49,7 +49,7 @@ product_by_id_result :: proc (conn: ^http.Conn) {
     util.static_send(conn.soc, {
         status = 200,
         header = {
-            "content-type:appliaction/josn"
+            "content-type:application/json"
         },
         body = string(response_body)
     })

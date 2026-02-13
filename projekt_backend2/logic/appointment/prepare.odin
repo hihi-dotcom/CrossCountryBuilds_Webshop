@@ -7,12 +7,12 @@ prepare :: proc () {
     pool.prepare("appointment_get_free", `
         SELECT id, service_date 
         FROM Service_DateTimes
-        WHERE user_id = NULL`
+        WHERE user_id IS NULL`
     )
     pool.prepare("appoint_appointment", `
         UPDATE Service_DateTimes
-        SET user_id = $2
-        SET problem_description = $3
+        SET user_id = $2,
+        problem_description = $3
         WHERE id = $1`,
     {.Int4, .Int4, .Text})
 }

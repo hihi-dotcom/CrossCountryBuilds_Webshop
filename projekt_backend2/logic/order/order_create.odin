@@ -72,6 +72,10 @@ order_create_start :: proc (conn: ^http.Conn) {
         util.stop(conn, 400, "Json cannot be parsed!")
         return
     }
+    if len(as.products) == 0 {
+        util.reset(conn, 400, "No products in order.")
+        return
+    }
     conn.user_data[OrderJson] = as
 
     addresses := new(Addresses)

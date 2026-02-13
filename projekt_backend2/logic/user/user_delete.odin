@@ -1,4 +1,4 @@
-package appointment
+package user
 
 import "../../http"
 import "../../http/util"

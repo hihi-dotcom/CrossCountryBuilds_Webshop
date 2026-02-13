@@ -32,7 +32,7 @@ appointment_book :: proc (conn: ^http.Conn, params: util.QueryParameter) {
 @(private = "file")
 appointment_book_query :: proc (conn: ^http.Conn) {
     qp := cast(^util.QueryParameter)conn.user_data[util.QueryParameter]
-    payload := cast(^auth.Payload)conn.user_data[util.QueryParameter]
+    payload := cast(^auth.Payload)conn.user_data[auth.Payload]
     body := cast(mw.StaticBody)conn.user_data[mw.StaticBody]
 
     as := new(BodyAs)

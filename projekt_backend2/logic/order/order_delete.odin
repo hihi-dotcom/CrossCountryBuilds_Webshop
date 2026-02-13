@@ -29,7 +29,7 @@ order_delete :: proc (conn: ^http.Conn, params: util.QueryParameter) {
 order_delete_delete :: proc (conn: ^http.Conn) {
     qp := cast(^util.QueryParameter)conn.user_data[util.QueryParameter]
 
-    if qp["id"] != "" {
+    if qp["id"] == "" {
         util.stop(conn, 400, "Missing parameters.")
         return
     }
@@ -43,14 +43,14 @@ order_delete_delete_delete :: proc (conn: ^http.Conn) {
 
     status, _ := pool.status(result)
     if status != .CommandOK {
-        util.reset(conn, 500, "Failed to delete status.")
+        util.reset(conn, 500, "Failed to delete order.")
         return
     }
 
     util.static_send(conn.soc, {
         status = 200,
         header = {
-            "content-type:appliaction/json"
+            "content-type:application/json"
         }, 
         body = `{"message": "Order deleted successfully"}`
     })

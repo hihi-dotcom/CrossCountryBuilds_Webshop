@@ -12,7 +12,7 @@ prepare :: proc () {
     {.Int4, .Int4})
     pool.prepare("products_count", "SELECT COUNT(*) AS num FROM products", {})
     pool.prepare("all_products", `
-        SELECT id, name, category, manufacturer, price, stock, pic_url
+        SELECT id, name, category, manufacturer, price, stock, pic_url, description
         FROM products`
     )
     pool.prepare("product_add",`
