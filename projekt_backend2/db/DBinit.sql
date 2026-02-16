@@ -1,12 +1,9 @@
-CREATE TYPE user_role AS ENUM ('admin', 'user');
-CREATE TYPE address_type AS ENUM ('delivery', 'billing');
-
 CREATE TABLE Users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(100) NOT NULL UNIQUE,
     email VARCHAR(100) UNIQUE NOT NULL,
     password TEXT NOT NULL,
-    role user_role DEFAULT 'user',
+    role VARCHAR(10) DEFAULT 'user',
     reset_token text DEFAULT NULL,
     reset_token_expires TIMESTAMP DEFAULT NULL
 );
@@ -14,12 +11,11 @@ CREATE TABLE Users (
 CREATE TABLE Addresses (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
-    type address_type,
+    type VARCHAR(10),
     zip_code VARCHAR(10),
     street VARCHAR(255),
     city_name VARCHAR(50) NOT NULL,
 
-    UNIQUE (user_id, type),
     FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
 );
 

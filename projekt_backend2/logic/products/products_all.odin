@@ -5,16 +5,19 @@ import "../../http"
 import "../../http/util"
 import "core:encoding/json"
 import "../../pool/pool_mw"
+import "../auth"
 
 products_all :: proc (conn: ^http.Conn) {
-    pool_mw.query(conn, product_responseformulator, "all_products", {})
+    auth.check_admin_mw(conn, proc (conn: ^http.Conn) {
+        pool_mw.query(conn, product_responseformulator, "all_products", {})
+    })
 }
 
 product_responseformulator :: proc (conn: ^http.Conn) {
     result := cast(pool.Result)conn.user_data[pool.Result]
     
     status, _ := pool.status(result)
-    if status != nil {
+    if status != .TuplesOK {
         util.stop(conn, 500, "Internal server error.")
         return
     }
@@ -25,11 +28,12 @@ product_responseformulator :: proc (conn: ^http.Conn) {
     for table, i in tables {
        products[i].category = table["category"]
        products[i].description = table["description"]
-       products[i].manufacturer = table["manufacturer"]
+       products[i].maker = table["manufacturer"]
        products[i].name = table["name"]
-       products[i].pic_url = table["pic_url"]
+       products[i].picUrl = table["pic_url"]
        products[i].price = table["price"]
-       products[i].stock = table["stock"]
+       products[i].stock_number = table["stock"]
+       products[i].id = table["id"]
     }
 
     body_bytes, _ := json.marshal(products)
