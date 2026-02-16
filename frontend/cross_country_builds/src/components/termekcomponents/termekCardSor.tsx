@@ -1,15 +1,11 @@
 import { Item } from "./termekCard";
-
 import type Product from "../../models/product";
 import IntoCartModal  from "../modalComponents/productintoCartModal";
-
 import { useState, useEffect } from 'react';
-import { useRouteLoaderData } from "react-router-dom";
 export function Products({filteredItems}: {filteredItems: Product[]}){
 
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const displayProducts = filteredItems;
-    const  user  = useRouteLoaderData("root") as {id:number, role:string} | null;
 
     function openModal(){
         setModalIsOpen(true);
@@ -26,8 +22,7 @@ export function Products({filteredItems}: {filteredItems: Product[]}){
         <section className="w-full h-full">
             {modalIsOpen && (
                 <IntoCartModal onClose={() => setModalIsOpen(false)}>
-                    {user && <p>A termék bekerült a kosarába!</p>}
-                    {!user && (<p>Ahhoz, hogy megnézd a kosarad, be kell, hogy jelentkezz!</p>)}
+                    <p>A termék bekerült a kosarába!</p>
                 </IntoCartModal>
             )}
            

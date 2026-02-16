@@ -1,12 +1,13 @@
 import { useRef } from "react";
 import { TextInput } from "../formFieldComponents/inputwithPlaceholder";
-import { Form } from "react-router-dom";
+import { Form, useSearchParams } from "react-router-dom";
 import KategoriakSelect from "../htmlselectComponents/selectinszurok";
 import { useState } from "react";
 import searchScheme from "../validationSchemes/searchScheme";
 
 
 export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
+    const [searchParams] = useSearchParams();
     const [errors, setErrors] = useState<Record<string, string>>({});
     const termekKategoriak = [
     {
@@ -57,7 +58,7 @@ export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
     };
 
     return(
-        <Form method="post" className="border-t-2 border-white border-b-2 md:border-transparent ">
+        <Form method="get" key={searchParams.toString()} className="border-t-2 border-white border-b-2 md:border-transparent ">
             <div className="szurok bg-transparent p-6 md:bg-[#3f484c] rounded-2xl w-full mx-auto">
 
                 <h1 className="text-center text-5xl sm:text-7xl font-semibold text-slate-100 mb-8">
@@ -68,20 +69,20 @@ export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
                 <div className="space-y-6 w-full">
                     <div>
 
-                        <input type="text" name="productName" id="termek_neve" placeholder="termék neve" ref={termekNeveRef} onChange={handleSearching} className="bg-transparent text-xl text-white  border-amber-50 border-2 sm:bg-amber-50 sm:text-black rounded-xl h-9 w-full placeholder-white sm:placeholder-black sm:rounded-lg px-4 py-5 focus:outline-none"/>
+                        <input type="text" name="name" id="termek_neve" placeholder="termék neve"  className="bg-transparent text-xl text-white  border-amber-50 border-2 sm:bg-amber-50 sm:text-black rounded-xl h-9 w-full placeholder-white sm:placeholder-black sm:rounded-lg px-4 py-5 focus:outline-none"/>
                         <p className="text-rose-400 md:text-orange-300 text-sm pt-1 font-semibold">
                             {errors.productName}
                         </p>
                     </div>
                        
                     <div>
-                        <input type="text" name="maker" id="termek_gyartoja" placeholder="termék gyártója" ref={termekGyartojaRef} onChange={handleSearching}  className="bg-transparent text-xl text-white  border-amber-50 border-2 rounded-xl sm:bg-amber-50 sm:text-black h-9 w-full placeholder-white sm:placeholder-black sm:rounded-lg px-4 py-5 focus:outline-none" />
+                        <input type="text" name="maker" id="termek_gyartoja" placeholder="termék gyártója"    className="bg-transparent text-xl text-white  border-amber-50 border-2 rounded-xl sm:bg-amber-50 sm:text-black h-9 w-full placeholder-white sm:placeholder-black sm:rounded-lg px-4 py-5 focus:outline-none" />
                         <p className="text-rose-400 md:text-orange-300 text-sm pt-1 font-semibold">
                             {errors.maker}
                         </p>
                     </div>
                     <div>
-                        <KategoriakSelect options={termekKategoriak} ref={kategoriakRef} OnChange={handleSearching}/>
+                        <KategoriakSelect options={termekKategoriak} />
                         <p className="text-rose-400 md:text-orange-300 text-sm pt-1 font-semibold">
                             {errors.category}
                         </p>
@@ -101,8 +102,8 @@ export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
                                 inp_id="artol"
                                 inp_placeholder="-tól"
                                 inp_className="text-white md:text-black placeholder-white  bg-amber-50 w-full rounded-lg h-10 px-3 bg-transparent text-white border-2 border-white md:bg-white md:placeholder-black "
-                                ref={priceFrom}
-                                OnChange={handleSearching}
+                                
+                               
                             />
                             <p className="text-rose-400 md:text-orange-300 text-sm pt-1 font-semibold">
                             {errors.priceFrom}
@@ -115,8 +116,8 @@ export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
                                 inp_id="arig"
                                 inp_placeholder="-ig"
                                 inp_className="text-white md:text-black placeholder-white  bg-amber-50 w-full rounded-lg h-10 px-3 bg-transparent text-white border-2 border-white md:bg-white md:placeholder-black"
-                                ref={priceTo}
-                                OnChange={handleSearching}
+                                
+                                
                             />
                              <p className="text-rose-400 md:text-orange-300 text-sm pt-1 font-semibold">
                                 {errors.priceTo}
@@ -128,8 +129,7 @@ export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
 
             
                 <button
-                    type="button"
-                    onClick={handleSearching}
+                    type="submit"
                     className="mt-10 block mx-auto bg-[#cc2936] text-amber-50 py-3 px-8 
                             rounded-xl text-lg font-semibold
                             hover:bg-[#b0202c] active:bg-[#8e1a23] border-transparent border-2 hover:border-white hover:font-bold  transition"

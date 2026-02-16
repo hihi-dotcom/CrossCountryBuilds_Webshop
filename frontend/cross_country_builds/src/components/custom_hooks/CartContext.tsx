@@ -31,7 +31,8 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({children}) 
                 name: product.name,
                 price: product.price,
                 maker: product.maker,
-                quantity: quantity
+                quantity: quantity,
+                picUrl: product.picUrl
             };
             return [...prev, newItem];
         })

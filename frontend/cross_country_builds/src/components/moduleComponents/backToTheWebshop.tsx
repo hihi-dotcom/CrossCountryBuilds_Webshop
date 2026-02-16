@@ -8,7 +8,7 @@ export default function BacktoTheWebShopSection({children}:{children: React.Reac
            <section className="mb-10">
                 <div className="hidden sm:flex sm:flex-row max-w-4xl p-4 text-white bg-[#cc2936] mx-auto text-center text-xl w-fit items-center justify-center rounded-2xl mt-10 shadow-2xl">
                     <p>{children}<ArrowRightIcon sx={{fontSize: 50}}/></p>
-                    <Link to={"/"} className="bg-[#08415c] p-3 rounded-xl">Vissza a főoldalra</Link>
+                    <Link to={"/"} className="bg-[#08415c] p-3 rounded-xl">Vásárlás folytatása</Link>
                 </div>
 
                 <div className=" max-w-fit mx-auto sm:hidden">

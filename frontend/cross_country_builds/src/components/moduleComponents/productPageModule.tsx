@@ -1,11 +1,9 @@
 import KosarbaButton from "../buttonComponents/kosarbaonProductPage";
 import BackToWebShopButton from "../buttonComponents/backtoWebshopButton";
-import Bigbicikli from "../../assets/letöltés.jpg";
 import QuantitySelector from "../quantity_components/Quantity_Selector";
 import { useCart } from "../custom_hooks/CartContext";
 import { useState, useEffect } from "react";
-import { useLoaderData, useParams, useRouteLoaderData } from "react-router-dom";
-import biciklik from "../termekcomponents/test_data";
+import { useLoaderData, useParams} from "react-router-dom";
 import IntoCartModal  from "../modalComponents/productintoCartModal";
 
 export default function ProductModule(){
@@ -13,7 +11,6 @@ export default function ProductModule(){
     const [menny, setMenny] = useState(1);
     const [IsModalOpen, setIsModalOpen] = useState(false);
     const { addToCart } = useCart();
-    const  user  = useRouteLoaderData("root") as {id:number, role:string} | null;
 
     const product = useLoaderData() as any;
     
@@ -41,8 +38,9 @@ export default function ProductModule(){
             <section>
                 {IsModalOpen && (
                                 <IntoCartModal onClose={() => setIsModalOpen(false)}>
-                                    {user && <p>A termék bekerült a kosarába!</p>}
-                                    {!user && (<p>Ahhoz, hogy megnézd a kosarad, be kell, hogy jelentkezz!</p>)}
+                                     
+                                          <span className="font-medium">A termék bekerült a kosárba!</span>
+                                    
                                 </IntoCartModal>
                 )}
                

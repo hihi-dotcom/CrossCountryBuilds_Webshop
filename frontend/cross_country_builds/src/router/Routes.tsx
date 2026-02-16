@@ -53,15 +53,15 @@ const routes = [
                 children: [
                     { index: true, element: <HomePage /> },
                     { path: "logout", action: logoutAction },
-                    
+                    { path: "cart", element: <CartPage /> },
 
                     {
                         element: <PublicOnlyRoute />,
                         children: [
                             { path: "login", action: loginAction, element: <LogInPage /> },
                             { path: "signup", action: registerAction, element: <RegistrationPage /> },
-                            { path: "getnewpass",/*action: getPassEmailAction ,*/element: <GetNewPasswordPage /> },
-                            { path: "createnewpass",/*action: createPassEmailAction ,*/ element: <CreateNewPasswordPage /> },
+                            { path: "getnewpass",action: getPassEmailAction ,element: <GetNewPasswordPage /> },
+                            { path: "createnewpass",action: createPassAction ,element: <CreateNewPasswordPage /> },
                         ]
                     },
                    
@@ -75,7 +75,7 @@ const routes = [
                             { path: "mydata", element: <MyDataPage /> },
                             { path: "orderData",action: MakeOrder ,  element: <OrderDataPage /> },
                             { path: "orderend", element: <EndofOrderPage /> },
-                            { path: "cart", element: <CartPage /> },
+                           
                             { path: "appointment",
                                 action: serviceDateTimeAction,
                                 loader: appointmentLoader,

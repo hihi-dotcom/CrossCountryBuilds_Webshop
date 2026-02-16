@@ -1,13 +1,13 @@
 import { Products } from "../components/termekcomponents/termekCardSor";
 import { Szurok } from "../components/szurokComponents/szurok";
 import { DateTimeSection } from "../components/dateTimeforpagescomponents/datetimesection";
-import bikeProducts from "../components/termekcomponents/test_data";
 import { useEffect, useState, useCallback } from "react";
-import type Product from "../models/product";
 import ProductService from "../services/ProductService";
+import { useSearchParams } from "react-router-dom";
 
 
 export default function HomePage(){
+    const [searchParams, setSearchParams] = useSearchParams(); 
     const [products, setProducts] = useState<any[]>([]);
     const [total, setTotal] = useState(0);
     const [hasMore, setHasMore] = useState(false);
@@ -15,6 +15,7 @@ export default function HomePage(){
     const [offset, setOffset] = useState(0);
 
     const LIMIT = 15;
+    /*
     const [filters, setFilters] = useState({
         name: "",
         maker:"",
@@ -22,11 +23,17 @@ export default function HomePage(){
         priceFrom:0,
         priceTo: 4000000
     });
+    */
+    function handleProductSearching(newFilters:any){
+        setSearchParams(newFilters);
+        setOffset(0);
+    }
 
     const loadProducts = useCallback(async(currentOffset: number, append: boolean = false) => {
         setLoading(true);
         try{
-            const result = await ProductService.getProducts(LIMIT, currentOffset);
+            const currentFilters = Object.fromEntries(searchParams.entries());
+            const result = await ProductService.getProducts(LIMIT, currentOffset, currentFilters);
 
             if(result.ok){
                 setTotal(result.total);
@@ -46,11 +53,12 @@ export default function HomePage(){
         finally{
             setLoading(false);
         }
-    }, []);
+    }, [searchParams]);
 
     useEffect(() => {
+        setOffset(0);
         loadProducts(0, false);
-    }, [loadProducts]);
+    }, [searchParams, loadProducts]);
 
     const handleLoadMore = () => {
         const nextOffset = offset + LIMIT;
@@ -58,32 +66,23 @@ export default function HomePage(){
         loadProducts(nextOffset, true);
     }
 
-    const filteredProducts = products.filter(p => {
-   
-        const matchName = filters.name === "" || 
-           p.name.toLowerCase().includes(filters.name.toLowerCase());
-
-        const matchMaker = filters.maker === "" ||  
-          p.maker.toLowerCase().includes(filters.maker.toLowerCase());
-        
-        const matchCategory = filters.category === "" ||
-          p.category === filters.category;
-        
-        const matchPrice = p.price >= (filters.priceFrom || 0) &&
-                           p.price <= (filters.priceTo || 4000000);
-
-        return matchName && matchMaker && matchCategory && matchPrice;
-    });
+    const resetFilters = () => {
+        setSearchParams({}); 
+        setOffset(0);        
+    };
     return(
     <>
         <section className="container mx-auto flex flex-col gap-10 px-5 pb-12 min-h-screen"> 
             <DateTimeSection/>
             <div className="flex flex-col lg:flex-row gap-8 items-start">  
-                <div className="w-full lg:w-1/3 xl: xl:w-1/4">
-                    <Szurok onSearch={setFilters}/>
+                <div className="w-full lg:w-1/3 xl: xl:w-1/4 gap-5">
+                    <Szurok onSearch={handleProductSearching}/>
+                    <button className="w-full mt-3 py-3 px-6 border-2 border-red-600 text-red-500 font-semibold rounded-xl 
+                   hover:bg-red-600 hover:text-white transition-all shadow-sm 
+                    flex items-center justify-center gap-2" onClick={resetFilters}>Szűrők törlése</button>
                 </div>
                 <div className="w-full lg:w-2/3 xl:w-3/4 flex-1">
-                    <Products filteredItems={filteredProducts}/>
+                    <Products filteredItems={products}/>
                     <div className="mt-12 flex flex-col gap-4  items-center justify-center max-w-md">
                         {hasMore &&(
                             <button onClick={handleLoadMore} disabled={loading} className="px-10 py-5 bg-blue-700 hover:bg-blue-800 hover:font-bold text-white  rounded-lg transition-all shadow-md disabled:bg-gray-400 active:scale-95 ">

@@ -5,15 +5,27 @@ const API_URL = "http://localhost:3000/api";
 
 class ProductService {
 
-    async getProducts(limit: number = 15, offset: number = 0) {
-        const response = await fetch(`${API_URL}/products?limit=${limit}&offset=${offset}`);
+    async getProducts(limit: number = 15, offset: number = 0, filters:any = {}) {
+        const params = new URLSearchParams({
+            limit: limit.toString(),
+            offset: offset.toString(),
+        });
+
+        Object.entries(filters).forEach(([key, value]) => {
+            if(value !== undefined && value !== "" && value !== null && value !== 0){
+                params.append(key, value.toString());
+            }
+        })
+
+
+        const response = await fetch(`${API_URL}/products?${params}`);
         const data = await response.json();
         
      
         return {
             ok: response.ok,
-            products: data.product, 
-            total: data.total,
+            products: data.product || [], 
+            total: data.total || 0,
             hasMore: data.hasMore
         };
     }
