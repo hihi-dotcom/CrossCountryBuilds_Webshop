@@ -7,8 +7,8 @@ import { redirect } from "react-router-dom";
 
 export async function getPassEmailAction({request}: {request: Request}) {
     const fData = await request.formData();
-
-    const result = getPassEmailScheme.safeParse(fData);
+    const data = Object.fromEntries(fData);
+    const result = getPassEmailScheme.safeParse(data);
     if(!result.success){
         return{
             errors: result.error.flatten().fieldErrors
@@ -35,7 +35,7 @@ export async function createPassAction({request}: {request: Request}){
         return {serverError: "Hiányzó vagy érvénytelen  jelszó visszaállító token!"};
     }
 
-    const result = createNewPassScheme.safeParse(fData);
+    const result = createNewPassScheme.safeParse(data);
     if(!result.success){
         return{
             errors: result.error.flatten().fieldErrors
@@ -43,8 +43,8 @@ export async function createPassAction({request}: {request: Request}){
     }
 
     const createPassResult = await PasswordService.createNewPass(token,{
-        newPassword: result.data.newjelszo, 
-        confirmPassword: result.data.newjelszo2
+        newjelszo: result.data.newjelszo, 
+        newjelszo2: result.data.newjelszo2
     })
     if(!createPassResult.ok){
         return {serverError: createPassResult.message}

@@ -1,3 +1,4 @@
+import { redirect } from "react-router-dom";
 import type { RegistrationCreds, LoginCreds } from "../models/models_for_services/auth_models";
 
 const API_url: string = `http://localhost:3000/api/`;
@@ -50,17 +51,19 @@ class AuthService {
             method: "POST",
             body: JSON.stringify({username, email, password, confirmPassword}),
         });
-
-        if(response.ok){
             const data = await response.json();
-
-            if(data.token){
-                this.setToken(data.token);
-
-                return {ok: true, data};
+        if(response.ok){
+            return {
+                ok: true, 
+               message: data.message,
+               redirect: data.redirect
             };
+        }
+        
+        return {
+            ok: false,
+            message: data.message || "Hiba történt a regisztráció során!"
         };
-        return {ok: false};
     }
 
     async login({username, password}:LoginCreds){
@@ -68,15 +71,21 @@ class AuthService {
             method: "POST",
             body: JSON.stringify({username, password})
         });
-
+        const data = await response.json();
         if(response.ok){
-            const data = await response.json();
+            
             if(data.token){
                 this.setToken(data.token);
-                return {ok: true, data};
+                return {
+                    ok: true, 
+                    data
+                };
             };
         }
-        return {ok: false}
+        return {
+            ok: false,
+            message: data.message
+        };
     }
 
     async logout(){

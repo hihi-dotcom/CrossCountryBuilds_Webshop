@@ -33,7 +33,7 @@ export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
     const kategoriakRef = useRef<HTMLSelectElement>(null);
     const priceFrom = useRef<HTMLInputElement>(null);
     const priceTo = useRef<HTMLInputElement>(null);
-
+    /*
     const handleSearching = () => {
             const searchData = {
                 name: termekNeveRef.current?.value || "",
@@ -56,7 +56,7 @@ export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
             }
             onSearch(searchData);
     };
-
+    */
     return(
         <Form method="get" key={searchParams.toString()} className="border-t-2 border-white border-b-2 md:border-transparent ">
             <div className="szurok bg-transparent p-6 md:bg-[#3f484c] rounded-2xl w-full mx-auto">

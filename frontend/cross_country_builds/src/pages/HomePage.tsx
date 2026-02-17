@@ -83,14 +83,16 @@ export default function HomePage(){
                 </div>
                 <div className="w-full lg:w-2/3 xl:w-3/4 flex-1">
                     <Products filteredItems={products}/>
-                    <div className="mt-12 flex flex-col gap-4  items-center justify-center max-w-md">
+                    <div className="mt-12 flex flex-col gap-4  items-center justify-center w-full">
                         {hasMore &&(
-                            <button onClick={handleLoadMore} disabled={loading} className="px-10 py-5 bg-blue-700 hover:bg-blue-800 hover:font-bold text-white  rounded-lg transition-all shadow-md disabled:bg-gray-400 active:scale-95 ">
+                            <button onClick={handleLoadMore} disabled={loading} className="w-full max-w-sm py-3 px-6 border-2 border-[#106187] text-white font-semibold rounded-xl 
+                           hover:bg-[#106187] hover:text-white transition-all shadow-sm 
+                           flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                                 {loading ? "Betöltés" : "További termékek betöltése"}
                             </button>
                         )}
                         <p className="text-white text-base">
-                            Jelenleg látsz: {products.length} / {total} termékből.
+                            Jelenleg ennyi terméket látsz: {products.length} / {total} termékből.
                         </p>
                         
                     </div>

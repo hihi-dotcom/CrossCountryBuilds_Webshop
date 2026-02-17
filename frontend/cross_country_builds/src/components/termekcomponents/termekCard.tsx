@@ -22,7 +22,7 @@ export function Item({product, OnCart}: ProductProps){
             <div className="termekdetails m-3">
                    <h4 className="termekkategoria text-lg">Kategória: {product.category} </h4>
                    <h4 className="termekgyarto text-lg">Gyártó: {product.maker} </h4>
-                   <h2 className="termekara text-xl">{product.price} ft</h2>
+                   <h2 className="termekara text-xl">{product.price.toLocaleString()} ft</h2>
             </div>
             <div className="flex px-3 gap-x-2 my-2">
                 <Link to={`/product/${product.id}`}className="bg-[#08415c] text-amber-50 p-3 rounded-2xl border-transparent border-2 hover:border-white hover:font-bold">Részletek</Link>

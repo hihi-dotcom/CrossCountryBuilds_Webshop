@@ -6,6 +6,8 @@ import BackToWebShopButton from "../buttonComponents/backtoWebshopButton";
 
 export default function SignUpModule(){
     const actionData = useActionData();
+    const navigation = useNavigation();
+    const isSubmitting = navigation.state === "submitting";
     return(
     <>
       <div className=" bg-transparent md:bg-[#3a464c] rounded-2xl max-w-4xl mx-auto my-10  py-4  px-6 ">
@@ -23,25 +25,25 @@ export default function SignUpModule(){
                 <div>
                   <Field label="Adj meg egy felhasználónevet: " placeholder="név" type="text" name="username" />
                   {actionData?.errors?.username && (
-                    <p className="text-rose-400 md:text-orange-400 text-lg">{actionData.errors.username[0]}</p>
+                    <p className="text-rose-400 md:text-orange-400 text-lg">{actionData.errors.username}</p>
                   )}
                 </div>
                 <div>
                   <Field label="Add meg az email címed: " placeholder="e-mail" type="email" name="email" />
                   {actionData?.errors?.email && (
-                    <p className="text-rose-400 md:text-orange-400 text-lg">{actionData.errors.email[0]}</p>
+                    <p className="text-rose-400 md:text-orange-400 text-lg">{actionData.errors.email}</p>
                   )}
                 </div>
                 <div>
                   <Field label="Adj meg egy erős jelszót: " placeholder="a te jelszavad" type="password" name="password" /> 
                   {actionData?.errors?.password && (
-                    <p className="text-rose-400 md:text-orange-400 text-lg">{actionData.errors.password[0]}</p>
+                    <p className="text-rose-400 md:text-orange-400 text-lg">{actionData.errors.password}</p>
                   )}
                 </div>
                 <div>
                   <Field label="Erősítsd meg a jelszavad: " placeholder="a te jelszavad újra" type="password" name="confirmPassword" />
                   {actionData?.errors?.confirmPassword && (
-                    <p className="text-rose-400 md:text-orange-400 text-lg">{actionData.errors.confirmPassword[0]}</p>
+                    <p className="text-rose-400 md:text-orange-400 text-lg">{actionData.errors.confirmPassword}</p>
                   )}
                 </div>
               </div>
@@ -56,7 +58,7 @@ export default function SignUpModule(){
             <div className="col-span-1 md:col-span-2 text-center">
                {actionData?.serverError && (
                 <p className="text-rose-400 md:text-orange-400 text-2xl pt-3 font-semibold">
-                  {actionData.serverError[0]}
+                  {actionData.serverError}
                 </p>
               )}
             </div>
@@ -64,8 +66,8 @@ export default function SignUpModule(){
 
           <div className=" flex flex-col md:flex-row items-center md:justify-between w-full py-2 px-3 gap-6 md:gap-30">
           
-            <button type="submit" className="bg-[#cc2936] text-white text-lg border-2 border-transparent hover:border-[#eee5e9] sm:w-fit mx-auto md:ml-24 mt-6 px-8 py-4 rounded-xl">
-              Regisztrálok!
+            <button type="submit" disabled={isSubmitting} className="bg-[#cc2936] text-white text-lg border-2 border-transparent hover:border-[#eee5e9] sm:w-fit mx-auto md:ml-24 mt-6 px-8 py-4 rounded-xl">
+              {isSubmitting ? "Betöltés..." : "Regisztrálok!"}
             </button>
             
             <div className="flex flex-row items-center text-white ">

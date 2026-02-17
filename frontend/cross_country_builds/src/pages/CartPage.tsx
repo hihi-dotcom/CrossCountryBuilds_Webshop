@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useCart } from "../components/custom_hooks/CartContext";
 import RendelesEndButton from "../components/buttonComponents/rendelesVegeButton";
 import CartProducts from "../components/termekcomponents/cartProductSor";

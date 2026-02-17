@@ -18,7 +18,7 @@ export async function loginAction({request}: {request: Request}) {
 
     const loginResult = await AuthService.login(result.data);
     if(!loginResult.ok){
-        return {serverError: "Hibás felhasználónév vagy jelszó!"};
+        return {serverError: loginResult.message || "Hibás felhasználónév vagy jelszó!"};
     }
 
     const userData = loginResult.data;
@@ -44,11 +44,11 @@ export async function registerAction({ request }: {request: Request}) {
     const regResult = await AuthService.registration(result.data);
     if(!regResult.ok){
         return {
-            serverError:  "A regisztráció sajnos nem sikerült. Próbálkozz más adatokkal!"
+            serverError: regResult.message || "A regisztráció sajnos nem sikerült. Próbálkozz más adatokkal!"
         }
     }
 
-    return redirect("/");
+    return redirect(regResult.redirect);
 };
 
 export async function logoutAction(){

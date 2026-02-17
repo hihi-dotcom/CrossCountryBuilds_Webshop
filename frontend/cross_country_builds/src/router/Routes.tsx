@@ -36,6 +36,7 @@ import { MakeOrder } from "../actions/orderActions";
 import { productLoader } from "../actions/productActions";
 import { createProductAction } from "../actions/productActions";
 import { createEmptyAppointmentAction } from "../actions/serviceActions";
+import CartGuard from "../pages/protects/CartGuard";
 
 const rootLoader = async () => {
     return await AuthService.gettingCurrentUser();
@@ -54,7 +55,10 @@ const routes = [
                     { index: true, element: <HomePage /> },
                     { path: "logout", action: logoutAction },
                     { path: "cart", element: <CartPage /> },
-
+                    { path: "appointment",
+                                action: serviceDateTimeAction,
+                                loader: appointmentLoader,
+                            element: <DateTimePage /> },
                     {
                         element: <PublicOnlyRoute />,
                         children: [
@@ -73,13 +77,13 @@ const routes = [
                         element: <ProtectRouteUser />,
                         children: [
                             { path: "mydata", element: <MyDataPage /> },
-                            { path: "orderData",action: MakeOrder ,  element: <OrderDataPage /> },
-                            { path: "orderend", element: <EndofOrderPage /> },
-                           
-                            { path: "appointment",
-                                action: serviceDateTimeAction,
-                                loader: appointmentLoader,
-                            element: <DateTimePage /> },
+                            {
+                                element: <CartGuard/>,
+                                children: [
+                                    { path: "orderData",action: MakeOrder ,  element: <OrderDataPage /> }
+                                ]
+                            },
+                            { path: "orderend", element: <EndofOrderPage /> }
                         ]
                     },
                     { path: "*", element: <ErrorPage /> }

@@ -1,9 +1,9 @@
 export interface ForgotCreds{
-    email: string
+    newpassword: string
 }
 
 
 export interface NewPassCreds{
-    newPassword:string,
-    confirmPassword: string
+    newjelszo:string,
+    newjelszo2: string
 }
