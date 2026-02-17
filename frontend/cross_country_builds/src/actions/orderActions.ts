@@ -13,20 +13,32 @@ export async function MakeOrder({ request }: {request: Request}){
         };
     };
 
-    const shippingAddr = data.shippingAddr as string;
+
     const isSameAddress = data.sameAddress === "on";
-    const billingAddr = isSameAddress ? shippingAddr : (data.billingAddr as string);
-    const cartProd = JSON.parse(data.cartProducts as string);
-    const totalAmount = Number(data.totalAmount);
-    const userId = Number(data.userId);
-    const orderObj = {
-        u_id: userId,
-        Daddress: shippingAddr,
-        Baddress: billingAddr,
+  
+const orderObj = {
+        u_id: Number(data.userId),
+        deliveryAddr: {
+            zipCode: data.shippingzipCode,
+            cityName: data.shippingcityName,
+            streetName: data.shippingstreetName,
+            houseNumber: data.shippinghouseNumber
+        },
+        billingAddr: isSameAddress ? {
+            zipCode: data.shippingzipCode,
+            cityName: data.shippingcityName,
+            streetName: data.shippingstreetName,
+            houseNumber: data.shippinghouseNumber
+        } : {
+            zipCode: data.billingzipCode,
+            cityName: data.billingcityName,
+            streetName: data.billingstreetName,
+            houseNumber: data.billinghouseNumber
+        },
         pMethod: data.paymentMethod,
         dMethod: data.shippingMethod,
-        total_amount: totalAmount,
-       products: cartProd.map((item: any) => ({
+        total_amount: Number(data.totalAmount),
+        products: JSON.parse(data.cartProducts as string).map((item: any) => ({
             id: item.id,
             price: item.price,
             amount: item.quantity 

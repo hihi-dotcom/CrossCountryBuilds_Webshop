@@ -78,7 +78,9 @@ class AuthService {
                 this.setToken(data.token);
                 return {
                     ok: true, 
-                    data
+                    data,
+                    message: data.message,
+                    
                 };
             };
         }

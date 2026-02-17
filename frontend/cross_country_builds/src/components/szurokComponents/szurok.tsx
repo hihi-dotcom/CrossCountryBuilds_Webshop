@@ -27,7 +27,6 @@ export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
         name: "ruházat"
     }
     ];
-
     const termekNeveRef = useRef<HTMLInputElement>(null);
     const termekGyartojaRef = useRef<HTMLInputElement>(null);
     const kategoriakRef = useRef<HTMLSelectElement>(null);
@@ -57,8 +56,14 @@ export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
             onSearch(searchData);
     };
     */
+   const formRef = useRef<HTMLFormElement>(null);
+
+    const handleReset = () => {
+        formRef.current?.reset(); 
+        setErrors({}); 
+    };
     return(
-        <Form method="get" key={searchParams.toString()} className="border-t-2 border-white border-b-2 md:border-transparent ">
+        <Form method="get" ref={formRef} key={searchParams.toString()} className="border-t-2 border-white border-b-2 md:border-transparent ">
             <div className="szurok bg-transparent p-6 md:bg-[#3f484c] rounded-2xl w-full mx-auto">
 
                 <h1 className="text-center text-5xl sm:text-7xl font-semibold text-slate-100 mb-8">

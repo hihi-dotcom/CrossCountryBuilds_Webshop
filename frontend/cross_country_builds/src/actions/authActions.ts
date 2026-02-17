@@ -26,6 +26,7 @@ export async function loginAction({request}: {request: Request}) {
     if(userData && userData.role === 'admin'){
         return redirect("/admin");
     }
+  
     return redirect("/");
 
 }

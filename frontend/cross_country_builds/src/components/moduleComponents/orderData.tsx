@@ -4,14 +4,16 @@ import { FormField } from "../formFieldComponents/textField";
 import { useCart } from "../custom_hooks/CartContext";
 import { Form, useActionData, useNavigation, useRouteLoaderData, useSubmit} from "react-router-dom"
 import { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import AddressFields from "../formFieldComponents/formFieldsforOrder";
+
 
 export default function OrderDataModule(){
     const {totalPrice, cartItems} = useCart();
     const userData = useRouteLoaderData("root") as {id:number, role: string} | null;
 
-    const actionData = useActionData() as {error?: string, ServerError?: string};
+    const actionData = useActionData() as {error?: string, ServerError?: string, errors?: Record<string, string[]>};
     const navigation = useNavigation();
+    console.log(actionData)
     const submit = useSubmit();
     const isSubmitting = navigation.state === "submitting";
     const [sameAddress, setSameAddress] = useState(true);
@@ -19,11 +21,9 @@ export default function OrderDataModule(){
     const handleSubmit = (event:any) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
-        const shipping = formData.get("shippingAddr") as string;
+       
 
-        if(sameAddress){
-            formData.set("billingAddr", shipping);
-        }
+        
         formData.set("sameAddress", sameAddress ? "on" : "off");
         if(userData?.id){
             formData.append("userId", userData.id.toString());
@@ -89,6 +89,7 @@ export default function OrderDataModule(){
                         
                     </div>
                     <div>
+
                         <FormField
                             input_name="email"
                             input_id="order-email"
@@ -99,24 +100,12 @@ export default function OrderDataModule(){
                         
                     </div>
                     <div>
-                        <FormField
-                            input_name="shippingAddr"
-                            input_id="order-deliveryaddr"
-                            type="text"
-                            input_placeholder="szállítási cím"
-                            ref={orderDeliveryAddrRef}
-                        />
-                        
+                        <div className="flex-1">
+                            <AddressFields prefix="shipping" label="Szállítási adatok" />
+                        </div>
                     </div>
-                    {!sameAddress && (<div>
-                        <FormField
-                            input_name="billingAddr"
-                            input_id="order-billingaddr"
-                            type="text"
-                            input_placeholder="számlázási cím"
-                            ref={orderBillingAddrRef}
-                        />
-                    
+                    {!sameAddress && (<div className="flex-1">
+                        <AddressFields prefix="billing" label="Számlázási adatok" />
                     </div>)}
                     <div>
                         <SelectforOrder
@@ -149,7 +138,16 @@ export default function OrderDataModule(){
                         <input id="default-checkbox" type="checkbox" value="" name="sameAddress" className="w-5 h-5   rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft" checked={sameAddress} onChange={(e) => setSameAddress(e.target.checked)}/>
                         <p className="select-none ms-2 font-medium text-heading text-[21px] ">A szállítási és a számlázási cím megegyezik.</p>
                     </div>
-                                        
+                    {actionData?.errors && (
+                        <div className="md:col-span-2 p-4  border-red-500/50 text-red-500 rounded-xl">
+                            <p className="font-bold mb-2">Javítsd az alábbi hibákat:</p>
+                            <ul className="list-none list-inside text-base ">
+                                {Object.values(actionData.errors).flat().map((err: any, index) => (
+                                    <li key={index}>{err}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}                  
                     {actionData?.ServerError && (
                         <div className="md:col-span-2 p-4 bg-red-100 border border-red-400 text-red-700 font-bold rounded-xl text-center animate-pulse">
                             {actionData.ServerError}

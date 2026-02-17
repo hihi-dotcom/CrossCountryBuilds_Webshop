@@ -1,7 +1,7 @@
 import AdminSidebar from "../../components/adminComponents/Admin_OrdersSidebar";
 import { Form, useLoaderData } from "react-router-dom";
 import { useState } from "react";
-import TrashIcon from "@mui/icons-material/DeleteOutlineOutlined";
+
 import CheckIcon from "@mui/icons-material/Check";
 import OrderService from "../../services/OrderService";
 import AdminProductModal from "../../components/modalComponents/adminModalComponents/adminProductsModal";
@@ -58,7 +58,7 @@ export default function OrdersDashboard(){
                 setLoadingId(null);
             }
         }
-
+        /*
         async function handleDeleteOrder(id:number){
             try{
                 const deleteResult = await OrderService.deleteOrderbyId(id);
@@ -74,28 +74,32 @@ export default function OrdersDashboard(){
                 setError("Váratlan hiba történt a megrendelés törlése közben!");
                 console.log(error);
             }
-        }
+        }*/
     return(
         <>
             <AdminProductModal
                 isOpen={selectedOrderItems !== null} 
                 onClose={() => setSelectedOrderItems(null)}
             >
-                <div className="w-full max-w-md">
+                <div className="w-full">
                     <h3 className="text-xl font-bold mb-6 border-b pb-2">Megrendelt termékek</h3>
-                    <div className="space-y-4">
-                        {selectedOrderItems?.map((item:any) => (
-                            <div key={item.id} className="flex justify-between items-center p-4 rounded-xl">
-                                <div className="flex flex-col text-left border-r-2 border-black px-8">
-                                    <span className="font-bold">{item.p_name}</span>
-                                    
+                   <div className="space-y-2">
+                        {selectedOrderItems?.map((item: any) => (
+                            <div key={item.id} className="grid grid-cols-12 gap-2 items-center p-4 bg-white/5 rounded-xl border border-black/5 shadow-sm">
+                                <div className="col-span-6 border-r border-black/10 pr-4">
+                                    <span className="font-bold text-gray-800 whitespace-nowrap">{item.p_name}</span>
                                 </div>
-                                <div className="text-lg font-bold text-black px-8">
-                                    {item.p_price} Ft
+                                <div className="col-span-2 border-r border-black/10 text-center">
+                                    <span className="font-medium text-black bg-gray-100 px-2 py-1 rounded-md">
+                                        {item.quantity} db
+                                    </span>
+                                </div>
+                                <div className="col-span-4 text-right font-bold text-black">
+                                    {item.p_price.toLocaleString()} Ft
                                 </div>
                             </div>
                         ))}
-                    </div>
+                </div>
                 </div>
             </AdminProductModal>
             <DeleteModal isOpen={deleteTargetId !== null} 
@@ -106,7 +110,7 @@ export default function OrdersDashboard(){
                         </h2>
                         <div className="flex gap-4">
                             <button className="bg-red-600 hover:bg-red-800 text-white  hover:font-bold rounded-xl transition-colors py-3 px-4 "
-                            onClick={() => deleteTargetId && handleDeleteOrder(deleteTargetId)}>
+                            >
                                 Igen, töröld a rendelést!
                             </button>
                         </div>
@@ -130,15 +134,6 @@ export default function OrdersDashboard(){
                             Megrendelések
                             </h2>
                            
-                           {/* <div className="flex items-center bg-amber-100 text-amber-700 px-2 py-1 sm:px-3 sm:py-1.2 rounded-full border border-amber-200">
-                            <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider">
-                               
-                            </span>
-                            <span className="ml-1 text-[10px] md:text-xs font-bold uppercase tracking-wider hidden sm:inline">
-                                folyamatban
-                            </span>
-                            </div>
-                            */}
                         </div>
                         <div className="w-full overflow-x-auto shadow-inner rounded-lg">
                             {error && <div className="text-red-500 bg-red-200 p-2 rounded">{error}</div>}
@@ -159,7 +154,7 @@ export default function OrdersDashboard(){
                                 <tbody className="divide-y px-2 divide-gray-100 text-base text-black">
                                     {orders.map((s) => (
                                         <tr key={s.id}  className={loadingId === s.id ? "opacity-50" : ""}>
-                                              <td className="py-4 px-2 font-medium w-fit">{s.customer_name}</td>
+                                              <td className="py-4 px-2 font-medium w-fit">#{s.u_id} {s.customer_name}</td>
                                               <td className="py-4 px-2">{s.delivery_Method}</td>
                                               <td className="py-4 px-2">{s.payment_Method}</td>
                                               <td className="py-4 px-2 font-semibold">{Number(s.total_amount).toLocaleString()} Ft</td>
@@ -170,18 +165,19 @@ export default function OrdersDashboard(){
                                                </button>
                                             </td>
                                             <td className="py-4 px-2">
-                                                <select value={s.status}  onChange={(e) => handleUpdateStatus(s.id, e.target.value)}  >
-                                                    <option value="pending">Függőben</option>
-                                                    <option value="processing">Feldolgozás alatt</option>
+                                                <select value={s.status} onChange={(e) => {
+                                                    const nextStatus = e.target.value;
+                                                    setOrders(prev => prev.map(o => 
+                                                        o.id === s.id ? { ...o, status: nextStatus } : o
+                                                    ));
+                                                }}>
+                                                    <option value="pending">Feldolgozás alatt</option>
+                                                    <option value="kész">Kész!</option>
                                                 </select>
                                             </td>
                                             <td className="py-3 px-2 text-right flex flex-col gap-4">
-                                                <button className="flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95" onClick={() => setDeleteTargetId(s.id)}>
-                                                    <TrashIcon sx={{ fontSize: 18 }} />
-                                                    <span className="md:hidden lg:inline">Törlés</span>
-                                                </button>
 
-                                                <button className="flex items-center justify-center gap-1 bg-black hover:shadow-2xl text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95">
+                                                <button className="flex items-center justify-center gap-1 bg-black hover:shadow-2xl text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95" onClick={() => handleUpdateStatus(s.id, s.status)}>
                                                     <CheckIcon sx={{ fontSize: 18 }} />
                                                     <span className="md:hidden lg:inline">Lezárás</span>
                                                 </button>
