@@ -33,6 +33,8 @@ main :: proc () {
                         order.order_create(conn)
                     case "/api/product":
                         products.product_add(conn)
+                    case "/api/newappointment":
+                        appointment.appointment_new(conn)
                     case:
                         util.stop(conn, 404, "Not Found")
                 }
@@ -52,6 +54,8 @@ main :: proc () {
                         user.user_all(conn)
                     case "/api/freeappointments":
                         appointment.appointment_get_free(conn)
+                    case "/api/admin/appointments":
+                        appointment.appointment_all(conn)
                     case:
                         util.stop(conn, 404, "Not Found")
                 }
@@ -72,6 +76,8 @@ main :: proc () {
                         products.product_delete(conn, params)
                     case "/api/user":
                         user.user_delete(conn, params)
+                    case "/api/appointment":
+                        appointment.appointment_delete(conn, params)
                     case:
                         util.stop(conn, 404, "Not Found")
                 }

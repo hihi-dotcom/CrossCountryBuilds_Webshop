@@ -7,9 +7,19 @@ import "core:encoding/json"
 import "../../pool/pool_mw"
 import "core:strconv"
 import "core:log"
+import "core:fmt"
 
 @(private = "file")
 Offset :: int
+
+@(private = "file")
+Filters :: struct {
+    name: string,
+    category: string,
+    maker: string,
+    priceFrom: int,
+    priceTo: int,
+}
 
 @(private)
 Product :: struct {
@@ -25,7 +35,7 @@ Product :: struct {
 
 @(private = "file")
 ResponseFromat :: struct {
-    product: []Product,
+    products: []Product,
     total: int,
     hasMore: bool
 }
@@ -35,17 +45,37 @@ products_range :: proc (conn: ^http.Conn, params: util.QueryParameter) {
     offset_string, offsetOk := params["offset"]
     if !limitOk || !offsetOk {
         util.stop(conn, 400, "Missing parameter.")
+        return
     }
 
-    _, limitParseOk := strconv.parse_int(limit_string, 10)
+    limit, limitParseOk := strconv.parse_int(limit_string, 10)
     offset, offsetParseOk := strconv.parse_int(offset_string, 10)
     if !limitParseOk || !offsetParseOk {
         util.stop(conn, 400, "Parameter is not number.")
+        return
     }
+
+    filters := new(Filters)
+    filters.name = params["name"]
+    filters.category = params["category"]
+    filters.maker = params["maker"]
+
+    priceFromString := params["priceFrom"]
+    priceToString := params["priceTo"]
+    if priceFromString != "" {
+        filters.priceFrom, _ = strconv.parse_int(priceFromString, 10)
+    }
+    if priceToString != "" {
+        filters.priceTo, _ = strconv.parse_int(priceToString, 10)
+    }
+
     heap_offset := new(int)
     heap_offset^ = offset
     conn.user_data[^Offset] = heap_offset
-    pool_mw.query(conn, products_more_query, "products_range", {limit_string, offset_string})
+    conn.user_data[^Filters] = filters
+
+    pool_mw.query(conn, products_more_query, "products_range",
+        {filters.name, filters.category, filters.maker, fmt.aprint(filters.priceFrom), fmt.aprint(filters.priceTo), limit_string, offset_string})
 }
 
 @(private = "file")
@@ -74,7 +104,9 @@ products_more_query :: proc (conn: ^http.Conn) {
     }
     conn.user_data[^[]Product] = products
 
-    pool_mw.query(conn, products_no_more_query, "products_count", {})
+    filters := cast(^Filters)conn.user_data[^Filters]
+    pool_mw.query(conn, products_no_more_query, "products_count",
+        {filters.name, filters.category, filters.maker, fmt.aprint(filters.priceFrom), fmt.aprint(filters.priceTo)})
 }
 
 @(private = "file")
@@ -93,9 +125,9 @@ products_no_more_query :: proc (conn: ^http.Conn) {
     count, _ := strconv.parse_int(tables[0]["num"])
 
     rp := ResponseFromat{
-        product = products^,
+        products = products^,
         hasMore = len(products) + offset^ < count,
-        total = count 
+        total = count
     }
 
     response_body, err := json.marshal(rp)

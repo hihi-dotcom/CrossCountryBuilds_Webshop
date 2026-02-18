@@ -21,12 +21,20 @@ import "core:strings"
 @(private = "file")
 OrderJson :: struct {
     u_id: string,
-    Daddress: string,
-    Baddress: string,
+    deliveryAddr: AddressJson,
+    billingAddr: AddressJson,
     pMethod: string,
     dMethod: string,
     total_amount: int,
     products: []ProductJson
+}
+
+@(private = "file")
+AddressJson :: struct {
+    zipCode: string,
+    cityName: string,
+    streetName: string,
+    houseNumber: string,
 }
 
 @(private = "file")
@@ -79,14 +87,18 @@ order_create_start :: proc (conn: ^http.Conn) {
     conn.user_data[OrderJson] = as
 
     addresses := new(Addresses)
-    badderss, bOk := but_why(as.Baddress)
-    daddress, dOk := but_why(as.Daddress)
-    if !bOk || !dOk {
-        util.reset(conn, 400, "Addess is in a wrong format.")
-        return
+    addresses.daddress = Address{
+        zip_code = as.deliveryAddr.zipCode,
+        city_name = as.deliveryAddr.cityName,
+        street_name = as.deliveryAddr.streetName,
+        house_number = as.deliveryAddr.houseNumber,
     }
-    addresses.baddress = badderss
-    addresses.daddress = daddress
+    addresses.baddress = Address{
+        zip_code = as.billingAddr.zipCode,
+        city_name = as.billingAddr.cityName,
+        street_name = as.billingAddr.streetName,
+        house_number = as.billingAddr.houseNumber,
+    }
     conn.user_data[Addresses] = addresses
 
     pool_mw.pin(conn, order_create_badderss, "order_begin")

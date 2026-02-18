@@ -11,8 +11,15 @@ import "core:fmt"
 
 
 @(private = "file")
-BodyAs :: struct {
-    description: string 
+BookBody :: struct {
+    description: string,
+}
+
+@(private = "file")
+FinalizeBody :: struct {
+    service_id: string,
+    price: int,
+    bringBackDate: string,
 }
 
 appointment_book :: proc (conn: ^http.Conn, params: util.QueryParameter) {
@@ -35,16 +42,27 @@ appointment_book_query :: proc (conn: ^http.Conn) {
     payload := cast(^auth.Payload)conn.user_data[auth.Payload]
     body := cast(mw.StaticBody)conn.user_data[mw.StaticBody]
 
-    as := new(BodyAs)
-    json.unmarshal(body^, as)
+    finalizeBody := new(FinalizeBody)
+    if json.unmarshal(body^, finalizeBody) == nil && finalizeBody.price > 0 {
+        conn.user_data[^FinalizeBody] = finalizeBody
+        pool_mw.query(conn, appointment_finalize_respond, "finalize_appointment",
+            {fmt.aprint(qp["id"]), finalizeBody.service_id, fmt.aprint(finalizeBody.price), finalizeBody.bringBackDate})
+        return
+    }
 
-    if as.description == "" {
+    bookBody := new(BookBody)
+    if json.unmarshal(body^, bookBody) != nil {
+        util.reset(conn, 400, "JSON parsing failed.")
+        return
+    }
+
+    if bookBody.description == "" {
         util.reset(conn, 400, "Missing parameter.")
         return
     }
 
-    pool_mw.query(conn, appointment_book_respond, "appoint_appointment", 
-        {fmt.aprint(payload.id), fmt.aprint(qp["id"]), as.description})
+    pool_mw.query(conn, appointment_book_respond, "appoint_appointment",
+        {fmt.aprint(qp["id"]), fmt.aprint(payload.id), bookBody.description})
 }
 
 @(private = "file")
@@ -63,6 +81,26 @@ appointment_book_respond :: proc (conn: ^http.Conn) {
             "content-type:application/json"
         },
         body = `{"message": "Appointment booked successfully"}`
+    })
+    http.reset_conn(conn)
+}
+
+@(private = "file")
+appointment_finalize_respond :: proc (conn: ^http.Conn) {
+    result := cast(pool.Result)conn.user_data[pool.Result]
+
+    status, _ := pool.status(result)
+    if status != .CommandOK {
+        util.stop(conn, 500, "Failed to finalize appointment.")
+        return
+    }
+
+    util.static_send(conn.soc, {
+        status = 200,
+        header = {
+            "content-type:application/json"
+        },
+        body = `{"message": "Appointment finalized successfully"}`
     })
     http.reset_conn(conn)
 }

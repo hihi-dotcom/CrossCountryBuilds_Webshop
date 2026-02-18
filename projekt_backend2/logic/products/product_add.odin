@@ -8,8 +8,6 @@ import mw "../../http/middleware"
 import "../../pool/pool_mw"
 import "../auth"
 
-//needed multipart form data handler
-
 @(private = "file")
 JsonResponse :: struct {
     id: string 

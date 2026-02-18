@@ -73,18 +73,13 @@ register_is_good :: proc (conn: ^http.Conn) {
     new_user := pool.unmarshal(result)
 
     new_token := token.sign(fmt.aprint(new_user[0]["id"], "$", new_user[0]["role"], sep = ""), 5 * time.Hour)
-    resopnse_body, marshal_err := json.marshal(Token{token=new_token})
-    if marshal_err != nil {
-        util.stop(conn, 500, "Marshal error.")
-        return
-    }
 
     util.static_send(conn.soc, util.Response{
         status = 200,
         header = {
             "content-type:application/json"
         },
-        body = string(resopnse_body)
+        body = fmt.aprint(`{"ok":true,"message":"Registration successful","token":"`, new_token, `"}`)
     })
     http.reset_conn(conn)
 }

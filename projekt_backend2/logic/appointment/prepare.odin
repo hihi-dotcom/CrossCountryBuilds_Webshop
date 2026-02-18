@@ -15,4 +15,30 @@ prepare :: proc () {
         problem_description = $3
         WHERE id = $1`,
     {.Int4, .Int4, .Text})
+
+    pool.prepare("finalize_appointment", `
+        UPDATE Service_DateTimes
+        SET service_name = $2,
+        service_price = $3,
+        bringback_date = $4
+        WHERE id = $1`,
+    {.Int4, .Varchar, .Int4, .Text})
+
+    pool.prepare("appointment_all", `
+        SELECT id, service_date, user_id, problem_description
+        FROM Service_DateTimes
+        ORDER BY service_date DESC`
+    )
+
+    pool.prepare("appointment_delete", `
+        DELETE FROM Service_DateTimes
+        WHERE id = $1
+        RETURNING id`,
+    {.Int4})
+
+    pool.prepare("appointment_new", `
+        INSERT INTO Service_DateTimes (service_date, user_id)
+        VALUES ($1, NULL)
+        RETURNING id`,
+    {.Text})
 }
