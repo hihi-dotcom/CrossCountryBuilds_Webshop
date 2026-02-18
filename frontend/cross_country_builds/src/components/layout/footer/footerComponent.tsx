@@ -7,7 +7,6 @@ export default function FooterComponent() {
     <Footer container className="rounded-none border-t bg-white">
       <div className="w-full max-w-screen-xl mx-auto">
         <div className="grid w-full justify-between sm:flex sm:justify-between md:flex md:grid-cols-1">
-          {/* LOGO - Linkbe csomagolva */}
           <div className="mb-6 md:mb-0">
             <Link to="/">
               <FooterBrand
@@ -19,8 +18,8 @@ export default function FooterComponent() {
             </Link>
           </div>
 
-          {/* ELÉRHETŐSÉGEK */}
-          <div className="grid grid-cols-1 gap-6 sm:mt-4 sm:grid-cols-3 sm:gap-6 text-white">
+        
+          <div className="hidden sm:grid grid-cols-1 gap-6 sm:mt-4 sm:grid-cols-3 sm:gap-6 text-white">
             <div className="flex items-center gap-3">
               <HiHome className="h-6 w-6 text-blue-700 hidden md:inline" />
               <span className="text-sm">1025 Budapest, Huhu utca 28.</span>
@@ -38,7 +37,7 @@ export default function FooterComponent() {
           </div>
         </div>
 
-        {/* MOBIL KAPCSOLAT GOMB */}
+     
         <div className="flex sm:hidden justify-center my-6">
           <Link to="/contacts" className="w-full">
             <button className="w-full bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md active:scale-95 transition-transform">
