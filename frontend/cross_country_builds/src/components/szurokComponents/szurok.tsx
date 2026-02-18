@@ -1,153 +1,97 @@
-import { useRef } from "react";
-import { TextInput } from "../formFieldComponents/inputwithPlaceholder";
+import { Label, TextInput, Select, Button, Card } from "flowbite-react";
 import { Form, useSearchParams } from "react-router-dom";
-import KategoriakSelect from "../htmlselectComponents/selectinszurok";
+import { HiSearch, HiTag } from "react-icons/hi";
 import { useState } from "react";
-import searchScheme from "../validationSchemes/searchScheme";
-
 
 export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
-    const [searchParams] = useSearchParams();
-    const [errors, setErrors] = useState<Record<string, string>>({});
-    const termekKategoriak = [
-    {
-        value: "kerékpárok",
-        name: "kerékpárok"
-    },
-    {
-        value: "kiegészítők",
-        name: "kiegészítők"
-    },
-    {
-        value: "Eszközök",
-        name: "Eszközök"
-    },
-    {
-        value: "ruházat",
-        name: "ruházat"
-    }
-    ];
-    const termekNeveRef = useRef<HTMLInputElement>(null);
-    const termekGyartojaRef = useRef<HTMLInputElement>(null);
-    const kategoriakRef = useRef<HTMLSelectElement>(null);
-    const priceFrom = useRef<HTMLInputElement>(null);
-    const priceTo = useRef<HTMLInputElement>(null);
-    /*
-    const handleSearching = () => {
-            const searchData = {
-                name: termekNeveRef.current?.value || "",
-                maker: termekGyartojaRef.current?.value || "",
-                category: kategoriakRef.current?.value || "",
-                priceFrom: Number(priceFrom.current?.value) || 0,
-                priceTo: Number(priceTo.current?.value) || 4000000
-            };
+  const [searchParams] = useSearchParams();
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-            const result = searchScheme.safeParse(searchData);
+  const termekKategoriak = [
+    { value: "kerékpárok", name: "Kerékpárok" },
+    { value: "kiegészítők", name: "Kiegészítők" },
+    { value: "Eszközök", name: "Eszközök" },
+    { value: "ruházat", name: "Ruházat" }
+  ];
 
-            if(!result.success){
-                const fieldErrors: Record<string, string> = {};
-                result.error.issues.forEach((issue) => {
-                    const key = String(issue.path[0])
-                    fieldErrors[key] = issue.message;
-                });
-                setErrors(fieldErrors);
-                return;
-            }
-            onSearch(searchData);
-    };
-    */
-   const formRef = useRef<HTMLFormElement>(null);
+  return (
+    <Card className="border-none shadow-lg bg-white p-1 md:bg-white/95 md:backdrop-blur-sm">
+      <Form method="get" className="flex flex-col lg:flex-row items-stretch lg:items-end gap-4">
 
-    const handleReset = () => {
-        formRef.current?.reset(); 
-        setErrors({}); 
-    };
-    return(
-        <Form method="get" ref={formRef} key={searchParams.toString()} className="border-t-2 border-white border-b-2 md:border-transparent ">
-            <div className="szurok bg-transparent p-6 md:bg-[#3f484c] rounded-2xl w-full mx-auto">
+        <div className="flex-1">
+          <Label className="text-[11px] font-bold uppercase text-gray-500 mb-1 ml-1">Termék neve</Label>
+          <TextInput
+            id="name"
+            name="name"
+            icon={HiSearch}
+            placeholder="Keresés..."
 
-                <h1 className="text-center text-5xl sm:text-7xl font-semibold text-slate-100 mb-8">
-                    Keresés
-                </h1>
-
-                
-                <div className="space-y-6 w-full">
-                    <div>
-
-                        <input type="text" name="name" id="termek_neve" placeholder="termék neve"  className="bg-transparent text-xl text-white  border-amber-50 border-2 sm:bg-amber-50 sm:text-black rounded-xl h-9 w-full placeholder-white sm:placeholder-black sm:rounded-lg px-4 py-5 focus:outline-none"/>
-                        <p className="text-rose-400 md:text-orange-300 text-sm pt-1 font-semibold">
-                            {errors.productName}
-                        </p>
-                    </div>
-                       
-                    <div>
-                        <input type="text" name="maker" id="termek_gyartoja" placeholder="termék gyártója"    className="bg-transparent text-xl text-white  border-amber-50 border-2 rounded-xl sm:bg-amber-50 sm:text-black h-9 w-full placeholder-white sm:placeholder-black sm:rounded-lg px-4 py-5 focus:outline-none" />
-                        <p className="text-rose-400 md:text-orange-300 text-sm pt-1 font-semibold">
-                            {errors.maker}
-                        </p>
-                    </div>
-                    <div>
-                        <KategoriakSelect options={termekKategoriak} />
-                        <p className="text-rose-400 md:text-orange-300 text-sm pt-1 font-semibold">
-                            {errors.category}
-                        </p>
-                    </div>
-                    
-                </div>
-
-            
-                <div className="mt-8 w-full">
-                    <label className="block text-3xl text-slate-100 mb-2">Termék ára:</label>
-
-                    <div className="flex gap-4 max-w-full">
-                        <div className="flex-1">
-                            <TextInput
-                                inp_type="number"
-                                inp_name="priceFrom"
-                                inp_id="artol"
-                                inp_placeholder="-tól"
-                                inp_className="text-white md:text-black placeholder-white  bg-amber-50 w-full rounded-lg h-10 px-3 bg-transparent text-white border-2 border-white md:bg-white md:placeholder-black "
-                                
-                               
-                            />
-                            <p className="text-rose-400 md:text-orange-300 text-sm pt-1 font-semibold">
-                            {errors.priceFrom}
-                            </p>
-                        </div>
-                        <div className="flex-1">
-                            <TextInput
-                                inp_type="number"
-                                inp_name="priceTo"
-                                inp_id="arig"
-                                inp_placeholder="-ig"
-                                inp_className="text-white md:text-black placeholder-white  bg-amber-50 w-full rounded-lg h-10 px-3 bg-transparent text-white border-2 border-white md:bg-white md:placeholder-black"
-                                
-                                
-                            />
-                             <p className="text-rose-400 md:text-orange-300 text-sm pt-1 font-semibold">
-                                {errors.priceTo}
-                            </p>
-                        </div>   
-
-                    </div>
-                </div>
-
-            
-                <button
-                    type="submit"
-                    className="mt-10 block mx-auto bg-[#cc2936] text-amber-50 py-3 px-8 
-                            rounded-xl text-lg font-semibold
-                            hover:bg-[#b0202c] active:bg-[#8e1a23] border-transparent border-2 hover:border-white hover:font-bold  transition"
-                >
-                    Keresés
-                </button>
-                 <p className="text-red-600 text-2xl pt-3 font-semibold"></p>
-            </div>
-        </Form>
+            className="[&_input]:bg-white [&_input]:text-gray-900 [&_input]:border-gray-200 focus:[&_input]:ring-blue-500" 
+            defaultValue={searchParams.get("name") || ""}
+          />
+        </div>
 
 
+        <div className="flex-1">
+          <Label className="text-[11px] font-bold uppercase text-gray-500 mb-1 ml-1">Gyártó</Label>
+          <TextInput
+            id="maker"
+            name="maker"
+            icon={HiTag}
+            placeholder="Márka"
+            className="[&_input]:bg-white [&_input]:text-gray-900 [&_input]:border-gray-200 focus:[&_input]:ring-blue-500"
+            defaultValue={searchParams.get("maker") || ""}
+          />
+        </div>
 
-    );
 
+        <div className="flex-1">
+          <Label className="text-[11px] font-bold uppercase text-gray-500 mb-1 ml-1">Kategória</Label>
+          <Select 
+            id="category" 
+            name="category" 
+            className="[&_select]:bg-white [&_select]:text-gray-900 [&_select]:border-gray-200 focus:[&_select]:ring-blue-500"
+            defaultValue={searchParams.get("category") || ""}
+          >
+            <option value="">Összes kategória</option>
+            {termekKategoriak.map((kat) => (
+              <option key={kat.value} value={kat.value}>{kat.name}</option>
+            ))}
+          </Select>
+        </div>
 
+        
+        <div className="flex-1">
+          <Label className="text-[11px] font-bold uppercase text-gray-500 mb-1 ml-1">Árkeret (Ft)</Label>
+          <div className="flex gap-2">
+            <TextInput 
+              name="priceFrom" 
+              type="number" 
+              placeholder="Min" 
+              className="w-full [&_input]:bg-white [&_input]:text-gray-900" 
+              defaultValue={searchParams.get("priceFrom") || ""}
+            />
+            <TextInput 
+              name="priceTo" 
+              type="number" 
+              placeholder="Max" 
+              className="w-full [&_input]:bg-white [&_input]:text-gray-900" 
+              defaultValue={searchParams.get("priceTo") || ""}
+            />
+          </div>
+        </div>
+
+      
+        <Button
+          type="submit"
+          color="blue"
+          size="lg"
+          className="font-bold uppercase tracking-widest mt-2 lg:mt-0 italic shadow-md active:scale-95 transition-transform"
+        >
+          <HiSearch className="mr-2 h-5 w-5" />
+          Keresés
+        </Button>
+      </Form>
+    </Card>
+  );
 }

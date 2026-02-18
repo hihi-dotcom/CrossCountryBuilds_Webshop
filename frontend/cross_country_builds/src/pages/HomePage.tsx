@@ -4,7 +4,8 @@ import { DateTimeSection } from "../components/dateTimeforpagescomponents/dateti
 import { useEffect, useState, useCallback } from "react";
 import ProductService from "../services/ProductService";
 import { useSearchParams } from "react-router-dom";
-
+import { Button, Spinner } from "flowbite-react";
+import { HiPlusCircle } from "react-icons/hi";
 
 export default function HomePage(){
     const [searchParams, setSearchParams] = useSearchParams(); 
@@ -14,20 +15,7 @@ export default function HomePage(){
     const [loading, setLoading] = useState(false);
     const [offset, setOffset] = useState(0);
 
-    const LIMIT = 15;
-    /*
-    const [filters, setFilters] = useState({
-        name: "",
-        maker:"",
-        category:"",
-        priceFrom:0,
-        priceTo: 4000000
-    });
-    */
-    function handleProductSearching(newFilters:any){
-        setSearchParams(newFilters);
-        setOffset(0);
-    }
+    const LIMIT = 12; 
 
     const loadProducts = useCallback(async(currentOffset: number, append: boolean = false) => {
         setLoading(true);
@@ -38,19 +26,11 @@ export default function HomePage(){
             if(result.ok){
                 setTotal(result.total);
                 setHasMore(result.hasMore);
-
-                if(append){
-                    setProducts((prev:any) => [...prev, ...result.products])
-                }
-                else{
-                    setProducts(result.products);
-                }
+                setProducts((prev:any) => append ? [...prev, ...result.products] : result.products);
             }
-        }
-        catch(error){
-            console.log(`Hiba a termékek betöltése közben: ${error}`)
-        }
-        finally{
+        } catch(error) {
+            console.error("Hiba:", error);
+        } finally {
             setLoading(false);
         }
     }, [searchParams]);
@@ -64,43 +44,60 @@ export default function HomePage(){
         const nextOffset = offset + LIMIT;
         setOffset(nextOffset);
         loadProducts(nextOffset, true);
-    }
-
-    const resetFilters = () => {
-        setSearchParams({}); 
-        setOffset(0);        
     };
+    function handleProductSearching(newFilters:any){
+
+        setSearchParams(newFilters);
+
+        setOffset(0);
+
+    }
+    
     return(
-    <>
-        <section className="container mx-auto flex flex-col gap-10 px-5 pb-12 min-h-screen"> 
-            <DateTimeSection/>
-            <div className="flex flex-col lg:flex-row gap-8 items-start">  
-                <div className="w-full lg:w-1/3 xl: xl:w-1/4 gap-5">
+        <section className="container mx-auto px-4 pb-12 min-h-screen">   
+            <div className="w-full">
+                <DateTimeSection />
+            </div>
+            <div className="w-full mt-5">
                     <Szurok onSearch={handleProductSearching}/>
-                    <button className="w-full mt-3 py-3 px-6 border-2 border-red-600 text-red-500 font-semibold rounded-xl 
-                   hover:bg-red-600 hover:text-white transition-all shadow-sm 
-                    flex items-center justify-center gap-2" onClick={resetFilters}>Szűrők törlése</button>
+            </div>
+          
+            <div className="mt-24 w-full">
+                <div className="flex justify-between items-end mb-8 border-b pb-4">
+                    <h2 className="text-2xl font-black italic uppercase text-gray-800">
+                        Kínálatunk <span className="text-blue-700">({total})</span>
+                    </h2>
                 </div>
-                <div className="w-full lg:w-2/3 xl:w-3/4 flex-1">
-                    <Products filteredItems={products}/>
-                    <div className="mt-12 flex flex-col gap-4  items-center justify-center w-full">
-                        {hasMore &&(
-                            <button onClick={handleLoadMore} disabled={loading} className="w-full max-w-sm py-3 px-6 border-2 border-[#106187] text-white font-semibold rounded-xl 
-                           hover:bg-[#106187] hover:text-white transition-all shadow-sm 
-                           flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                                {loading ? "Betöltés" : "További termékek betöltése"}
-                            </button>
-                        )}
-                        <p className="text-white text-base">
-                            Jelenleg ennyi terméket látsz: {products.length} / {total} termékből.
+
+                <Products filteredItems={products}/>
+                <div className="mt-16 flex flex-col gap-6 items-center justify-center">
+                    {hasMore && (
+                        <Button 
+                            onClick={handleLoadMore} 
+                            disabled={loading} 
+                            color="blue"
+                            size="xl"
+                            pill
+                            className="px-10 shadow-xl hover:scale-105 transition-transform"
+                        >
+                            {loading ? <Spinner size="sm" className="mr-3" /> : <HiPlusCircle className="mr-2 h-6 w-6" />}
+                            {loading ? "Betöltés..." : "Mutass többet"}
+                        </Button>
+                    )}
+                    
+                    <div className="text-center">
+                        <p className="text-gray-500 text-sm mb-2">
+                            Látod: <span className="font-bold">{products.length}</span> / {total} termék
                         </p>
-                        
+                        <div className="w-64 h-1 bg-gray-200 rounded-full overflow-hidden">
+                            <div 
+                                className="h-full bg-blue-600 transition-all duration-700" 
+                                style={{ width: `${(products.length / total) * 100}%` }}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
-        
-    </>
-
     );
 }
