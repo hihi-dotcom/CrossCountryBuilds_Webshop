@@ -8,4 +8,6 @@ export default interface CartContextType{
     removeFromCart: (name: string) => void;
     clearCart: () => void;
     totalPrice: number;
+    isCartValidated: boolean;
+    setIsCartValidated: (validated: boolean) => void;
 }

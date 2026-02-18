@@ -1,104 +1,130 @@
-import KosarbaButton from "../buttonComponents/kosarbaonProductPage";
-import BackToWebShopButton from "../buttonComponents/backtoWebshopButton";
-import QuantitySelector from "../quantity_components/Quantity_Selector";
 import { useCart } from "../custom_hooks/CartContext";
 import { useState, useEffect } from "react";
-import { useLoaderData, useParams} from "react-router-dom";
-import IntoCartModal  from "../modalComponents/productintoCartModal";
-import CheckIcon from "@mui/icons-material/CheckCircleOutline";
+import { useLoaderData, useParams, Link } from "react-router-dom";
+import { Badge, Button, Modal, ModalBody, ModalHeader } from "flowbite-react";
+import { 
+  HiShoppingCart, 
+  HiArrowLeft, 
+  HiCheckCircle, 
+  HiExclamationCircle, 
+  HiTag, 
+  HiOfficeBuilding 
+} from "react-icons/hi";
+import QuantitySelector from "../quantity_components/Quantity_Selector";
 
-export default function ProductModule(){
-    const { id } = useParams();
-    const [menny, setMenny] = useState(1);
-    const [IsModalOpen, setIsModalOpen] = useState(false);
-    const { addToCart } = useCart();
+export default function ProductModule() {
+  const { id } = useParams();
+  const [menny, setMenny] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { addToCart } = useCart();
 
-    const product = useLoaderData() as any;
-    const isOutOfStock = product?.stock_number <= 0;
+  const product = useLoaderData() as any;
+  const isOutOfStock = product?.stock_number <= 0;
 
-    if(!id){
-        return <h2>Hiba: Hiányzó termék azonosító!</h2>;
+  useEffect(() => {
+    if (isModalOpen) {
+      const timer = setTimeout(() => { setIsModalOpen(false) }, 2000);
+      return () => clearTimeout(timer);
     }
+  }, [isModalOpen]);
 
-    if(!product){
-        return <h2>A termék nem található! (ID: {id})</h2>;
-    }
-    function openModal(){
-        setIsModalOpen(true);
-    }
+  if (!id || !product) return null;
 
-    useEffect(() =>{
-        const timer = setTimeout(() => {setIsModalOpen(false)}, 1500);
+  return (
+    <section className="container mx-auto px-4 py-8 md:py-16 min-h-screen">
+      
+      <Modal show={isModalOpen} size="md" onClose={() => setIsModalOpen(false)} popup>
+        <ModalHeader />
+        <ModalBody className="bg-white rounded-lg">
+          <div className="text-center">
+            <HiCheckCircle className="mx-auto mb-4 h-14 w-14 text-green-500" />
+            <h3 className="mb-5 text-lg font-bold uppercase italic text-gray-800">
+              Bekerült a kosárba!
+            </h3>
+          </div>
+        </ModalBody>
+      </Modal>
 
-        return () => clearTimeout(timer);
-    }, [IsModalOpen])
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        
+        <div className="relative">
+          <div className="overflow-hidden rounded-[2.5rem] bg-white shadow-2xl border-none">
+            <img 
+              src={`http://localhost:3000/uploads/${product.picUrl}`} 
+              alt={product.name} 
+              className="w-full h-auto object-contain aspect-square p-8"
+            />
+          </div>
+          {isOutOfStock && (
+            <div className="absolute inset-0 bg-white/40 backdrop-blur-sm flex items-center justify-center rounded-[2.5rem]">
+              <Badge color="failure" size="xl" className="px-8 py-4 text-2xl font-black uppercase italic shadow-2xl">
+                Elfogyott
+              </Badge>
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col gap-6">
+          <div className="space-y-4">
+            <div className="flex flex-wrap gap-2">
+              <Badge className="bg-blue-100 text-blue-700 px-3 py-1 font-black uppercase border-none tracking-tighter italic">
+                {product.category}
+              </Badge>
+              <Badge className="bg-gray-100 text-gray-500 px-3 py-1 font-black uppercase border-none tracking-tighter italic">
+                {product.maker}
+              </Badge>
+            </div>
+            
+            <h1 className="text-4xl md:text-6xl font-black text-gray-900 uppercase italic leading-[0.9] tracking-tighter">
+              {product.name}
+            </h1>
+          </div>
 
-    useEffect(() => {})
-    return(
-        <section>
-            <section>
-                {IsModalOpen && (
-                    <IntoCartModal onClose={() => setIsModalOpen(false)}>
-                        <span className="font-medium">A termék bekerült a kosárba!</span>
-                    </IntoCartModal>
-                )}
-               
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 xl:gap-16 items-start mb-10">
-                    <div className="w-full">
-                        <img src={`http://localhost:3000/uploads/${product.picUrl}`} alt={product.name} className="w-full h-auto rounded-2xl shadow-2xl object-cover aspect-4/3"/>
-                         
-                        {isOutOfStock && (
-                            <div className="absolute flex items-center justify-center">
-                                <span className="bg-black/60 text-white px-6 py-3 rounded-b-2xl text-xl font-bold uppercase tracking-widest">Elfogyott</span>
-                            </div>
-                        )}
-                    </div>
-                   
-                    <div className="flex flex-col h-full justify-between gap-6">
-                        <div className="space-y-4">
-                            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">{product.name}</h1>
-                        </div>
-                         <div className="h-8">
-                            {isOutOfStock ? (
-                                <p className="text-red-500 font-bold text-lg italic">Jelenleg nem elérhető!</p>
-                            ) : product.stock_number <= 5 ? (
-                                <p className="text-orange-400 font-bold text-lg ">
-                                    <CheckIcon/> Készleten: {product.stock_number} darab
-                                </p>
-                            ) : (
-                                <p className="text-green-600 font-medium">Raktáron</p>
-                            )}
-                        </div>
+          <div className="py-2">
+            {isOutOfStock ? (
+              <p className="text-red-600 font-bold italic uppercase tracking-tighter"> Jelenleg nem elérhető</p>
+            ) : product.stock_number <= 5 ? (
+              <p className="text-orange-500 font-bold italic uppercase tracking-tighter"> Csak {product.stock_number} maradt készleten!</p>
+            ) : (
+              <p className="text-green-600 font-bold italic uppercase tracking-tighter">✓ Raktáron</p>
+            )}
+          </div>
 
-                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-8 text-2xl font-medium opacity-90">
-                            <p>Gyártó: {product.maker}</p>
-                            <p>Kategória: {product.category}</p>
-                        </div>
-                        <div className="text-base leading-relaxed opacity-80 mt-2 space-y-2">
-                            <p>{product.description}</p>
-                        </div>
-                        <div className="mt-4 flex flex-col lg:items-end items-center  gap-8 pt-6">
-                            <div className="flex flex-col flex-wrap sm:flex-row items-center justify-center gap-8 w-full lg:w-auto">
-                                <p className={`text-4xl font-bold whitespace-nowrap ${isOutOfStock ? 'opacity-30' : ''}`}>{product.price * menny} Ft</p>
-                                <div className={isOutOfStock ? "pointer-events-none opacity-40 flex flex-row items-center gap-x-8" : "flex flex-row items-center gap-x-8"}>
-                                    <QuantitySelector quantity={menny} setQuantity={setMenny} min={1}/>
-                                    <KosarbaButton OntoCart={() => {
-                                        if(!isOutOfStock){
-                                            addToCart(product, menny);
-                                            openModal();
-                                        }
-                                        }}/>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+          <div className="border-t border-gray-100 pt-6">
+            <p className="text-gray-500 leading-relaxed text-lg italic font-medium">
+              {product.description || "Nincs leírás."}
+            </p>
+          </div>
 
+          <div className={`mt-4 space-y-8 ${isOutOfStock ? 'opacity-30 grayscale pointer-events-none' : ''}`}>
+            <div className="flex items-baseline gap-2">
+              <span className="text-6xl font-black text-gray-900 tracking-tighter italic">
+                {(product.price * menny).toLocaleString()}
+              </span>
+              <span className="text-2xl font-bold text-gray-400 italic">Ft</span>
+            </div>
 
-                </div>
-                <div className="flex flex-col sm:flex-row justify-center md:justify-end  items-center gap-4 mt-24">
-                    <BackToWebShopButton/>
-                </div>
-            </section>
-        </section>
-    );
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="bg-gray-50 p-3 rounded-2xl border border-gray-100">
+                <QuantitySelector quantity={menny} setQuantity={setMenny} min={1} />
+              </div>
+              <Button 
+                onClick={() => { addToCart(product, menny); setIsModalOpen(true); }}
+                className="w-full sm:flex-1 h-16 rounded-2xl bg-[#2563eb] enabled:hover:bg-[#1d4ed8] shadow-xl shadow-blue-200 uppercase font-black italic tracking-widest text-lg border-none"
+              >
+                <HiShoppingCart className="mr-3 h-6 w-6" />
+                Kosárba teszem
+              </Button>
+            </div>
+          </div>
+
+          <div className="mt-4 sm:ml-auto bg-gray-500  px-2 py-1 rounded-full">
+            <Link to="/" className="inline-flex items-center text-white transition-colors uppercase font-black italic text-xs tracking-widest">
+              <HiArrowLeft className="mr-2 h-4 w-4" />
+              Vissza a webshopba
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }

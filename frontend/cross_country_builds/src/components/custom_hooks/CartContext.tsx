@@ -15,6 +15,13 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({children}) 
         return saved ? JSON.parse(saved) : [];
     });
 
+    const [isCartValidated, setIsCartValidated] = useState(false);
+
+    useEffect(() => {
+        setIsCartValidated(false);
+        localStorage.setItem('bike-cart', JSON.stringify(cartItems));
+    }, [cartItems]);
+
     useEffect(() => {
         localStorage.setItem('bike-cart', JSON.stringify(cartItems));
     }, [cartItems]);
@@ -29,6 +36,7 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({children}) 
             const newItem: CartItem = {
                 id: product.id,
                 name: product.name,
+                category: product.category,
                 price: product.price,
                 maker: product.maker,
                 quantity: quantity,
@@ -55,7 +63,8 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({children}) 
 
 
     return(
-        <CartContext.Provider value={{cartItems, updateQuantity, addToCart, removeFromCart, clearCart, totalPrice}}>
+        <CartContext.Provider value={{cartItems, updateQuantity, addToCart, removeFromCart, clearCart, totalPrice, isCartValidated,   
+        setIsCartValidated}}>
             {children}
         </CartContext.Provider>
     );

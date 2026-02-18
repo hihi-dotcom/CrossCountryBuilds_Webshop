@@ -1,12 +1,16 @@
-import { Navigate, Outlet } from "react-router-dom";
 import { useCart } from "../../components/custom_hooks/CartContext";
+import { Navigate, Outlet } from "react-router-dom";
 
-export default function CartGuard(){
-    const { cartItems } = useCart();
+export default function CartGuard() {
+  const { cartItems } = useCart();
 
-    if(!cartItems || cartItems.length === 0){
-        return <Navigate to={"/cart"} replace/>
-    }
+  
+  if (cartItems === undefined) return null; 
 
-    return <Outlet/>;
+
+  if (cartItems.length === 0) {
+    return <Navigate to="/cart" replace />;
+  }
+
+  return <Outlet />;
 }

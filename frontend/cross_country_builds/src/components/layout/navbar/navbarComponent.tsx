@@ -1,97 +1,96 @@
 import { Link, Form, useRouteLoaderData, useLocation } from "react-router-dom";
-import LogInIcon from "@mui/icons-material/Login";
-import LogOutIcon from "@mui/icons-material/Logout";
-import HowtoRegIcon from "@mui/icons-material/HowToReg";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCartRounded";
-
-import LogOutButton from "../../buttonComponents/LogOutButton";
+import { Navbar, NavbarBrand, NavbarCollapse, NavbarLink, NavbarToggle, Button, Badge } from "flowbite-react";
+import { HiShoppingCart, HiLogin, HiUserAdd, HiLogout } from "react-icons/hi";
 import { useCart } from "../../custom_hooks/CartContext";
 
-export default function Navbar() {
-  const user = useRouteLoaderData("root") as { id: number; role: string } | null;
+export default function NavbarComponent() {
+  const user = useRouteLoaderData("root") as { id: number; role: string; username?: string } | null;
   const { cartItems } = useCart();
   const location = useLocation();
 
   const isOrderFlow = ["/cart", "/orderdata"].includes(location.pathname.toLowerCase());
   const isOrderEnd = location.pathname.toLowerCase() === "/orderend";
   const isOnCart = location.pathname.toLowerCase() === "/cart";
-
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  
-  const CartIconButton = ({ size }: { size: number }) => (
-    (!isOrderEnd && !isOnCart) ? (
-      <Link to="/cart" className="relative p-2 transition-transform hover:scale-110 flex items-center">
-        <ShoppingCartIcon sx={{ fontSize: size }} />
-        {totalItems > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-600 text-white text-sm font-bold w-6 h-6 flex items-center justify-center rounded-full drop-shadow-md">
-            {totalItems}
-          </span>
-        )}
-      </Link>
-    ) : null
-  );
-
   return (
- <nav className="bg-[#08415c] max-w-6xl mx-auto text-white shadow-lg overflow-hidden rounded-b-2xl w-full">
-    <div className="px-4 sm:px-6 lg:px-8">
-      <div className="flex justify-between items-center h-20">
-        
-        
-        <div className="shrink-0 flex items-center">
-          <Link to="/" className="flex items-center group no-underline">
-            <div className="flex items-center italic font-black uppercase text-lg md:text-2xl">
-              <span className=" text-white">Cross</span>
-              <span className="text-[#a1202b] ml-1">Country</span>
-              <span className="hidden md:flex ml-2 text-sm not-italic lowercase tracking-widest text-white self-end mb-1 font-bold">builds</span>
-            </div>
+    <Navbar fluid className="sticky top-0 z-50 border-b border-gray-200 bg-white shadow-sm">
+      <Link to="/">
+        <NavbarBrand as="div">
+          <span className="self-center whitespace-nowrap italic font-black uppercase text-xl md:text-2xl text-white">
+            Cross<span className="text-blue-700">Country</span>
+          </span>
+        </NavbarBrand>
+      </Link>
+
+      <div className="flex md:order-2 items-center gap-2">
+        {!isOrderEnd && !isOnCart && (
+          <Link to="/cart" className="relative p-2 text-white hover:text-blue-700 transition-colors mr-1">
+            <HiShoppingCart size={28} />
+            {totalItems > 0 && (
+              <Badge color="failure" size="xs" className="absolute top-0 right-0 px-1.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full">
+                {totalItems}
+              </Badge>
+            )}
           </Link>
-        </div>
+        )}
 
-       
-        <div className="hidden md:flex items-center space-x-6">
-          <CartIconButton size={40} />
-          
-          
-          {!isOrderFlow && (
-            user ? (
-              <div className="flex items-center space-x-4">
-                <Form method="post" action="/logout">
-                  <LogOutButton />
-                </Form>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-4">
-                <Link to="/login" className="px-6 py-2.5 rounded-lg bg-[#435159] hover:bg-opacity-80 border-2 border-transparent hover:border-white hover:font-bold transition font-normal">Belépés</Link>
-                <Link to="/signup" className="px-5 py-2.5 rounded-lg bg-[#a1202b] hover:bg-red-700 border-2 border-transparent hover:border-white hover:font-bold transition font-normal">Regisztráció</Link>
-              </div>
-            )
-          )}
-        </div>
-
-       
-        <div className="flex md:hidden items-center space-x-4 ml-auto">
-          <CartIconButton size={35} />
-          
-          
-          {!isOrderFlow && (
-            user ? (
+        
+        {!isOrderFlow && (
+          user ? (
+            <div className="flex items-center gap-2">
+              <span className="hidden lg:inline-flex text-sm font-medium text-white">{user.username}</span>
               <Form method="post" action="/logout">
-                <button type="submit" className="bg-[#cc2936] py-2 rounded-xl px-2 text-white">
-                  <LogOutIcon sx={{ fontSize: 30 }} />
-                </button>
+                <Button color="failure" size="sm" type="submit" pill>
+                  <HiLogout className="h-6 w-6 text-white " />
+                </Button>
               </Form>
-            ) : (
-              <div className="flex items-center space-x-3">
-                <Link to="/login"><LogInIcon fontSize="large" /></Link>
-                <Link to="/signup"><HowtoRegIcon fontSize="large" /></Link>
-              </div>
-            )
-          )}
-        </div>
-
+            </div>
+          ) : (
+            <div className="flex items-center gap-1 sm:gap-2">
+              <Link to="/login" className="hidden sm:block">
+                <Button color="gray" size="xs" className="border-none" as="div">
+                  <HiLogin className="sm:mr-2 h-4 w-4" /> <span className="hidden sm:inline">Belépés</span>
+                </Button>
+              </Link>
+              <Link to="/signup">
+                <Button color="blue" size="xs" as="div">
+                  <HiUserAdd className="sm:mr-2 h-7 w-7" /> <span className="hidden sm:inline">Regisztráció</span>
+                </Button>
+              </Link>
+            </div>
+          )
+        )}
+        <NavbarToggle className="ml-1" />
       </div>
-    </div>
-  </nav>
+
+      <NavbarCollapse className="bg-white md:bg-transparent rounded-lg mt-2 md:mt-0 border md:border-none shadow-lg md:shadow-none p-4 md:p-0">
+        <Link to="/" className="w-full md:w-auto">
+          <NavbarLink active={location.pathname === "/"} as="div" className="text-gray-900 hover:text-blue-700 font-medium py-2 cursor-pointer">
+            Főoldal
+          </NavbarLink>
+        </Link>
+        
+        <Link to="/appointment" className="w-full md:w-auto">
+          <NavbarLink active={location.pathname === "/appointment"} as="div" className="text-gray-900 hover:text-blue-700 font-medium py-2 cursor-pointer">
+            Szerviz
+          </NavbarLink>
+        </Link>
+        
+        <Link to="/contacts" className="w-full md:w-auto">
+          <NavbarLink active={location.pathname === "/contacts"} as="div" className="text-gray-900 hover:text-blue-700 font-medium py-2 cursor-pointer">
+            Kapcsolat
+          </NavbarLink>
+        </Link>
+        
+        {user?.role === 'admin' && (
+          <Link to="/admin" className="w-full md:w-auto">
+            <NavbarLink className="text-red-600 font-bold py-2 border-t md:border-none mt-2 md:mt-0 cursor-pointer" as="div">
+              ADMIN
+            </NavbarLink>
+          </Link>
+        )}
+      </NavbarCollapse>
+    </Navbar>
   );
 }

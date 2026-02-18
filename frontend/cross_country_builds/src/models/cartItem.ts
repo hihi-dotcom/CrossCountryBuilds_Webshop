@@ -7,5 +7,6 @@ export default interface CartItem{
     price: number;
     quantity: number;
     maker?: string;
+    category: string
 };
 
