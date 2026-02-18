@@ -29,7 +29,7 @@ export function Products({ filteredItems }: { filteredItems: Product[] }) {
         </ModalBody>
       </Modal>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
         {filteredItems.map(bikeP => (
           <Item product={bikeP} key={bikeP.id} OnCart={() => setModalIsOpen(true)} />
         ))}

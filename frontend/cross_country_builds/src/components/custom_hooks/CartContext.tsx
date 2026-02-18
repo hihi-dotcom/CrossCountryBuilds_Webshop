@@ -36,6 +36,7 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({children}) 
             const newItem: CartItem = {
                 id: product.id,
                 name: product.name,
+                category: product.category,
                 price: product.price,
                 maker: product.maker,
                 quantity: quantity,

@@ -51,7 +51,11 @@ export default function HomePage(){
 
         setOffset(0);
 
-    }
+    };
+    const handleResetFilters = () => {
+        setSearchParams({}); // Törli az összes paramétert az URL-ből
+        setOffset(0);        // Visszaállítja a lapozást
+    };
     
     return(
         <section className="container mx-auto px-4 pb-12 min-h-screen">   
@@ -59,7 +63,7 @@ export default function HomePage(){
                 <DateTimeSection />
             </div>
             <div className="w-full mt-5">
-                    <Szurok onSearch={handleProductSearching}/>
+                    <Szurok onSearch={handleProductSearching} onReset={handleResetFilters}/>
             </div>
           
             <div className="mt-24 w-full">

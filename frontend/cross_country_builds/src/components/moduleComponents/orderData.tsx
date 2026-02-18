@@ -27,66 +27,58 @@ export default function OrderDataModule() {
     formData.append("totalAmount", totalPrice.toString());
     submit(formData, { method: "post" });
   };
+  const hasBicycle = cartItems?.some(item => item.category === "kerékpárok") ?? false;
 
-    const paying_options = [
+const shipping_methods = [
+    {
+        value: "futar",
+        name: "futar",
+        innerText: "házhoz szállítás",
+        disabled: hasBicycle 
+    },
+    {
+        value: "uzlet",
+        name: "uzlet",
+        innerText: "személyes átvétel az üzletünkben",
+        disabled: false
+    }
+].filter(method => (hasBicycle ? method.value === "uzlet" : true));;
 
-        {
+const paying_options = [
+    {
+        value: "kartya-uzlet",
+        name: "kartya-uzlet" ,
+        innerText: "üzletben Paypal segítségével",
+        disabled: false
+    },
+    {
+        value: "penz-uzlet",
+        name: "penz-uzlet",
+        innerText: "üzletben készpénzzel",
+        disabled: false
+    },
+    {
+        value: "futar-penz",
+        name: "futar-penz",
+        innerText: "futárunknak készpénzzel",
+        disabled: hasBicycle 
+    },
+    {
+        value: "futar-kartya",
+        name: "futar-kartya",
+        innerText: "futárunknak Paypal segítségével",
+        disabled: hasBicycle
+    }
+]
 
-            value: "kartya-uzlet",
+    
 
-            name: "kartya-uzlet" ,
-
-            innerText: "üzletben bankártyával"
-
-        },
-
-        {
-
-            value: "penz-uzlet",
-
-            name: "penz-uzlet",
-
-            innerText: "üzletben készpénzzel"
-
-        },
-
-        {
-
-            value: "futar-penz",
-
-            name: "futar-penz",
-
-            innerText: "futárunknak készpénzzel"
-
-        },
-
-    ];
-
-
-
-    const shipping_methods = [
-
-        {
-
-            value: "futar",
-
-            name: "futar",
-
-            innerText: "házhoz szállítás"
-
-        },
-
-        {
-
-            value: "uzlet",
-
-            name: "uzlet",
-
-            innerText: "személyes átvétel az üzletünkben"
-
-        }
-
-    ];
+    const filtered_paying_options = paying_options.filter(option => {
+      if(hasBicycle && option.value === "futar-penz"){
+          return false;
+      }
+      return true;
+    })
 
   return (
     <section className="bg-gray-50/50 min-h-screen py-12 px-4">
@@ -163,7 +155,7 @@ export default function OrderDataModule() {
                       name="paymentMethod"
                       id="payingmethods"
                       selectlabel="Fizetési mód"
-                      options={paying_options}
+                      options={filtered_paying_options}
 
                     />
                   </div>

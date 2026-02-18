@@ -3,10 +3,10 @@ import { Form, useSearchParams } from "react-router-dom";
 import { HiSearch, HiTag } from "react-icons/hi";
 import { useState } from "react";
 
-export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
+export function Szurok({ onSearch, onReset }: { onSearch: (filters: any) => void, onReset: () => void }) {
   const [searchParams] = useSearchParams();
   const [errors, setErrors] = useState<Record<string, string>>({});
-
+  const hasActiveFilters = Object.keys(Object.fromEntries(searchParams)).length > 0;
   const termekKategoriak = [
     { value: "kerékpárok", name: "Kerékpárok" },
     { value: "kiegészítők", name: "Kiegészítők" },
@@ -91,6 +91,11 @@ export function Szurok({ onSearch }: { onSearch: (filters: any) => void }) {
           <HiSearch className="mr-2 h-5 w-5" />
           Keresés
         </Button>
+        {hasActiveFilters && (
+                    <Button color="red" onClick={onReset} outline>
+                        Szűrők törlése
+                    </Button>
+          )}
       </Form>
     </Card>
   );
