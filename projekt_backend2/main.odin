@@ -18,7 +18,7 @@ main :: proc () {
     products.UPLOAD_DIR = "./uploads"
     logic.prepare()
 
-    http.listen_and_serve(3000, proc (conn: ^http.Conn) {
+    http.listen_and_serve(3001, proc (conn: ^http.Conn) {
         fmt.println(conn.source, ":", conn.header["method"][0], conn.header["path"][0])
         path, params := util.query_parameter(conn.header["path"][0])
         method := conn.header["method"][0]
