@@ -67,13 +67,17 @@ export function Szurok({ onSearch, onReset }: { onSearch: (filters: any) => void
             <TextInput 
               name="priceFrom" 
               type="number" 
+              min={15000}
+              max={1000000}
               placeholder="Min" 
               className="w-full [&_input]:bg-white [&_input]:text-gray-900" 
               defaultValue={searchParams.get("priceFrom") || ""}
             />
             <TextInput 
               name="priceTo" 
-              type="number" 
+              type="number"
+              min={1000000}
+              max={1000000} 
               placeholder="Max" 
               className="w-full [&_input]:bg-white [&_input]:text-gray-900" 
               defaultValue={searchParams.get("priceTo") || ""}

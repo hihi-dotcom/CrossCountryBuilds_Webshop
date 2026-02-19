@@ -53,8 +53,8 @@ export default function HomePage(){
 
     };
     const handleResetFilters = () => {
-        setSearchParams({}); // Törli az összes paramétert az URL-ből
-        setOffset(0);        // Visszaállítja a lapozást
+        setSearchParams({}); 
+        setOffset(0);        
     };
     
     return(

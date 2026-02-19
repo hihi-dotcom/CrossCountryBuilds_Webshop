@@ -50,12 +50,18 @@ class ProductService {
         return respD;
     }
 
-    async createNewProduct(Indata:any) {
-
-        const response = await AuthService._request("product", {
+    async createNewProduct(Indata:any, isJson:boolean = false) {
+        const fetchOptions: any = {
             method: "POST",
-            body: Indata
-        });
+            body: isJson ? JSON.stringify(Indata) : Indata
+        };
+
+        if(isJson){
+                fetchOptions.headers = {
+                    "Content-Type": "application/json"
+                }
+        }
+        const response = await AuthService._request("product", fetchOptions);
 
         const data = await response.json();
 
