@@ -142,5 +142,5 @@ save_image :: proc (base64_data: string) -> ImageResult {
     os.close(handle)
     delete(decoded)
 
-    return {success = true, url_path = fmt.aprintf("/uploads/%s", filename)}
+    return {success = true, url_path = filename}
 }
