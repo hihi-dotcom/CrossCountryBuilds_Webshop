@@ -22,7 +22,7 @@ prepare :: proc () {
         service_price = $3,
         bringback_date = $4
         WHERE id = $1`,
-    {.Int4, .Varchar, .Int4, .Text})
+    {.Int4, .Varchar, .Int4, .Timestamp})
 
     pool.prepare("appointment_all", `
         SELECT id, service_date, user_id, problem_description
@@ -40,5 +40,5 @@ prepare :: proc () {
         INSERT INTO Service_DateTimes (service_date, user_id)
         VALUES ($1, NULL)
         RETURNING id`,
-    {.Text})
+    {.Timestamp})
 }

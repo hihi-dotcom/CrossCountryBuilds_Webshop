@@ -15,6 +15,7 @@ import "logic/auth"
 
 main :: proc () {
     token.SECRET = token.create_secret()
+    products.UPLOAD_DIR = "./uploads"
     logic.prepare()
 
     http.listen_and_serve(3000, proc (conn: ^http.Conn) {
@@ -29,6 +30,8 @@ main :: proc () {
                         auth.register(conn)
                     case "/api/login":
                         auth.login(conn)
+                    case "/api/logout":
+                        auth.logout(conn)
                     case "/api/order":
                         order.order_create(conn)
                     case "/api/product":

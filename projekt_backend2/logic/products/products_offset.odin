@@ -35,7 +35,7 @@ Product :: struct {
 
 @(private = "file")
 ResponseFromat :: struct {
-    products: []Product,
+    product: []Product,
     total: int,
     hasMore: bool
 }
@@ -125,7 +125,7 @@ products_no_more_query :: proc (conn: ^http.Conn) {
     count, _ := strconv.parse_int(tables[0]["num"])
 
     rp := ResponseFromat{
-        products = products^,
+        product = products^,
         hasMore = len(products) + offset^ < count,
         total = count
     }
