@@ -15,7 +15,7 @@ import "logic/auth"
 
 main :: proc () {
     token.SECRET = token.create_secret()
-    products.UPLOAD_DIR = "./uploads"
+    products.UPLOAD_DIR = "../uploads"
     logic.prepare()
 
     http.listen_and_serve(3001, proc (conn: ^http.Conn) {

@@ -1,0 +1,26 @@
+#   caddy run --config Caddyfile --adapter caddyfile
+#   caddy start --config Caddyfile --adapter caddyfile
+#   caddy stop
+
+{
+    admin off
+}
+
+:3000 {
+    # API requests -> proxy to Odin backend (port 3001)
+    handle /api/* {
+        reverse_proxy localhost:3001
+    }
+
+    # Uploaded images -> serve from project root uploads directory
+    handle /uploads/* {
+        uri strip_prefix /uploads
+        root * ./uploads
+        file_server
+    }
+
+    # Everything else -> Vite dev server (port 5173)
+    handle {
+        reverse_proxy localhost:5173
+    }
+}
