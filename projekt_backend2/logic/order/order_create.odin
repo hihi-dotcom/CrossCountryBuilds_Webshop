@@ -73,6 +73,7 @@ order_create :: proc (conn: ^http.Conn) {
 
 @(private = "file")
 order_create_start :: proc (conn: ^http.Conn) {
+    payload := cast(^auth.Payload)conn.user_data[auth.Payload]
     body := cast(mw.StaticBody)conn.user_data[mw.StaticBody]
 
     as := new(OrderJson)
@@ -84,6 +85,7 @@ order_create_start :: proc (conn: ^http.Conn) {
         util.reset(conn, 400, "No products in order.")
         return
     }
+    as.u_id = fmt.aprint(payload.id)
     conn.user_data[OrderJson] = as
 
     addresses := new(Addresses)

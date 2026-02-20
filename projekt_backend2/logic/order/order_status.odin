@@ -38,7 +38,10 @@ order_start_update :: proc (conn: ^http.Conn) {
     qp := cast(^util.QueryParameter)conn.user_data[util.QueryParameter]
 
     as := new(BodyAs)
-    json.unmarshal(body^, as)
+    if json.unmarshal(body^, as) != nil {
+        util.stop(conn, 400, "Invalid JSON format.")
+        return
+    }
     if as.status == "" || qp["id"] == "" {
         util.stop(conn, 400, "Missing parameters.")
         return

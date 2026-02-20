@@ -79,7 +79,7 @@ register_is_good :: proc (conn: ^http.Conn) {
         header = {
             "content-type:application/json"
         },
-        body = fmt.aprint(`{"ok":true,"message":"Registration successful","token":"`, new_token, `"}`)
+        body = fmt.aprint(`{"ok":true,"message":"Registration successful","token":"`, new_token, `","redirect":"/login"}`)
     })
     http.reset_conn(conn)
 }

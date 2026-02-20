@@ -32,7 +32,10 @@ login_query :: proc (conn: ^http.Conn) {
     body := (cast(mw.StaticBody)conn.user_data[mw.StaticBody])^
 
     as := new(BodyAs)
-    json.unmarshal(body, as)
+    if json.unmarshal(body, as) != nil {
+        util.stop(conn, 400, "Invalid JSON format.")
+        return
+    }
 
     if as.password == "" || as.username == "" {
         util.stop(conn, 400, "Missing paramter.")

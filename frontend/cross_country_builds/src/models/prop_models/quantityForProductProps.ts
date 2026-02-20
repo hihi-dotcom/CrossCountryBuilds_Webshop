@@ -1,7 +1,7 @@
 
 export default interface QuantityProps {
     quantity: number,
-    setQuantity:  (value:number) => void,
+    setQuantity:  (value: number | ((prev: number) => number)) => void,
     min: number
    
 }

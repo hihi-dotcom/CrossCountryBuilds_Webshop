@@ -44,6 +44,11 @@ appointment_book_query :: proc (conn: ^http.Conn) {
 
     finalizeBody := new(FinalizeBody)
     if json.unmarshal(body^, finalizeBody) == nil && finalizeBody.price > 0 {
+        // SECURITY: Only admins can finalize appointments (set price, service, bringback date)
+        if payload.role != "admin" {
+            util.reset(conn, 403, "Only administrators can finalize appointments.")
+            return
+        }
         conn.user_data[^FinalizeBody] = finalizeBody
         pool_mw.query(conn, appointment_finalize_respond, "finalize_appointment",
             {fmt.aprint(qp["id"]), finalizeBody.service_id, fmt.aprint(finalizeBody.price), finalizeBody.bringBackDate})

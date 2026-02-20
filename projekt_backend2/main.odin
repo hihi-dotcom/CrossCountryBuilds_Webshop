@@ -2,6 +2,7 @@ package main
 
 import "core:fmt"
 import "core:net"
+import "core:os"
 
 import "http"
 import "http/util"
@@ -15,7 +16,9 @@ import "logic/auth"
 
 main :: proc () {
     token.SECRET = token.create_secret()
-    products.UPLOAD_DIR = "../uploads"
+    upload_dir := os.get_env_alloc("UPLOAD_DIR")
+    if len(upload_dir) == 0 { upload_dir = "../uploads" }
+    products.UPLOAD_DIR = upload_dir
     logic.prepare()
 
     http.listen_and_serve(3001, proc (conn: ^http.Conn) {
@@ -24,6 +27,13 @@ main :: proc () {
         method := conn.header["method"][0]
 
         switch method {
+            case "OPTIONS":
+                util.static_send(conn.soc, {
+                    status = 200,
+                    header = {"content-type:application/json"},
+                    body = ""
+                })
+                http.reset_conn(conn)
             case "POST":
                 switch path {
                     case "/api/signup":

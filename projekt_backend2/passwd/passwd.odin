@@ -71,8 +71,9 @@ verify :: proc (password: string, hashed: string) -> bool {
     defer delete(old_salt)
 
     new_hash := transmute([]u8)hash(password, old_salt)
+    defer delete(new_hash)
 
     if crypto.compare_constant_time(hashed_bytes, new_hash) == 0 do return false
-    
+
     return true
 }

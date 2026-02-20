@@ -1,26 +1,31 @@
+# Run caddy from the project root directory:
+#   cd /path/to/CrossCountryBuilds_Webshop
 #   caddy run --config Caddyfile --adapter caddyfile
-#   caddy start --config Caddyfile --adapter caddyfile
-#   caddy stop
+#
+# Or with docker compose:
+#   docker compose up
 
 {
     admin off
 }
 
-:3000 {
-    # API requests -> proxy to Odin backend (port 3001)
+:80 {
+    # API requests -> proxy to Odin backend
     handle /api/* {
-        reverse_proxy localhost:3001
+        reverse_proxy backend:3001
     }
 
-    # Uploaded images -> serve from project root uploads directory
+    # Uploaded images -> serve from uploads volume
     handle /uploads/* {
         uri strip_prefix /uploads
-        root * ./uploads
+        root * /var/www/uploads
         file_server
     }
 
-    # Everything else -> Vite dev server (port 5173)
+    # Frontend static files
     handle {
-        reverse_proxy localhost:5173
+        root * /var/www/frontend/dist
+        try_files {path} /index.html
+        file_server
     }
 }

@@ -67,3 +67,10 @@ CREATE TABLE Service_DateTimes (
 
     FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
 );
+
+INSERT INTO Users (username, email, password, role) VALUES (
+    'admin',
+    'admin@webshop.com',
+    'pbkdf2_sha256:200000$3uCB1QXwCBNLrDMHQ6qk0UDREvLNNwF0lveQRma4S7Y=|UO3PTIsfRKq/DFUnyFAPOIQVVilltWy1XrzNzPLEhNw=',
+    'admin'
+);

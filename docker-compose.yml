@@ -1,0 +1,62 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: webshop-db
+    environment:
+      POSTGRES_DB: webshop
+      POSTGRES_USER: webshop-root
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./projekt_backend2/db/DBinit.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U webshop-root -d webshop"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./projekt_backend2
+      dockerfile: Dockerfile
+    container_name: webshop-backend
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: webshop
+      DB_USER: webshop-root
+      DB_PASSWORD: 1234
+      UPLOAD_DIR: /app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - uploads:/app/uploads
+
+  frontend:
+    build:
+      context: ./frontend/cross_country_builds
+      dockerfile: Dockerfile
+    container_name: webshop-frontend
+    volumes:
+      - frontend_dist:/app/dist
+
+  caddy:
+    image: caddy:latest
+    container_name: webshop-caddy
+    ports:
+      - "3000:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - frontend_dist:/var/www/frontend/dist:ro
+      - uploads:/var/www/uploads:ro
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  postgres_data:
+  frontend_dist:
+  uploads:

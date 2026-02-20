@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.log
+.git/
+.gitignore
+*.md
+.env
+.env.*
+.idea/
+.vscode/
+*.exe
+*.o
+*.obj
+bin/

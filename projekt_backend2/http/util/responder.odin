@@ -52,6 +52,13 @@ try_send :: proc (soc: net.TCP_Socket, res: Response) -> (n: int, err: net.TCP_S
  
     n += net.send_tcp(soc, transmute([]u8)status_to_reason_phrase(res.status)) or_return
     n += net.send_tcp(soc, {'\r', '\n'}) or_return
+
+    n += net.send_tcp(soc, transmute([]u8)string("Access-Control-Allow-Origin:*")) or_return
+    n += net.send_tcp(soc, {'\r', '\n'}) or_return
+    n += net.send_tcp(soc, transmute([]u8)string("Access-Control-Allow-Methods:GET,POST,PATCH,DELETE,OPTIONS")) or_return
+    n += net.send_tcp(soc, {'\r', '\n'}) or_return
+    n += net.send_tcp(soc, transmute([]u8)string("Access-Control-Allow-Headers:Content-Type,Authorization")) or_return
+    n += net.send_tcp(soc, {'\r', '\n'}) or_return
     
     for header_line in res.header {
         n += net.send_tcp(soc, transmute([]u8)header_line) or_return

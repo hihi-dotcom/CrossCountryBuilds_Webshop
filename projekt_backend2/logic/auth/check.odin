@@ -29,6 +29,11 @@ check_mw :: proc (conn: ^http.Conn, to_run_after: http.Handler) {
     }
 
     incoming_token_with_bearer := incoming_tokens[0]
+    // SECURITY: Validate "Bearer " prefix exists before slicing
+    if len(incoming_token_with_bearer) < 7 || incoming_token_with_bearer[:7] != "Bearer " {
+        util.reset(conn, 401, "Invalid authorization header format")
+        return
+    }
     incoming_token := incoming_token_with_bearer[7:]
 
     payload, authentic := token.verify(incoming_token)
