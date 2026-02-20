@@ -29,7 +29,7 @@ appointment_delete_respond :: proc (conn: ^http.Conn) {
     result := cast(pool.Result)conn.user_data[pool.Result]
 
     status, _ := pool.status(result)
-    if status != .CommandOK {
+    if status != .TuplesOK {
         util.stop(conn, 500, "Failed to delete appointment.")
         return
     }

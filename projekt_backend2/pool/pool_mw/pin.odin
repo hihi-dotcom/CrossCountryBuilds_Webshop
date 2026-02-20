@@ -22,7 +22,8 @@ pin :: proc (conn: ^http.Conn, to_run_after: http.Handler, prepared_name: cstrin
     if exists {
         state := cast(^PinMwState)state_ptr
 
-        state.params = params
+        state.params = make([]string, len(params))
+        copy(state.params, params)
         state.prepared_name = prepared_name
         state.to_run_after = to_run_after
 
@@ -31,7 +32,8 @@ pin :: proc (conn: ^http.Conn, to_run_after: http.Handler, prepared_name: cstrin
     }
     
     state := new(PinMwState)
-    state.params = params
+    state.params = make([]string, len(params))
+    copy(state.params, params)
     state.prepared_name = prepared_name
     state.to_run_after = to_run_after
     state.ticket = -1
