@@ -10,8 +10,10 @@ import { FormField } from "../formFieldComponents/textField";
 
 export default function OrderDataModule() {
   const { totalPrice, cartItems } = useCart();
+  const [selectedShipping, setSelectedShipping] = useState<string | null>("");
   const userData = useRouteLoaderData("root") as { id: number; role: string } | null;
   const actionData = useActionData() as { error?: string, ServerError?: string, errors?: Record<string, string[]> };
+  console.log(actionData);
   const navigation = useNavigation();
   const submit = useSubmit();
   const isSubmitting = navigation.state === "submitting";
@@ -46,7 +48,7 @@ const shipping_methods = [
 
 const paying_options = [
     {
-        value: "kartya-uzlet",
+        value: "kartya",
         name: "kartya-uzlet" ,
         innerText: "üzletben Paypal segítségével",
         disabled: false
@@ -64,7 +66,7 @@ const paying_options = [
         disabled: hasBicycle 
     },
     {
-        value: "futar-kartya",
+        value: "kartya",
         name: "futar-kartya",
         innerText: "futárunknak Paypal segítségével",
         disabled: hasBicycle
@@ -76,6 +78,14 @@ const paying_options = [
     const filtered_paying_options = paying_options.filter(option => {
       if(hasBicycle && option.value === "futar-penz"){
           return false;
+      }
+
+      if(selectedShipping === "uzlet"){
+        return option.value.includes("uzlet") || option.name.includes("uzlet")
+      }
+      if (selectedShipping === "futar") {
+        
+        return option.value.includes("futar") || option.name.includes("futar");
       }
       return true;
     })
@@ -101,7 +111,7 @@ const paying_options = [
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField input_name="name" input_id="nev" type="text" input_placeholder="Teljes név" ref={passwordref} />
-                <FormField input_name="email" input_id="order-email" type="email" input_placeholder="Email cím" ref={emailref} />
+                <p className="text-white">*A regisztrációkor megadott e-mail címre küldjük rendelésed összesítőjét.</p>
               </div>
             </Card>
 
@@ -148,16 +158,16 @@ const paying_options = [
                       name="shippingMethod"
                       id="shippingmethods"
                       selectlabel="Szállítási mód"
+                      onChange={(e: any) => setSelectedShipping(e.target.value)} 
                       options={shipping_methods}
 
                     />
-                    <SelectforOrder
-                      name="paymentMethod"
-                      id="payingmethods"
-                      selectlabel="Fizetési mód"
-                      options={filtered_paying_options}
-
-                    />
+                    <div className="w-full flex flex-col gap-3 md:gap-5">
+                        <label htmlFor={"payingmethods"} className="text-3xl">{"Fizetési mód"}</label>
+                        <select  name={"paymentMethod"} id={"payingmethods"} className=" md:text-black border-2 md:border-transparent rounded-lg text-lg bg-transparent sm:rounded-lg px-3 py-2 md:bg-amber-50 dark-select">
+                            {filtered_paying_options.map((option:{value: string, name: string, innerText:string, disabled:boolean}) => <option className="text-black text-lg" value={option.value} disabled={option.disabled}>{option.innerText}</option>)}
+                        </select>
+                    </div>
                   </div>
                 </div>
 

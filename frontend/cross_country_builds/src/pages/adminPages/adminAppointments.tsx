@@ -1,12 +1,15 @@
-import AdminSidebar from "../../components/adminComponents/Admin_OrdersSidebar";
+
 import SaveIcon from "@mui/icons-material/Save";
 import { useState, useRef, useEffect } from "react";
-import { Form, useLoaderData } from "react-router-dom";
+import { Form, useLoaderData, useActionData } from "react-router-dom";
 import DateTimeService from "../../services/DateTimeService";
 import TrashIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
 export default function AppointmentDashboard(){
     const initAppointments = useLoaderData();
+    const actionData = useActionData();
+
+    console.log(actionData);
     const [error, setError] = useState("");
     const [loadingId, setLoadingId] = useState<number | null>(0);
     const [services, setServices] = useState(initAppointments);
@@ -48,50 +51,53 @@ export default function AppointmentDashboard(){
         setServices(filteredServices);
     }
 
-    async function handleUpdate(e:any, id:number){
-        const appointmentRow = e.currentTarget.closest("tr");
+    
+   
+  async function handleUpdate(e: any, id: number) {
+    const row = e.currentTarget.closest("tr");
+    if (!row) return;
 
-        if(!appointmentRow){
-            return;
+    const priceInput = row.querySelector('input[name="price"]') as HTMLInputElement;
+    const dateInput = row.querySelector('input[name="bringBackDate"]') as HTMLInputElement;
+
+    // JAVÍTÁS: A service_id-t generáljuk le stringként, vagy kérjük be
+    const dataForUpdate = {
+        service_id: `SZERV-${id}-${new Date().getFullYear()}`, 
+        price: Number(priceInput.value),
+        bringBackDate: dateInput.value // HTML datetime-local "YYYY-MM-DDTHH:mm" formátumot ad
+    };
+
+    setLoadingId(id);
+    // ... innentől a kódod többi része jó
+
+    try {
+        const result = await DateTimeService.finalizeService(id, dataForUpdate);
+
+        if (result.ok) {
+            
+            setServices((prev: any) =>
+                prev.map((s: any) =>
+                    s.id === id 
+                        ? { ...s, service_price: dataForUpdate.price, bringback_date: dataForUpdate.bringBackDate } 
+                        : s
+                )
+            );
+            alert("A szerviz lezárása sikeres volt!");
+        } else {
+            setError(result.message || "Hiba történt a mentéskor.");
         }
-
-        const formData = new FormData(appointmentRow as any);
-
-        const dataForUpdate = {
-            service_id: formData.get("service_name") as string,
-            price: Number(formData.get("price")),
-            bringBackDate: formData.get("bringBackDate") as string
-        };
-        setLoadingId(id);
-        try{
-            const result = await DateTimeService.finalizeService(id, dataForUpdate);
-
-            if(result.ok){
-                setServices((prev:any) => prev.map((s:any) => (s.id === id ? {...s, ...dataForUpdate, service_price: dataForUpdate.price, bringback_date: dataForUpdate.bringBackDate} : s)));
-
-                alert("A szerviz lezárása sikeres volt!");
-            }
-        }
-        catch(error){
-            console.log("Hiba a szerviz lezárása közben!" + error);
-        }
-        finally{
-            setLoadingId(null);
-        }
+    } catch (error) {
+        console.error("Hiba a szerviz lezárása közben!", error);
+        setError("Szerver hiba történt.");
+    } finally {
+        setLoadingId(null);
     }
+}
 
     return(
         <>
             <section className="min-h-screen py-6 px-4 grid grid-cols-1 lg:grid-cols-4 gap-6 bg-gray-50">
                 <div className="lg:col-span-1">
-                    <AdminSidebar 
-                        link1_to="/admin/orders"
-                        link1_innerText="Megrendelések Dashboard"
-                        link2_to="/admin/products"
-                        link2_innerText="Termékek Dashboard"
-                        link3_to="/admin/users"
-                        link3_innerText="Felhasználók Dashboard"
-                    />
                     <div id="kereses" className="rounded-xl py-2 px-3 border-2 text-black mt-15 border-black flex flex-col h-fit ">
                         <h2 className="text-2xl text-center">Szerviz keresés (user alapján)</h2>
                         <div className="flex flex-col">
@@ -116,7 +122,7 @@ export default function AppointmentDashboard(){
                         <Form method="post">
                             <div id="free-service-date" className="flex flex-col gap-3">
                                 <label htmlFor="freedateinsert">Adj meg egy szabad szerviz időpontot: </label>
-                                <input type="datetime-local" name="freedateinsert" id="freedateinsert" className="text-black border-black border-2 bg-white rounded-xl px-2 h-10"/>
+                                <input type="datetime-local" name="appointmentDate" id="freedateinsert" className="text-black border-black border-2 bg-white rounded-xl px-2 h-10"/>
                                 <button type="submit" className=" text-lg bg-[#08415c] text-white px-3 py-2 rounded-lg    hover:font-bold">Hozzáadás!</button>
                             </div>
                         </Form>
@@ -154,27 +160,27 @@ export default function AppointmentDashboard(){
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 text-base">
                                     {services.map((s:any) => (
-                                        
-                                        <tr key={s.id} className="hover:bg-blue-50/30 transition-colors">
-                                            <td className="py-4 px-2">{s.customer_name || "Szabad"}</td>
-                                            <td className="py-4 px-2">{new Date(s.service_date).toLocaleString('hu-HU', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
-                                            <td className="py-4 px-2">{s.problem_description}</td>
-                                            <td className="py-4 px-2">
-                                                <input type="number" name="price"  className="w-24 border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 outline-none" disabled={!(!!s.customer_name) || !!s.bringback_date} defaultValue={s.service_price || "---"}/>
-                                            </td>
-                                            <td className="py-4 px-2">
-                                                <input type="datetime-local" name="bringBackDate" defaultValue={s.bringback_date ? s.bringback_date.substring(0, 16) : ""} disabled={!(!!s.customer_name) || !!s.bringback_date}  className="border border-gray-300 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-blue-500 outline-none"/>
-                                            </td>
-                                            <td className="py-4 px-2 text-center flex gap-3 flex-row">
-                                                {!!s.customer_name && !(!!s.bringback_date) &&(
-                                                    <>
-                                                        <button  onClick={(e) => handleUpdate(e, s.id)}  className="text-white bg-blue-600 hover:bg-blue-900 rounded-lg py-2 px-2">Kész!</button>
-                                                    </>
-                                                )}
-                                                
-                                                <button onClick={() => handleDeleteAppointment(s.id)} className="text-white bg-red-500 py-2 px-3 rounded-lg">Törlés</button>
-                                            </td>
-                                        </tr>
+                                      
+                                            <tr key={s.id} className={s.bringback_date ? " bg-green-200 opacity-85" : "hover:bg-blue-50/30 transition-colors"}>
+                                                <td className="py-4 px-2">{s.customer_name || "Szabad"}</td>
+                                                <td className="py-4 px-2">{new Date(s.service_date).toLocaleString('hu-HU', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
+                                                <td className="py-4 px-2">{s.problem_description}</td>
+                                                <td className="py-4 px-2">
+                                                    <input type="number" name="price"  className="w-24 border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 outline-none" disabled={!(!!s.customer_name) || !!s.bringback_date} defaultValue={s.service_price || "---"}/>
+                                                </td>
+                                                <td className="py-4 px-2">
+                                                    <input type="datetime-local" name="bringBackDate" defaultValue={s.bringback_date ? s.bringback_date.substring(0, 16) : ""} disabled={!(!!s.customer_name) || !!s.bringback_date}  className="border border-gray-300 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-blue-500 outline-none"/>
+                                                </td>
+                                                <td className="py-4 px-2 text-center flex gap-3 flex-row">
+                                                    {!!s.customer_name && !(!!s.bringback_date) &&(
+                                                        <>
+                                                            <button  onClick={(e) => handleUpdate(e, s.id)}  className="text-white bg-blue-600 hover:bg-blue-900 rounded-lg py-2 px-2"  disabled={s.bringback_date}>Kész!</button>
+                                                        </>
+                                                    )}
+                                                    
+                                                    <button onClick={() => handleDeleteAppointment(s.id)} className="text-white bg-red-500 py-2 px-3 rounded-lg" disabled={s.bringback_date}>Törlés</button>
+                                                </td>
+                                            </tr>
                                     ))}
                                 </tbody>
                             </table>

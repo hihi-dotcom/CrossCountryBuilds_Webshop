@@ -2,8 +2,6 @@ import { z } from "zod";
 
 const orderDataScheme = z.object({
     name: z.string().min(3, "A név kitöltése kötelező (min. 3 karakter)."),
-    email: z.string().email("Érvénytelen e-mail cím!"),
-    
     // Szállítási cím - MINDIG KÖTELEZŐ
     shippingzipCode: z.string().min(4, "irányítószám kötelező").max(4, "4 számjegy"),
     shippingcityName: z.string().min(2, "Város kötelező"),
@@ -16,12 +14,8 @@ const orderDataScheme = z.object({
     billingstreetName: z.string().default(""),
     billinghouseNumber: z.string().default(""),
 
-    paymentMethod: z.enum(["kartya-uzlet", "penz-uzlet", "futar-penz"]).catch(error => {
-        throw { message: "Válassz fizetési módot!" };
-    }),
-    shippingMethod: z.enum(["futar", "uzlet"]).catch(error => {
-        throw { message: "Válassz szállítási módot!" };
-    }),
+    paymentMethod: z.string().min(1, "Válassz fizetési módot!"),
+    shippingMethod: z.string().min(1, "Válassz szállítási módot!"),
     sameAddress: z.string().optional(),
     
     // Segédadatok a formból

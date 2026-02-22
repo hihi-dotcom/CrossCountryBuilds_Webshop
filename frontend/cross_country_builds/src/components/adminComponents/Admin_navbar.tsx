@@ -1,49 +1,51 @@
-import AdminLogoutButton from "./adminButtons/LogoutButtonforAdmin";
-import { Form } from "react-router-dom";
-import CloseIcon from "@mui/icons-material/Close";
-export default function Admin_Navbar(){
+import { Navbar, NavbarBrand, NavbarCollapse, NavbarLink, NavbarToggle } from "flowbite-react";
+import { useLocation, Link, Form } from "react-router-dom";
+
+export default function AdminNavbar() {
+  const location = useLocation();
+  const currentPath = location.pathname.toLowerCase();
+  const isEditing = currentPath.startsWith("/admin/products/") && currentPath !== "/admin/products";
+  const allLinks = [
+    { href: "/admin", label: "Felhasználók" },
+    { href: "/admin/orders", label: "Megrendelések" },
+    { href: "/admin/dates", label: "Szerviz" },
+    { href: "/admin/products", label: "Termékek" },
     
-    return(
-        <>
-            <nav className="bg-[#08415c] fixed w-full z-20 top-0 start-0 border-b border-default">
-            <div className="max-w-screen-xl flex items-center justify-between mx-auto px-2 md:py-3">
-                <div className="shrink-0 md:flex items-center">
-                       
-                        <div className="flex items-center italic font-black uppercase text-2xl">
-                            <span className="text-white transition-colors duration-200 ">
-                            Cross
-                            </span>
-                            <span className="text-[#a1202b] ml-1 transition-transform  ">
-                            Country
-                            </span>
-                            <span className="hidden sm:flex ml-2 text-xs font-light not-italic lowercase tracking-widest text-gray-400 self-end mb-1">
-                            builds
-                            </span>
-                        </div>
-                        
-                </div>
-                <div className="w-full md:block md:w-auto" id="navbar-default">
-                <ul className="font-medium flex flex-row items-center justify-end flex-1 p-4 md:p-0 md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0">
-                    <li className="hidden md:flex items-center">
-                        <p>Üdv Admin!</p>
-                    </li>
-                    <li>
-                        <Form method="post" action="/logout">
-                            <AdminLogoutButton/>
-                        </Form>
+  ];
 
-                    </li>
-                    <li>
-                        <Form method="post" action="/logout">
-                            <button type="submit" className="block md:hidden shadow-2xl  py-2 px-2 text-heading border-2 border-transparent hover:border-white   ml-auto hover:font-bold bg-[#cc2936] text-white rounded-xl"><CloseIcon className="pr-1 flex items-center"/></button>
-                        </Form>
-                    </li>
+  return (
+    <Navbar fluid rounded>
+      <NavbarBrand as={Link} href="/admin">
+        <span className="self-center whitespace-nowrap text-2xl uppercase md:text-4xl font-bold italic dark:text-white">Cross</span>
+        <span className="self-center whitespace-nowrap text-2xl uppercase md:text-4xl text-blue-600 font-bold italic">Country</span>
+      </NavbarBrand>
 
-                </ul>
-                </div>
-            </div>
-            </nav>
+      <div className="flex md:order-2">
+        {!isEditing && (
+          <>
+              <Form method="POST" action="/logout">
+                <button className="text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl transition-colors mx-1 md:mx-3">
+                  Kilépés
+                </button>
+              </Form>
+          </>
+        )}
+        
+        <NavbarToggle />
+      </div>
 
-        </>
-    );
+      <NavbarCollapse>
+        {!isEditing && allLinks
+          .filter(link => link.href !== currentPath)
+          .map((link) => (
+            <NavbarLink 
+              key={link.href} 
+              href={link.href}
+            >
+              {link.label}
+            </NavbarLink>
+          ))}
+      </NavbarCollapse>
+    </Navbar>
+  );
 }

@@ -1,6 +1,6 @@
-import AdminSidebar from "../../components/adminComponents/Admin_OrdersSidebar";
 import TrashIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import { Form, useLoaderData } from "react-router-dom";
+import PenIcon from "@mui/icons-material/Edit";
+import { Form, useLoaderData, Link } from "react-router-dom";
 import { useState, useRef } from "react";
 import ProductService from "../../services/ProductService";
 import type Product from "../../models/product";
@@ -55,14 +55,6 @@ export default function ProductDashboard(){
             </DeleteModal>
             <section className="min-h-screen py-6 px-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
                <div className="lg:col-span-1">
-                    <AdminSidebar 
-                        link1_to="/admin/orders"
-                        link1_innerText="Megrendelések Dashboard"
-                        link2_to="/admin/dates"
-                        link2_innerText="Szerviz Dashboard"
-                        link3_to="/admin/"
-                        link3_innerText="Felhasználók Dashboard"
-                    />
                     <div id="kereses" className="rounded-xl py-2 px-3 border-2 text-black mt-15 border-black flex flex-col h-fit ">
                         <h2 className="text-2xl text-center">Termék keresés (név alapján)</h2>
                         <div className="flex flex-row">
@@ -116,8 +108,8 @@ export default function ProductDashboard(){
                 </div>
                
                <div className="md:col-span-3 bg-white p-6 rounded-xl shadow-sm border mt-15 border-gray-200">
-                    <div className="flex justify-start items-center mb-6">
-                        <h1 className="text-sm md:text-2xl font-bold text-gray-800">Termékek kezelése</h1>
+                    <div className="flex justify-center items-center mb-6">
+                        <h1 className="text-sm md:text-2xl font-bold text-gray-800 justify-center">Termékek kezelése</h1>
                     </div>
 
                     <div className="overflow-x-auto">
@@ -150,12 +142,13 @@ export default function ProductDashboard(){
                                             <td className="py-4 px-2 text-center font-medium">
                                                {product.price.toLocaleString()} Ft
                                             </td>
-                                            <td className="py-3 px-2 text-right flex flex-col md:flex-row">
-                                            <div className="flex flex-col md:flex-row justify-end items-center gap-2"> 
-                                                <button className="flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95" onClick={() => setDeleteTargetId(product.id)}>
+                                            <td className="py-3 px-2 text-center flex flex-col md:flex-row">
+                                            <div className="flex flex-col md:flex-row justify-content-end items-center gap-2"> 
+                                                <button className="flex items-center justify-right gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95" onClick={() => setDeleteTargetId(product.id)}>
                                                     <TrashIcon sx={{ fontSize: 18 }} />
                                                     <span className="md:hidden lg:inline">Törlés</span>
                                                 </button>
+                                                <Link to={`/admin/products/${product.id}`} className="flex flex-col md:flex-row  justify-center items-center gap-1 bg-blue-600 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95"><PenIcon sx={{ fontSize: 18 }} /> <span className="md:hidden lg:inline">Szerkesztés</span></Link>
                                             </div>
                                         </td>
                                     </tr>

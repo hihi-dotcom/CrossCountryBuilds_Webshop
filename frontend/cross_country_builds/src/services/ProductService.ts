@@ -86,6 +86,22 @@ class ProductService {
             ok: response.ok,
             message: data.message
         };
+    };
+
+    async updateProductbyId(id:number, data:any){
+        const response = await AuthService._request(`admin/products?id=${id}`,{
+            method: "PATCH",
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        if(!response.ok){
+             throw new Error(result.message || "A termék módosítása közben szerverhiba történt.");
+        }
+        return {
+            ok: response.ok,
+            message: result.message
+        }
     }
 }
 

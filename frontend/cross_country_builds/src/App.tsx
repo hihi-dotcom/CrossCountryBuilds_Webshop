@@ -8,11 +8,9 @@ function App() {
   return (
             
     <div className='min-h-screen flex flex-col bg-[#052636]'>
-      
         <CartProvider>
             <RouterProvider router={router}/>
         </CartProvider>
-      
     </div>
   )
 }

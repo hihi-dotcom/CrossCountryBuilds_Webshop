@@ -36,26 +36,25 @@ export async function serviceDateTimeAction({request}: {request:Request}) {
 }
 
 
-
 export async function createEmptyAppointmentAction({request}: {request: Request}){
     const formData = await request.formData();
     const data = Object.fromEntries(formData);
 
     const result = AppointmentSchema.safeParse(data);
     if(!result.success){
-        return{
-            errors: result.error.flatten().fieldErrors
-        }
+        return { errors: result.error.flatten().fieldErrors };
     }
-    try{
+    
+    try {
         await DateTimeService.createFreeService(result.data);
-    }
-    catch(error:any){
-        return{
+        return { success: true }; 
+    } catch(error: any) {
+        
+        return {
             serverError: error.message || "Az időpont létrehozása sikertelen volt!"
-        }
+        };
     }
-};
+}
 
 
 export async function appointmentLoader(){

@@ -33,10 +33,12 @@ import PublicOnlyRoute from "../pages/protects/ProtectPublicOnly";
 import { appointmentLoader, serviceDateTimeAction } from "../actions/serviceActions";
 import { getPassEmailAction, createPassAction } from "../actions/passwordActions";
 import { MakeOrder } from "../actions/orderActions";
-import { productLoader } from "../actions/productActions";
+import { productLoader, UpdateProduct } from "../actions/productActions";
 import { createProductAction } from "../actions/productActions";
 import { createEmptyAppointmentAction } from "../actions/serviceActions";
 import CartGuard from "../pages/protects/CartGuard";
+import { EditProductPage } from "../pages/adminPages/AdminProductEdit";
+import { prefault } from "zod";
 
 const rootLoader = async () => {
     return await AuthService.gettingCurrentUser();
@@ -55,10 +57,6 @@ const routes = [
                     { index: true, element: <HomePage /> },
                     { path: "logout", action: logoutAction },
                     { path: "cart", element: <CartPage /> },
-                    { path: "appointment",
-                                action: serviceDateTimeAction,
-                                loader: appointmentLoader,
-                            element: <DateTimePage /> },
                     {
                         element: <PublicOnlyRoute />,
                         children: [
@@ -83,7 +81,11 @@ const routes = [
                                     { path: "orderData",action: MakeOrder ,  element: <OrderDataPage /> }
                                 ]
                             },
-                            { path: "orderend", element: <EndofOrderPage /> }
+                            { path: "orderend", element: <EndofOrderPage /> },
+                            { path: "appointment",
+                                action: serviceDateTimeAction,
+                                loader: appointmentLoader,
+                            element: <DateTimePage /> },
                         ]
                     },
                     { path: "*", element: <ErrorPage /> }
@@ -130,6 +132,12 @@ const routes = [
                 loader: async() => {
                     return await ProductService.getAdminProducts();
                 } 
+            },
+            {
+                path: "products/:id",
+                element: <EditProductPage/>,
+                loader: productLoader,
+                action: UpdateProduct
             }
         ]
     }

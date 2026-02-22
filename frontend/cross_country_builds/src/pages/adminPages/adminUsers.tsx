@@ -1,4 +1,3 @@
-import AdminSidebar from "../../components/adminComponents/Admin_OrdersSidebar";
 import { useEffect, useRef, useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import type Guest from "../../models/guest";
@@ -33,14 +32,6 @@ export default function UsersDashboard(){
 
             <section className="min-h-screen py-6 px-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
                <div className="lg:col-span-1">
-                    <AdminSidebar 
-                        link1_to="/admin/orders"
-                        link1_innerText="Megrendelések Dashboard"
-                        link2_to="/admin/dates"
-                        link2_innerText="Szerviz Dashboard"
-                        link3_to="/admin/products"
-                        link3_innerText="Termékek Dashboard"
-                    />
                     <div id="kereses" className="rounded-xl py-2 pr-2  border-2 text-black mt-15 border-black flex flex-col h-fit ">
                         <h2 className="text-2xl text-center">User keresés (név alapján)</h2>
                         <div className="flex flex-row">
@@ -58,7 +49,7 @@ export default function UsersDashboard(){
 
 
                <div className="md:col-span-3 bg-white p-6 rounded-xl shadow-sm border mt-15 border-gray-200">
-                    <div className="flex justify-start items-center mb-6">
+                    <div className="flex justify-center items-center mb-6">
                         <h1 className="text-sm md:text-2xl font-bold text-gray-800">Felhasználók kezelése</h1>
                     </div>
 

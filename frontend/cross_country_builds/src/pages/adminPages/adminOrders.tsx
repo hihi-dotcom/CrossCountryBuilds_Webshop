@@ -1,4 +1,4 @@
-import AdminSidebar from "../../components/adminComponents/Admin_OrdersSidebar";
+
 import { Form, useLoaderData } from "react-router-dom";
 import { useState } from "react";
 
@@ -117,19 +117,10 @@ export default function OrdersDashboard(){
                     </>
             </DeleteModal>
             <section className="min-h-screen py-6 px-4 grid grid-cols-1 lg:grid-cols-4 gap-6 bg-gray-50">
-                <div className="lg:col-span-1">
-                    <AdminSidebar 
-                        link1_to="/admin/dates"
-                        link1_innerText="Szerviz Dashboard"
-                        link2_to="/admin/products"
-                        link2_innerText="Termékek Dashboard"
-                        link3_to="/admin/"
-                        link3_innerText="Felhasználók Dashboard"
-                    />
-                </div>
-                <div className="lg:col-span-3 bg-white  rounded-xl shadow-sm border mt-15 border-gray-200">
+
+                <div className="lg:col-span-4 bg-white  rounded-xl shadow-sm border mt-15 border-gray-200">
                                                
-                        <div className="mb-6 flex flex-wrap items-center gap-2">
+                        <div className="mb-6 flex flex-wrap justify-center items-center gap-2">
                             <h2 className=" text-3xl md:text-4xl p-3 font-bold text-gray-800 tracking-tight ">
                             Megrendelések
                             </h2>
@@ -153,19 +144,19 @@ export default function OrdersDashboard(){
                                 </thead>
                                 <tbody className="divide-y px-2 divide-gray-100 text-base text-black">
                                     {orders.map((s) => (
-                                        <tr key={s.id}  className={loadingId === s.id ? "opacity-50" : ""}>
+                                        <tr key={s.id}  className={s.status === "kész" ? "opacity-75 bg-green-200" : ""}>
                                               <td className="py-4 px-2 font-medium w-fit">#{s.u_id} {s.customer_name}</td>
                                               <td className="py-4 px-2">{s.delivery_Method}</td>
                                               <td className="py-4 px-2">{s.payment_Method}</td>
                                               <td className="py-4 px-2 font-semibold">{Number(s.total_amount).toLocaleString()} Ft</td>
                                             <td className="py-4 px-2">
-                                               <button onClick={() => setSelectedOrderItems(s.items)}  className="bg-blue-600 hover:bg-blue-800 text-white hover:font-bold py-2 px-3  flex flex-col md:flex-row items-center gap-1 transition-colors rounded-xl">
+                                               <button onClick={() => setSelectedOrderItems(s.items)}  className={s.status === "kész" ? "bg-blue-600 text-white rounded-xl py-2 px-3  flex flex-col md:flex-row items-center gap-1 transition-colors" :"bg-blue-600 hover:bg-blue-800 text-white hover:font-bold py-2 px-3  flex flex-col md:flex-row items-center gap-1 transition-colors rounded-xl"} disabled={s.status === "kész"}>
                                                 <span>{s.items?.length || 0} termék</span>
                                                 <span className="text-sm">(megtekintése)</span>
                                                </button>
                                             </td>
                                             <td className="py-4 px-2">
-                                                <select value={s.status} onChange={(e) => {
+                                                <select value={s.status} disabled={s.status === "kész"} onChange={(e) => {
                                                     const nextStatus = e.target.value;
                                                     setOrders(prev => prev.map(o => 
                                                         o.id === s.id ? { ...o, status: nextStatus } : o
@@ -177,7 +168,7 @@ export default function OrdersDashboard(){
                                             </td>
                                             <td className="py-3 px-2 text-right flex flex-col gap-4">
 
-                                                <button className="flex items-center justify-center gap-1 bg-black hover:shadow-2xl text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95" onClick={() => handleUpdateStatus(s.id, s.status)}>
+                                                <button className="flex items-center justify-center gap-1 bg-black hover:shadow-2xl text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95" onClick={() => handleUpdateStatus(s.id, s.status)} disabled={s.status === "kész"}>
                                                     <CheckIcon sx={{ fontSize: 18 }} />
                                                     <span className="md:hidden lg:inline">Lezárás</span>
                                                 </button>
