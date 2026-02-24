@@ -4,7 +4,8 @@ import { useLocation, Link, Form } from "react-router-dom";
 export default function AdminNavbar() {
   const location = useLocation();
   const currentPath = location.pathname.toLowerCase();
-  const isEditing = currentPath.startsWith("/admin/products/") && currentPath !== "/admin/products";
+  const isProductEditing = currentPath.startsWith("/admin/products/") && currentPath !== "/admin/products";
+  const isAppointmentFinalizing = currentPath.startsWith("/admin/appointments/") && currentPath !== "/admin/dates";
   const allLinks = [
     { href: "/admin", label: "Felhasználók" },
     { href: "/admin/orders", label: "Megrendelések" },
@@ -21,7 +22,7 @@ export default function AdminNavbar() {
       </NavbarBrand>
 
       <div className="flex md:order-2">
-        {!isEditing && (
+        {!isProductEditing && !isAppointmentFinalizing && (
           <>
               <Form method="POST" action="/logout">
                 <button className="text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl transition-colors mx-1 md:mx-3">
@@ -35,7 +36,7 @@ export default function AdminNavbar() {
       </div>
 
       <NavbarCollapse>
-        {!isEditing && allLinks
+        {!isProductEditing && !isAppointmentFinalizing && allLinks
           .filter(link => link.href !== currentPath)
           .map((link) => (
             <NavbarLink 

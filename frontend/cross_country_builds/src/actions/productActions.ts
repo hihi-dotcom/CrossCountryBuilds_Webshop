@@ -76,7 +76,7 @@ export async function UpdateProduct({request, params}:any){
         console.log(`Hiba történt a módosításkor: ${err}`);
 
         return{
-            message: err.message || "Váratlan szerverhiba"
+            message: err.message || "Váratlan szerverhiba!"
         }
     }
    

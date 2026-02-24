@@ -1,9 +1,7 @@
 
-import SaveIcon from "@mui/icons-material/Save";
 import { useState, useRef, useEffect } from "react";
-import { Form, useLoaderData, useActionData } from "react-router-dom";
-import DateTimeService from "../../services/DateTimeService";
-import TrashIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import { Form, useLoaderData, useActionData, Link } from "react-router-dom";
+import { FaCheck } from "react-icons/fa6";
 
 export default function AppointmentDashboard(){
     const initAppointments = useLoaderData();
@@ -11,29 +9,11 @@ export default function AppointmentDashboard(){
 
     console.log(actionData);
     const [error, setError] = useState("");
-    const [loadingId, setLoadingId] = useState<number | null>(0);
     const [services, setServices] = useState(initAppointments);
 
     useEffect(() => {
         setServices(initAppointments);
     }, [initAppointments]);
-
-    async function handleDeleteAppointment(id:number){
-        try{
-                    const deleteResult = await DateTimeService.deleteService(id);
-                    if(deleteResult.ok){
-                        setServices((prev:any) => prev.filter((p:any) => p.id !== id));
-                        setError(deleteResult.message || "A felhasználó törlése nem sikerült! ");
-                    }
-                    else{
-                        setError("Váratlan hiba történt a törlés közben! ");
-                    console.log(error);
-                    }
-        }
-        catch(error){
-            throw new Error("Hiba az időpont törlése közben!")
-        }
-    }
 
     const usrNameRef = useRef<HTMLInputElement>(null);
     const AppointmentStatusRef = useRef<HTMLSelectElement>(null);
@@ -52,47 +32,7 @@ export default function AppointmentDashboard(){
     }
 
     
-   
-  async function handleUpdate(e: any, id: number) {
-    const row = e.currentTarget.closest("tr");
-    if (!row) return;
 
-    const priceInput = row.querySelector('input[name="price"]') as HTMLInputElement;
-    const dateInput = row.querySelector('input[name="bringBackDate"]') as HTMLInputElement;
-
-    // JAVÍTÁS: A service_id-t generáljuk le stringként, vagy kérjük be
-    const dataForUpdate = {
-        service_id: `SZERV-${id}-${new Date().getFullYear()}`, 
-        price: Number(priceInput.value),
-        bringBackDate: dateInput.value // HTML datetime-local "YYYY-MM-DDTHH:mm" formátumot ad
-    };
-
-    setLoadingId(id);
-    // ... innentől a kódod többi része jó
-
-    try {
-        const result = await DateTimeService.finalizeService(id, dataForUpdate);
-
-        if (result.ok) {
-            
-            setServices((prev: any) =>
-                prev.map((s: any) =>
-                    s.id === id 
-                        ? { ...s, service_price: dataForUpdate.price, bringback_date: dataForUpdate.bringBackDate } 
-                        : s
-                )
-            );
-            alert("A szerviz lezárása sikeres volt!");
-        } else {
-            setError(result.message || "Hiba történt a mentéskor.");
-        }
-    } catch (error) {
-        console.error("Hiba a szerviz lezárása közben!", error);
-        setError("Szerver hiba történt.");
-    } finally {
-        setLoadingId(null);
-    }
-}
 
     return(
         <>
@@ -159,7 +99,7 @@ export default function AppointmentDashboard(){
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 text-base">
-                                    {services.map((s:any) => (
+                                    {initAppointments.map((s:any) => (
                                       
                                             <tr key={s.id} className={s.bringback_date ? " bg-green-200 opacity-85" : "hover:bg-blue-50/30 transition-colors"}>
                                                 <td className="py-4 px-2">{s.customer_name || "Szabad"}</td>
@@ -174,11 +114,17 @@ export default function AppointmentDashboard(){
                                                 <td className="py-4 px-2 text-center flex gap-3 flex-row">
                                                     {!!s.customer_name && !(!!s.bringback_date) &&(
                                                         <>
-                                                            <button  onClick={(e) => handleUpdate(e, s.id)}  className="text-white bg-blue-600 hover:bg-blue-900 rounded-lg py-2 px-2"  disabled={s.bringback_date}>Kész!</button>
+                                                            <Link to={`/admin/appointments/${s.id}`}  className="text-white bg-blue-600 hover:bg-blue-900 rounded-lg py-2 px-2"  >Kész!</Link>
                                                         </>
                                                     )}
-                                                    
-                                                    <button onClick={() => handleDeleteAppointment(s.id)} className="text-white bg-red-500 py-2 px-3 rounded-lg" disabled={s.bringback_date}>Törlés</button>
+                                                    {s.bringback_date && s.service_price && (
+                                                        <>
+                                                          <div className="flex flex-1 items-center justify-center text-4xl">
+                                                            <FaCheck className=" text-green-700 "/>
+                                                          </div>
+                                                        </>
+                                                    )}
+                                                    {/* <button className="text-white bg-red-500 py-2 px-3 rounded-lg" disabled={s.bringback_date}>Törlés</button> */}
                                                 </td>
                                             </tr>
                                     ))}

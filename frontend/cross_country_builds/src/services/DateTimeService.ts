@@ -2,7 +2,7 @@ import AuthService from "./AuthService";
 import type BookCreds from "../models/models_for_services/datetime_models";
 import type FinalizeCreds from "../models/models_for_services/datetime_models";
 import type FreeDate from "../models/models_for_services/datetime_models";
-
+const API_URL = "http://localhost:3000/api";
 class DateTimeService{
     async gettingFreeDates(){
         const resp = await AuthService._request("freeappointments");
@@ -29,7 +29,7 @@ class DateTimeService{
     };
 
     async finalizeService(id:number, data:{service_id:string, price:number, bringBackDate: string}){
-        const response = await AuthService._request(`appointment?id=${id}`, {
+        const response = await AuthService._request(`finalize?id=${id}`, {
             method: "PATCH",
             body: JSON.stringify(data)
         });
@@ -79,6 +79,16 @@ class DateTimeService{
         }
         return await respD;
     }
+
+    
+    async getAppointmentById(id: number) {
+        const response = await AuthService._request(`admin/appointment?id=${id}`);
+        const data = await response.json();
+        
+        
+        return data.length > 0 ? data[0] : null;
+    }
+
     
 }
 

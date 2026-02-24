@@ -69,7 +69,45 @@ export async function appointmentLoader(){
     }
     catch(error){
         console.log("Hiba a szabad szervizidőpontok betöltésekor:", error);
-        //throw new Error("Hiba a szabad időpontok betöltése közben");
         return [];
     }
+}
+
+export async function appointmentLoaderById({params}:any){
+    const id = params.id;
+
+    const response = await DateTimeService.getAppointmentById(parseInt(id));
+    if(!response){
+        throw new Response("A termék nem található", {status: 404});
+    };
+
+    return response;
+};
+
+export async function UpdateAppointment({request, params}:any){
+    const data = await request.formData();
+    const AppointmentId = params.id
+    const DatetimeData = {
+        service_id: data.get("service_id") || AppointmentId,
+        price: data.get("service_price"),
+        bringBackDate: data.get("bringback_date"),
+    };
+    
+    const productId = params.id;
+    try{
+        const response = await DateTimeService.finalizeService(Number(productId),DatetimeData);
+        
+        if(!response.ok){
+           return {message: response.message || "A szerviz lezárása közben szerverhiba történt."};
+        }
+         return redirect("/admin/dates");
+    }
+    catch(err:any){
+        console.log(`Hiba történt a véglegesítéskor: ${err}`);
+
+        return{
+            message: err.message || "Váratlan szerverhiba!"
+        }
+    }
+   
 }

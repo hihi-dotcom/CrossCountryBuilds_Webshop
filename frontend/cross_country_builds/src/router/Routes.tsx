@@ -17,6 +17,7 @@ import UsersDashboard from "../pages/adminPages/adminUsers";
 import OrdersDashboard from "../pages/adminPages/adminOrders";
 import AppointmentDashboard from "../pages/adminPages/adminAppointments";
 import ProductDashboard from "../pages/adminPages/adminProducts";
+import { EditAppointmentPage } from "../pages/adminPages/adminAppointmEdit";
 import AdminErrorPage from "../pages/errorPages/AdminErrorPage";
 
 import ProtectRouteAdmin from "../pages/protects/saferouteforadmin";
@@ -30,7 +31,7 @@ import AuthService from "../services/AuthService";
 import OrderService from "../services/OrderService";
 import ProtectRouteUser from "../pages/protects/ProtectiveRouteUser";
 import PublicOnlyRoute from "../pages/protects/ProtectPublicOnly";
-import { appointmentLoader, serviceDateTimeAction } from "../actions/serviceActions";
+import { appointmentLoader, serviceDateTimeAction, UpdateAppointment } from "../actions/serviceActions";
 import { getPassEmailAction, createPassAction } from "../actions/passwordActions";
 import { MakeOrder } from "../actions/orderActions";
 import { productLoader, UpdateProduct } from "../actions/productActions";
@@ -38,7 +39,7 @@ import { createProductAction } from "../actions/productActions";
 import { createEmptyAppointmentAction } from "../actions/serviceActions";
 import CartGuard from "../pages/protects/CartGuard";
 import { EditProductPage } from "../pages/adminPages/AdminProductEdit";
-import { prefault } from "zod";
+import {appointmentLoaderById} from "../actions/serviceActions";
 
 const rootLoader = async () => {
     return await AuthService.gettingCurrentUser();
@@ -138,6 +139,12 @@ const routes = [
                 element: <EditProductPage/>,
                 loader: productLoader,
                 action: UpdateProduct
+            },
+            {
+                path:"appointments/:id",
+                element: <EditAppointmentPage/>,
+                loader: appointmentLoaderById,
+                action: UpdateAppointment
             }
         ]
     }

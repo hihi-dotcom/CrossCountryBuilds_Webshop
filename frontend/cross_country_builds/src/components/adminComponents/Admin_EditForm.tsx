@@ -1,5 +1,5 @@
-import { Button, Checkbox, Label, TextInput, Alert } from "flowbite-react";
-import { Link, Form } from "react-router-dom";
+import { Button, Label, TextInput, Alert } from "flowbite-react";
+import { Form } from "react-router-dom";
 
 export function EditForm({product}:any) {
   return (

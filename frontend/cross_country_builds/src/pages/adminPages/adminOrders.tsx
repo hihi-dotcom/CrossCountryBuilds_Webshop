@@ -1,7 +1,7 @@
 
 import { Form, useLoaderData } from "react-router-dom";
 import { useState } from "react";
-
+import { FaCheck } from "react-icons/fa6";
 import CheckIcon from "@mui/icons-material/Check";
 import OrderService from "../../services/OrderService";
 import AdminProductModal from "../../components/modalComponents/adminModalComponents/adminProductsModal";
@@ -33,31 +33,31 @@ export default function OrdersDashboard(){
         ]);*/
 
         async function handleUpdateStatus(id:number, newStatus: string) {
-            setLoadingId(id);
-            setError("");
-            try{
-                const result = await OrderService.UpdateOrderStat(id, {status: newStatus});
+        if (newStatus === "") return; // Biztonsági ellenőrzés
 
-                if(result.ok){
-                   setOrders((prev:any) => 
-                        prev.map((order:any) =>
-                            order.id === id ? {...order, status: newStatus } : order 
-                        )
-                    );
-                   
-                }
-                else{
-                    setError(result.message || "Hiba történt a státusz frissítésekor!")
-                }
+        setLoadingId(id);
+        setError("");
+        
+        try {
+            const result = await OrderService.UpdateOrderStat(id, { status: newStatus });
+
+            if (result.ok) {
+                setOrders((prev) =>
+                    prev.map((order) =>
+                        order.id === id ? { ...order, status: newStatus } : order
+                    )
+                );
+            } else {
+                setError(result.message || "Hiba történt a státusz frissítésekor!");
             }
-            catch(err){
-                setError("Hálozati hiba a státusz frissítés közben!" + err);
-                console.log(err);
-            }
-            finally{
-                setLoadingId(null);
-            }
+        } catch (err) {
+            setError("Hálózati hiba történt!");
+            console.error(err);
+        } finally {
+            setLoadingId(null);
         }
+    }
+        
         /*
         async function handleDeleteOrder(id:number){
             try{
@@ -143,8 +143,12 @@ export default function OrdersDashboard(){
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y px-2 divide-gray-100 text-base text-black">
-                                    {orders.map((s) => (
-                                        <tr key={s.id}  className={s.status === "kész" ? "opacity-75 bg-green-200" : ""}>
+                                    {orders.map((s) => {
+                                      
+                                        const isLoading = loadingId === s.id;
+                                        return(
+                                           <>
+                                                <tr key={s.id}  className={s.status === "kész" ? "opacity-75 bg-green-200" : ""}>
                                               <td className="py-4 px-2 font-medium w-fit">#{s.u_id} {s.customer_name}</td>
                                               <td className="py-4 px-2">{s.delivery_Method}</td>
                                               <td className="py-4 px-2">{s.payment_Method}</td>
@@ -156,26 +160,29 @@ export default function OrdersDashboard(){
                                                </button>
                                             </td>
                                             <td className="py-4 px-2">
-                                                <select value={s.status} disabled={s.status === "kész"} onChange={(e) => {
-                                                    const nextStatus = e.target.value;
-                                                    setOrders(prev => prev.map(o => 
-                                                        o.id === s.id ? { ...o, status: nextStatus } : o
-                                                    ));
-                                                }}>
+                                                <select value={s.status} disabled={isLoading} onChange={(e) => handleUpdateStatus(s.id, e.target.value)} >
                                                     <option value="pending">Feldolgozás alatt</option>
                                                     <option value="kész">Kész!</option>
                                                 </select>
                                             </td>
                                             <td className="py-3 px-2 text-right flex flex-col gap-4">
 
-                                                <button className="flex items-center justify-center gap-1 bg-black hover:shadow-2xl text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95" onClick={() => handleUpdateStatus(s.id, s.status)} disabled={s.status === "kész"}>
-                                                    <CheckIcon sx={{ fontSize: 18 }} />
-                                                    <span className="md:hidden lg:inline">Lezárás</span>
-                                                </button>
+                                    
+                                              {s.status === "kész" && (
+                                                <>
+                                                     <div className="flex flex-1 items-center justify-center text-4xl">
+                                                            <FaCheck className=" text-green-700"/>
+                                                    </div>
+                                                </>
+                                              )} 
                                             </td>
                                             
                                         </tr>
-                                    ))}
+                                           </>
+                                        );
+                                    }
+                                        
+                                    )}
                                 </tbody>
                             </table>
 
