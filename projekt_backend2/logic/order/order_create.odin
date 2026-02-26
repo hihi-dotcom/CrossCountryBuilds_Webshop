@@ -20,7 +20,7 @@ import "core:strings"
 
 @(private = "file")
 OrderJson :: struct {
-    u_id: string,
+    u_id: int,
     deliveryAddr: AddressJson,
     billingAddr: AddressJson,
     pMethod: string,
@@ -41,7 +41,7 @@ AddressJson :: struct {
 ProductJson :: struct {
     id: string,
     price: string,
-    amount: string
+    amount: int
 }
 
 @(private = "file")
@@ -76,6 +76,7 @@ order_create_start :: proc (conn: ^http.Conn) {
     payload := cast(^auth.Payload)conn.user_data[auth.Payload]
     body := cast(mw.StaticBody)conn.user_data[mw.StaticBody]
 
+    fmt.println(string(body^))
     as := new(OrderJson)
     if json.unmarshal(body^, as) != nil {
         util.stop(conn, 400, "Json cannot be parsed!")
@@ -85,7 +86,6 @@ order_create_start :: proc (conn: ^http.Conn) {
         util.reset(conn, 400, "No products in order.")
         return
     }
-    as.u_id = fmt.aprint(payload.id)
     conn.user_data[OrderJson] = as
 
     addresses := new(Addresses)
@@ -122,7 +122,7 @@ order_create_badderss :: proc (conn: ^http.Conn) {
     }
 
     pool_mw.pin(conn, order_create_address2, "order_insert_address", 
-        {as.u_id, "billing", addresses.baddress.zip_code, fmt.aprint(addresses.baddress.street_name, addresses.baddress.house_number), addresses.baddress.city_name})
+        {fmt.aprint(as.u_id), "billing", addresses.baddress.zip_code, fmt.aprint(addresses.baddress.street_name, addresses.baddress.house_number), addresses.baddress.city_name})
 }
 
 @(private = "file")
@@ -166,7 +166,7 @@ order_create_order :: proc (conn: ^http.Conn) {
     addresses.daddress_id = table[0]["id"]
 
     pool_mw.pin(conn, order_create_connection, "order_insert", 
-        {as.u_id, addresses.baddress_id, addresses.daddress_id, as.pMethod, as.dMethod})
+        {fmt.aprint(as.u_id), addresses.baddress_id, addresses.daddress_id, as.pMethod, as.dMethod})
 }
 
 @(private = "file")
@@ -192,7 +192,7 @@ order_create_connection :: proc (conn: ^http.Conn) {
     conn.user_data[ProductsProcessed] = new(ProductsProcessed)
 
     pool_mw.pin(conn, order_create_connections, "order_products", 
-        {order_id^, as.products[0].id, as.products[0].amount, as.products[0].price})
+        {order_id^, fmt.aprint(as.products[0].id), fmt.aprint(as.products[0].amount), fmt.aprint(as.products[0].price)})
 }
 
 @(private = "file")
@@ -229,7 +229,7 @@ order_create_connections :: proc (conn: ^http.Conn) {
     }
 
     pool_mw.pin(conn, order_create_connections, "order_products", 
-        {order_id^, as.products[pp^].id, as.products[pp^].amount, as.products[pp^].price})
+        {order_id^, fmt.aprint(as.products[pp^].id), fmt.aprint(as.products[pp^].amount), fmt.aprint(as.products[pp^].price)})
 }
 
 order_end :: proc (conn: ^http.Conn) {
