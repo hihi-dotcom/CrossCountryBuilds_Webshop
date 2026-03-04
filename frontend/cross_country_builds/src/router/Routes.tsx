@@ -97,7 +97,7 @@ const routes = [
 
     
     {
-        path: "admin",
+        path: "/admin",
         id: "admin",
         element: <ProtectRouteAdmin />,
         loader: rootLoader, 
