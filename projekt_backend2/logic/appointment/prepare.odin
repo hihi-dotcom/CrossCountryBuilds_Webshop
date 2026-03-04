@@ -25,9 +25,10 @@ prepare :: proc () {
     {.Int4, .Varchar, .Int4, .Timestamp})
 
     pool.prepare("appointment_all", `
-        SELECT id, service_date, user_id, problem_description
-        FROM Service_DateTimes
-        ORDER BY service_date DESC`
+        SELECT s.id, s.service_date, s.user_id, s.problem_description, s.service_name, s.service_price, s.bringback_date, u.username
+        FROM Service_DateTimes s
+        LEFT JOIN Users u ON s.user_id = u.id
+        ORDER BY s.service_date DESC`
     )
 
     pool.prepare("appointment_delete", `
@@ -41,4 +42,11 @@ prepare :: proc () {
         VALUES ($1, NULL)
         RETURNING id`,
     {.Timestamp})
+
+    pool.prepare("appointment_by_id", `
+        SELECT s.id, s.service_date, s.user_id, s.problem_description, s.service_name, s.service_price, s.bringback_date, u.username
+        FROM Service_DateTimes s
+        LEFT JOIN Users u ON s.user_id = u.id
+        WHERE s.id = $1`,
+    {.Int4})
 }

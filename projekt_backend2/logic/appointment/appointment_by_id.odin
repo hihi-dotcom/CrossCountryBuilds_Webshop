@@ -7,29 +7,27 @@ import "core:encoding/json"
 import "../../pool/pool_mw"
 import "../auth"
 
-Appointment :: struct {
-    id: string,
-    service_date: string,
-    user_id: string,
-    customer_name: string,
-    problem_description: string,
-    service_name: string,
-    service_price: string,
-    bringback_date: string,
-    status: string,
-}
+appointment_by_id :: proc (conn: ^http.Conn, params: util.QueryParameter) {
+    if params["id"] == "" {
+        util.stop(conn, 400, "Missing parameter")
+        return
+    }
 
-appointment_all :: proc (conn: ^http.Conn) {
-    auth.check_admin_mw(conn, appointment_all_query)
+    qp := new(util.QueryParameter)
+    qp^ = params
+    conn.user_data[util.QueryParameter] = qp
+
+    auth.check_admin_mw(conn, appointment_by_id_query)
 }
 
 @(private = "file")
-appointment_all_query :: proc (conn: ^http.Conn) {
-    pool_mw.query(conn, appointment_all_respond, "appointment_all", {})
+appointment_by_id_query :: proc (conn: ^http.Conn) {
+    qp := cast(^util.QueryParameter)conn.user_data[util.QueryParameter]
+    pool_mw.query(conn, appointment_by_id_respond, "appointment_by_id", {qp["id"]})
 }
 
 @(private = "file")
-appointment_all_respond :: proc (conn: ^http.Conn) {
+appointment_by_id_respond :: proc (conn: ^http.Conn) {
     result := cast(pool.Result)conn.user_data[pool.Result]
 
     status, _ := pool.status(result)

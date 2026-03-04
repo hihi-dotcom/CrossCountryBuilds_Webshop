@@ -10,7 +10,7 @@ import "core:encoding/json"
 @(private = "file")
 ResponseFromat :: struct {
     id: string,
-    appointmentDate: string
+    service_date: string,
 }
 
 appointment_get_free :: proc (conn: ^http.Conn) {
@@ -34,7 +34,7 @@ appointment_get_free_responder :: proc (conn: ^http.Conn) {
     response := make([]ResponseFromat, len(table))
     for &resp, i in response {
         resp.id = table[i]["id"]
-        resp.appointmentDate = table[i]["service_date"]
+        resp.service_date = table[i]["service_date"]
     }
 
     response_body, _ := json.marshal(response)

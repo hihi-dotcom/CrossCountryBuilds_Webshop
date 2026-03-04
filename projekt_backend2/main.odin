@@ -69,6 +69,8 @@ main :: proc () {
                         appointment.appointment_get_free(conn)
                     case "/api/admin/appointments":
                         appointment.appointment_all(conn)
+                    case "/api/admin/appointment":
+                        appointment.appointment_by_id(conn, params)
                     case:
                         util.stop(conn, 404, "Not Found")
                 }
@@ -78,6 +80,10 @@ main :: proc () {
                         order.order_status(conn, params)
                     case "/api/appointment":
                         appointment.appointment_book(conn, params)
+                    case "/api/finalize":
+                        appointment.finalize(conn, params)
+                    case "/api/admin/products":
+                        products.product_update(conn, params)
                     case:
                         util.stop(conn, 404, "Not Found")
                 }

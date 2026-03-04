@@ -44,4 +44,10 @@ prepare :: proc () {
     pool.prepare("product_delete", `
         DELETE FROM products WHERE id = $1`,
     {.Int4})
+
+    pool.prepare("product_update", `
+        UPDATE products
+        SET name = $1, category = $2, manufacturer = $3, price = $4, stock = $5, description = $6
+        WHERE id = $7`,
+    {.Varchar, .Varchar, .Varchar, .Int4, .Int4, .Text, .Int4})
 }
