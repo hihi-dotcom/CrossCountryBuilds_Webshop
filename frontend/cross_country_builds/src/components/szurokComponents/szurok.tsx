@@ -1,11 +1,18 @@
 import { Label, TextInput, Select, Button, Card } from "flowbite-react";
 import { Form, useSearchParams } from "react-router-dom";
 import { HiSearch, HiTag } from "react-icons/hi";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function Szurok({ onSearch, onReset }: { onSearch: (filters: any) => void, onReset: () => void }) {
   const [searchParams] = useSearchParams();
-  const [errors, setErrors] = useState<Record<string, string>>({});
+
+    const [priceFrom, setPriceFrom] = useState(searchParams.get("priceFrom") || "");
+    const [priceTo, setPriceTo] = useState(searchParams.get("priceTo") || "");
+
+    useEffect(() => {
+      setPriceFrom(searchParams.get("priceFrom") || "");
+      setPriceTo(searchParams.get("priceTo") || "");
+    }, [searchParams]);
   const hasActiveFilters = Object.keys(Object.fromEntries(searchParams)).length > 0;
   const termekKategoriak = [
     { value: "kerékpárok", name: "Kerékpárok" },
@@ -67,8 +74,7 @@ export function Szurok({ onSearch, onReset }: { onSearch: (filters: any) => void
             <TextInput 
               name="priceFrom" 
               type="number" 
-              min={15000}
-              max={10000000}
+              max={priceTo || undefined}
               placeholder="Min" 
               className="w-full [&_input]:bg-white [&_input]:text-gray-900" 
               defaultValue={searchParams.get("priceFrom") || ""}
@@ -76,8 +82,7 @@ export function Szurok({ onSearch, onReset }: { onSearch: (filters: any) => void
             <TextInput 
               name="priceTo" 
               type="number"
-              min={1000000}
-              max={10000000} 
+             min={priceFrom || undefined} 
               placeholder="Max" 
               className="w-full [&_input]:bg-white [&_input]:text-gray-900" 
               defaultValue={searchParams.get("priceTo") || ""}

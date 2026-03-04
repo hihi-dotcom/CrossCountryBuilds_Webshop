@@ -46,7 +46,16 @@ export default function HomePage(){
         loadProducts(nextOffset, true);
     };
     function handleProductSearching(newFilters:any){
+        const correctedFilters = { ...newFilters };
 
+       
+        const min = parseFloat(correctedFilters.minPrice);
+        const max = parseFloat(correctedFilters.maxPrice);
+
+        if (!isNaN(min) && !isNaN(max) && min > max) {
+            correctedFilters.minPrice = max.toString();
+            correctedFilters.maxPrice = min.toString();
+        }
         setSearchParams(newFilters);
 
         setOffset(0);

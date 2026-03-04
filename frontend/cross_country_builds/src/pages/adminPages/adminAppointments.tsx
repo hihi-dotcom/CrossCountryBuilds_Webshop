@@ -7,7 +7,7 @@ export default function AppointmentDashboard(){
     const initAppointments = useLoaderData();
     const actionData = useActionData();
 
-    console.log(actionData);
+   
     const [error, setError] = useState("");
     const [services, setServices] = useState(initAppointments);
 
@@ -63,6 +63,11 @@ export default function AppointmentDashboard(){
                             <div id="free-service-date" className="flex flex-col gap-3">
                                 <label htmlFor="freedateinsert">Adj meg egy szabad szerviz időpontot: </label>
                                 <input type="datetime-local" name="appointmentDate" id="freedateinsert" className="text-black border-black border-2 bg-white rounded-xl px-2 h-10"/>
+                                {actionData?.errors?.appointmentDate && (
+                                    <p className="text-red-500 text-sm font-bold">
+                                        {actionData.errors.appointmentDate[0]}
+                                    </p>
+                                )}
                                 <button type="submit" className=" text-lg bg-[#08415c] text-white px-3 py-2 rounded-lg    hover:font-bold">Hozzáadás!</button>
                             </div>
                         </Form>

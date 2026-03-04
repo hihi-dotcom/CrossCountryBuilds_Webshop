@@ -15,7 +15,7 @@ const dateSchema = (validTimes: any) => {
 
 export const AppointmentSchema = z.object({
   appointmentDate: z.string()
-    .min(1, "A dátum megadása kötelező")
+    .min(1, "A dátum megadása kötelező!")
     .refine((val) => {
       const selectedDate = new Date(val);
       const now = new Date();
