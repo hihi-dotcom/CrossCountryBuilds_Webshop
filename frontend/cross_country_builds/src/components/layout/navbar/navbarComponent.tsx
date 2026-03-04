@@ -14,92 +14,107 @@ export default function NavbarComponent() {
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <Navbar fluid className="sticky top-0 z-50 border-b border-gray-200 bg-white shadow-sm">
-    {isOrderFlow ? (
-      <div className="flex items-center">
-        <NavbarBrand as="div">
+  <Navbar fluid className="sticky top-0 z-50 border-b border-gray-700 dark:bg-[#1a222f] bg-white shadow-md">
+     
+      <div className="container mx-auto flex flex-wrap items-center justify-between w-full">
+     
+        <Link to={isOrderFlow ? "#" : "/"} className="flex items-center">
+          <NavbarBrand as="div">
             <span className="self-center whitespace-nowrap italic font-black uppercase text-xl md:text-2xl dark:text-white">
               Cross<span className="text-blue-500">Country</span>
             </span>
-        </NavbarBrand>
-      </div>
-    ) : (
-      <Link to="/">
-        <NavbarBrand as="div">
-          <span className="self-center whitespace-nowrap italic font-black uppercase text-xl md:text-2xl dark:text-white">
-            Cross<span className="text-blue-500">Country</span>
-          </span>
-        </NavbarBrand>
-      </Link>
-    )}
-
-      <div className="flex md:order-2 items-center gap-2">
-        {!isOrderEnd && !isOnCart && (
-          <Link to="/cart" className="relative p-2 dark:text-white hover:text-blue-500 transition-colors mr-1">
-            <HiShoppingCart size={28} />
-            {totalItems > 0 && (
-              <Badge color="failure" size="xs" className="absolute top-0 right-0 px-1.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full">
-                {totalItems}
-              </Badge>
-            )}
-          </Link>
-        )}
-
-        
-        {!isOrderFlow && (
-          user ? (
-            <div className="flex items-center gap-2">
-              <span className="hidden lg:inline-flex text-sm font-medium text-white">{user.username}</span>
-              <Form method="post" action="/logout">
-                <Button color="failure" size="sm" type="submit" pill>
-                  <HiLogout className="h-5 w-5 text-white " />
-                </Button>
-              </Form>
-            </div>
-          ) : (
-            <div className="flex items-center gap-1 sm:gap-2">
-              <Link to="/login" className="hidden sm:block">
-                <Button color="gray" size="xs" className="border-none" as="div">
-                  <HiLogin className="sm:mr-2 h-4 w-4" /> <span className="hidden sm:inline">Belépés</span>
-                </Button>
-              </Link>
-              <Link to="/signup">
-                <Button color="blue" size="xs" as="div">
-                  <HiUserAdd className="sm:mr-2 h-5 w-5" /> <span className="hidden sm:inline">Regisztráció</span>
-                </Button>
-              </Link>
-            </div>
-          )
-        )}
-        <NavbarToggle className="ml-1" />
-      </div>
-
-     
-    {!isOrderFlow  && !isOrderEnd  &&(
-      <NavbarCollapse className="bg-white md:bg-transparent rounded-lg mt-2 md:mt-0 border md:border-none shadow-lg md:shadow-none p-4 md:p-0">
-        <Link to="/" className="w-full md:w-auto">
-          <NavbarLink active={location.pathname === "/"} as="div" className="text-gray-900 hover:text-blue-500 font-medium py-2 cursor-pointer">
-            Főoldal
-          </NavbarLink>
+          </NavbarBrand>
         </Link>
+
+       
+        <div className="flex items-center gap-1 md:gap-3 md:order-2">
+          
         
-        {!isOrderEnd && !isOnCart && (
-          <Link to="/appointment" className="w-full md:w-auto">
-            <NavbarLink as="div" className="text-gray-900 hover:text-blue-500 font-medium py-2 cursor-pointer">
-              Szerviz
-            </NavbarLink>
-          </Link>
+          {!isOrderEnd && !isOnCart && (
+            <Link to="/cart" className="relative p-2 text-white hover:text-blue-400 transition-colors">
+              <HiShoppingCart size={28} />
+              {totalItems > 0 && (
+                <Badge 
+                  color="failure" 
+                  className="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full p-0 text-[10px]"
+                >
+                  {totalItems}
+                </Badge>
+              )}
+            </Link>
+          )}
+
+
+          {!isOrderFlow && (
+            user ? (
+              <div className="flex items-center gap-2">
+                <span className="hidden lg:inline-flex text-sm font-medium text-white">{user.username}</span>
+                <Form method="post" action="/logout">
+                  <Button color="failure" size="xs" type="submit" pill className="p-1">
+                    <HiLogout className="h-8 w-8" />
+                  </Button>
+                </Form>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1">
+                <Link to="/login">
+                  <Button color="gray" size="md" className="border-none bg-gray-700 text-white hover:bg-gray-600 focus:ring-0 px-2">
+                    <HiLogin className="h-7 w-7 md:mr-2" />
+                    <span className="hidden md:inline">Belépés</span>
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button color="blue" size="md" className="px-2">
+                    <HiUserAdd className="h-7 w-7 md:mr-2" />
+                    <span className="hidden md:inline">Regisztráció</span>
+                  </Button>
+                </Link>
+              </div>
+            )
+          )}
+
+
+          {!isOrderFlow && <NavbarToggle className="text-gray-400 hover:bg-gray-700 focus:bg-gray-700" />}
+        </div>
+
+       
+        {!isOrderFlow && !isOrderEnd && (
+          <NavbarCollapse className="w-full md:w-auto md:order-1">
+            <div className="flex flex-col md:flex-row md:gap-8 mt-4 md:mt-0 bg-[#1a222f] md:bg-transparent p-4 md:p-0  border-gray-700 md:border-none rounded-lg shadow-xl md:shadow-none">
+                <Link to="/" className="w-full md:w-auto border-gray-700 md:border-none py-2 md:py-0">
+                  <NavbarLink 
+                    
+                    as="div" 
+                    className="cursor-pointer text-gray-400  font-medium"
+                  >
+                    Főoldal
+                  </NavbarLink>
+                </Link>
+                
+                <Link to="/appointment" className="w-full md:w-auto  border-gray-700 md:border-none py-2 md:py-0">
+                  <NavbarLink 
+                    active={location.pathname === "/appointment"} 
+                    as="div" 
+                    className="cursor-pointer text-gray-400  font-medium"
+                  >
+                    Szerviz
+                  </NavbarLink>
+                </Link>
+                
+                {user?.role === 'admin' && (
+                  <Link to="/admin" className="w-full md:w-auto py-2 md:py-0">
+                    <NavbarLink 
+                      as="div" 
+                      className="cursor-pointer font-bold text-red-500 hover:text-red-400"
+                    >
+                      ADMIN
+                    </NavbarLink>
+                  </Link>
+                )}
+            </div>
+          </NavbarCollapse>
         )}
-        
-        {user?.role === 'admin' && (
-          <Link to="/admin" className="w-full md:w-auto">
-            <NavbarLink className="text-red-500 font-bold py-2 border-t md:border-none mt-2 md:mt-0 cursor-pointer" as="div">
-              ADMIN
-            </NavbarLink>
-          </Link>
-        )}
-      </NavbarCollapse>
-    )}
+      </div>
     </Navbar>
   );
 }

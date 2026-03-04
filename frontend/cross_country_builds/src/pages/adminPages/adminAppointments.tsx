@@ -109,7 +109,7 @@ export default function AppointmentDashboard(){
                                                     <input type="number" name="price"  className="w-24 border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 outline-none" disabled={!(!!s.customer_name) || !!s.bringback_date} defaultValue={s.service_price || "---"}/>
                                                 </td>
                                                 <td className="py-4 px-2">
-                                                    <input type="datetime-local" name="bringBackDate" defaultValue={s.bringback_date ? s.bringback_date.substring(0, 16) : ""} disabled={!(!!s.customer_name) || !!s.bringback_date}  className="border border-gray-300 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-blue-500 outline-none"/>
+                                                    <input type="datetime-local" disabled name="bringBackDate" defaultValue={s.bringback_date ? s.bringback_date.substring(0, 16) : ""}  className="border border-gray-300 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-blue-500 outline-none"/>
                                                 </td>
                                                 <td className="py-4 px-2 text-center flex gap-3 flex-row">
                                                     {!!s.customer_name && !(!!s.bringback_date) &&(
