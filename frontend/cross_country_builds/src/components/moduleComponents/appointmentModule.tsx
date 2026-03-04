@@ -47,7 +47,7 @@ export default function AppointmentModule() {
                                 </div>
                             )}
 
-                            {actionData?.errors?.appointmentDate[0] && (
+                            {actionData?.errors?.appointmentDate && actionData.errors.appointmentDate[0] && (
                                 <p className="mt-4 text-red-500 text-sm font-medium flex items-center gap-1">
                                     <span className="text-lg">⚠️</span> {actionData.errors.appointmentDate[0]}
                                 </p>
@@ -73,7 +73,7 @@ export default function AppointmentModule() {
                                 placeholder="Pl.: Defektet kaptam, vagy furcsa hangot ad a középcsapágy..."
                             ></textarea>
                             
-                            {actionData?.errors?.message[0] && (
+{actionData?.errors?.message && actionData.errors.message[0] && (
                                 <p className="mt-3 text-red-500 text-sm font-medium">{actionData.errors.message[0]}</p>
                             )}
                         </div>
