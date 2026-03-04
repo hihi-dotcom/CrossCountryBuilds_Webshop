@@ -19,7 +19,7 @@ export default function FooterComponent() {
           </div>
 
         
-          <div className="hidden sm:grid grid-cols-1 gap-6 sm:mt-4 sm:grid-cols-3 sm:gap-6  text-white">
+          <div className="hidden sm:grid grid-cols-1 gap-6 sm:mt-4 sm:grid-cols-3 sm:gap-6  dark:text-white">
             <div className="flex items-center gap-3">
               <HiHome className="h-8 w-8 text-blue-700 hidden md:inline" />
               <span className="text-base">1025 Budapest, Huhu utca 28.</span>

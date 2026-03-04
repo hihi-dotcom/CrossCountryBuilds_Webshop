@@ -18,7 +18,7 @@ export default function NavbarComponent() {
     {isOrderFlow ? (
       <div className="flex items-center">
         <NavbarBrand as="div">
-            <span className="self-center whitespace-nowrap italic font-black uppercase text-xl md:text-2xl text-white">
+            <span className="self-center whitespace-nowrap italic font-black uppercase text-xl md:text-2xl dark:text-white">
               Cross<span className="text-blue-500">Country</span>
             </span>
         </NavbarBrand>
@@ -26,7 +26,7 @@ export default function NavbarComponent() {
     ) : (
       <Link to="/">
         <NavbarBrand as="div">
-          <span className="self-center whitespace-nowrap italic font-black uppercase text-xl md:text-2xl text-white">
+          <span className="self-center whitespace-nowrap italic font-black uppercase text-xl md:text-2xl dark:text-white">
             Cross<span className="text-blue-500">Country</span>
           </span>
         </NavbarBrand>
@@ -35,7 +35,7 @@ export default function NavbarComponent() {
 
       <div className="flex md:order-2 items-center gap-2">
         {!isOrderEnd && !isOnCart && (
-          <Link to="/cart" className="relative p-2 text-white hover:text-blue-500 transition-colors mr-1">
+          <Link to="/cart" className="relative p-2 dark:text-white hover:text-blue-500 transition-colors mr-1">
             <HiShoppingCart size={28} />
             {totalItems > 0 && (
               <Badge color="failure" size="xs" className="absolute top-0 right-0 px-1.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full">
