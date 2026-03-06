@@ -2,6 +2,7 @@ import { Label, TextInput, Button, Card } from "flowbite-react";
 import { HiUser, HiMail, HiLockClosed, HiArrowRight, HiExclamationCircle, HiCheckCircle } from "react-icons/hi";
 import { Link, Form, useActionData, useNavigation } from "react-router-dom";
 import BackToWebShopButton from "../buttonComponents/backtoWebshopButton";
+import { act } from "react";
 
 export default function SignUpModule() {
   const actionData = useActionData() as any;
@@ -106,6 +107,11 @@ export default function SignUpModule() {
               </div>
 
               <div className=" flex sm:flex-row items-center justify-between gap-4 pt-2">
+                {actionData?.serverError && (
+                    <div className="mt-2 text-red-500 flex items-center gap-2 text-xs font-bold uppercase italic">
+                      <HiExclamationCircle /> {actionData.serverError}
+                    </div>
+                  )}
                 <div className="hidden items-center gap-5 justify-center sm:flex sm:flex-row sm:items-start order-2 sm:order-1">
                   <span className="text-gray-300 text-sm font-black uppercase tracking-widest italic">Van már fiókod?</span>
                   <Link to="/login" className="text-sm text-gray-200 rounded-full bg-gray-600 px-2 py-1 font-bold uppercase italic hover:text-white flex items-center">

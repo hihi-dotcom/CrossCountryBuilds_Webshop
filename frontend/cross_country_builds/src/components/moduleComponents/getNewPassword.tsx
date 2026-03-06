@@ -40,20 +40,18 @@ export default function GetNewPasswordModule() {
               color={actionData?.errors?.newpassword ? "failure" : "gray"}
             />
             
-            {/* Hibaüzenetek */}
+            
             {actionData?.errors?.newpassword && (
               <p className="text-red-500 text-[10px] font-black uppercase italic ml-1 tracking-tighter">
-                {actionData.errors.newpassword}
+                {actionData.errors.newpassword[0]}
               </p>
             )}
-            {actionData?.errors?.serverError && (
+            {actionData?.serverError && (
               <p className="text-red-500 text-[10px] font-black uppercase italic ml-1 tracking-tighter flex items-center gap-1">
-                <HiExclamationCircle className="h-4 w-4" /> {actionData.errors.serverError}
+                <HiExclamationCircle className="h-4 w-4" /> {actionData.serverError}
               </p>
             )}
           </div>
-
-          {/* AKCIÓ GOMBOK */}
           <div className="flex flex-col gap-4 mt-2">
             <Button 
               type="submit" 

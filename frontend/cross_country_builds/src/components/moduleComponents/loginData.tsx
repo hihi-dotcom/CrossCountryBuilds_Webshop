@@ -46,7 +46,7 @@ export default function LoginModule() {
                     color={actionData?.errors?.username ? "failure" : "gray"}
                   />
                   {actionData?.errors?.username && (
-                    <span className="text-red-500 text-[10px] font-bold italic ml-1 uppercase">{actionData.errors.username}</span>
+                    <span className="text-red-500 text-[10px] font-bold italic ml-1 uppercase">{actionData.errors.username[0]}</span>
                   )}
                 </div>
 
@@ -64,7 +64,7 @@ export default function LoginModule() {
                     color={actionData?.errors?.password ? "failure" : "gray"}
                   />
                   {actionData?.errors?.password && (
-                    <span className="text-red-500 text-[10px] font-bold italic ml-1 uppercase">{actionData.errors.password}</span>
+                    <span className="text-red-500 text-[10px] font-bold italic ml-1 uppercase">{actionData.errors.password[0]}</span>
                   )}
                 </div>
               </div>

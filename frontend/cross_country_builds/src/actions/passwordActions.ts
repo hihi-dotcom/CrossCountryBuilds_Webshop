@@ -21,7 +21,7 @@ export async function getPassEmailAction({request}: {request: Request}) {
         return {serverError: sendEmailResult.message}
     }
     else{
-        return sendEmailResult.message;
+        return redirect('/login')
     }
 };
 

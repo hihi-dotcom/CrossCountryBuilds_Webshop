@@ -8,7 +8,7 @@ export function DateTimeSection() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const navigate = useNavigate();
 
-  // A modál automatikus bezárása (ha még szükség van rá)
+  
   useEffect(() => {
     if (modalIsOpen) {
       const timer = setTimeout(() => { setModalIsOpen(false) }, 2500);
@@ -26,7 +26,7 @@ export function DateTimeSection() {
 
   return (
     <>
-      {/* FLOWBITE MODAL: A bejelentkezés hiányára */}
+     
       <Modal show={modalIsOpen} size="md" onClose={() => setModalIsOpen(false)} popup>
         <ModalHeader />
         <ModalBody>

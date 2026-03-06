@@ -8,7 +8,7 @@ export default function AppointmentModule() {
 
     return (
         <div className="max-w-6xl mx-auto px-4 py-8 md:py-12 min-h-screen font-sans text-slate-800">
-            {/* Fejléc szekció */}
+            
             <div className="mb-10 text-center sm:text-left">
                 <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-4">
                     Szerviz Időpontfoglalás
@@ -22,7 +22,7 @@ export default function AppointmentModule() {
             <Form method="post" className="space-y-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     
-                    {/* 1. Oszlop: Időpont választás */}
+                    
                     <div className="lg:col-span-2 space-y-6">
                         <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-6 md:p-8">
                             <div className="flex items-center gap-3 mb-6">
@@ -35,7 +35,7 @@ export default function AppointmentModule() {
                             </div>
 
                             {freedates.length > 0 ? (
-                                <div className="space-y-4">
+                                <div className="flex space-y-4 flex-col">
                                     <label className="text-sm font-medium text-slate-500 uppercase tracking-wider">Szabad időpontok</label>
                                     <SelectforDatetime datetimes={freedates} />
                                 </div>
@@ -47,14 +47,14 @@ export default function AppointmentModule() {
                                 </div>
                             )}
 
-                            {actionData?.errors?.appointmentDate && actionData.errors.appointmentDate[0] && (
+                            {actionData?.errors?.appointmentDate && (
                                 <p className="mt-4 text-red-500 text-sm font-medium flex items-center gap-1">
                                     <span className="text-lg">⚠️</span> {actionData.errors.appointmentDate[0]}
                                 </p>
                             )}
                         </div>
 
-                        {/* 2. Szekció: Üzenet */}
+                      
                         <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-6 md:p-8">
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">

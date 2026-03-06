@@ -6,10 +6,11 @@ import ProductService from "../services/ProductService";
 import { useSearchParams } from "react-router-dom";
 import { Button, Spinner } from "flowbite-react";
 import { HiPlusCircle } from "react-icons/hi";
+import type Product from "../models/product";
 
 export default function HomePage(){
     const [searchParams, setSearchParams] = useSearchParams(); 
-    const [products, setProducts] = useState<any[]>([]);
+    const [products, setProducts] = useState<Product[]>([]);
     const [total, setTotal] = useState(0);
     const [hasMore, setHasMore] = useState(false);
     const [loading, setLoading] = useState(false);
