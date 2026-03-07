@@ -4,6 +4,7 @@ import loginSchema from "../components/validationSchemes/loginScheme";
 
 import registScheme from "../components/validationSchemes/registrScheme";
 import AuthService from "../services/AuthService";
+import { success } from "zod";
 
 export async function loginAction({request}: {request: Request}) {
     const formData = await request.formData();
@@ -27,9 +28,14 @@ export async function loginAction({request}: {request: Request}) {
         return redirect("/admin");
     }
   
-    return redirect("/");
+    return {
+        success:true,
+        message: loginResult.message,
+        status:200,
+        userData: loginResult.data
+    };
 
-}
+};
 
 export async function registerAction({ request }: {request: Request}) {
     const formData = await request.formData();
@@ -49,7 +55,12 @@ export async function registerAction({ request }: {request: Request}) {
         }
     }
 
-    return redirect(regResult.redirect);
+    return {
+        ok: regResult.ok,
+        message: regResult.message,
+        status:200,
+    };
+
 };
 
 export async function logoutAction(){

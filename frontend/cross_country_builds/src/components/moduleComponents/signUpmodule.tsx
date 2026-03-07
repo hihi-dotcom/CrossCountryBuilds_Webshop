@@ -1,13 +1,27 @@
 import { Label, TextInput, Button, Card } from "flowbite-react";
+import { useEffect } from "react";
 import { HiUser, HiMail, HiLockClosed, HiArrowRight, HiExclamationCircle, HiCheckCircle } from "react-icons/hi";
-import { Link, Form, useActionData, useNavigation } from "react-router-dom";
-import BackToWebShopButton from "../buttonComponents/backtoWebshopButton";
-import { act } from "react";
+import { Link, Form, useActionData, useNavigation, useNavigate } from "react-router-dom";
 
 export default function SignUpModule() {
   const actionData = useActionData() as any;
+  const navigate = useNavigate();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+
+  useEffect(() => {
+    if(actionData){
+        if(actionData.ok){
+          navigate("/login", {
+            state: {
+              toastMsg: actionData.message,
+              toastStatus: actionData.status
+            }
+          })
+        }
+    }
+    
+  }, [actionData, navigate])
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-2 sm:px-4 py-6 md:py-10">
@@ -45,7 +59,7 @@ export default function SignUpModule() {
                     color={actionData?.errors?.username ? "failure" : "gray"}
                   />
                   {actionData?.errors?.username && (
-                    <p className="text-red-500 text-[9px] font-black uppercase italic ml-1">{actionData.errors.username}</p>
+                    <p className="text-red-500 text-xs font-black uppercase italic ml-1">{actionData.errors.username}</p>
                   )}
                 </div>
 
@@ -64,7 +78,7 @@ export default function SignUpModule() {
                     color={actionData?.errors?.email ? "failure" : "gray"}
                   />
                   {actionData?.errors?.email && (
-                    <p className="text-red-500 text-[9px] font-black uppercase italic ml-1">{actionData.errors.email}</p>
+                    <p className="text-red-500 text-xs  font-black uppercase italic ml-1">{actionData.errors.email}</p>
                   )}
                 </div>
 
@@ -83,7 +97,7 @@ export default function SignUpModule() {
                     color={actionData?.errors?.password ? "failure" : "gray"}
                   />
                   {actionData?.errors?.password && (
-                    <p className="text-red-500 text-[9px] font-black uppercase italic ml-1">{actionData.errors.password}</p>
+                    <p className="text-red-500 text-xs  font-black uppercase italic ml-1">{actionData.errors.password}</p>
                   )}
                 </div>
 
@@ -101,20 +115,20 @@ export default function SignUpModule() {
                     color={actionData?.errors?.confirmPassword ? "failure" : "gray"}
                   />
                   {actionData?.errors?.confirmPassword && (
-                    <p className="text-red-500 text-[9px] font-black uppercase italic ml-1">{actionData.errors.confirmPassword}</p>
+                    <p className="text-red-500 text-xs  font-black uppercase italic ml-1">{actionData.errors.confirmPassword}</p>
                   )}
                 </div>
               </div>
 
               <div className=" flex sm:flex-row items-center justify-between gap-4 pt-2">
                 {actionData?.serverError && (
-                    <div className="mt-2 text-red-500 flex items-center gap-2 text-xs font-bold uppercase italic">
+                    <div className="mt-2 text-red-500 flex items-center gap-2 text-xs  font-bold uppercase italic">
                       <HiExclamationCircle /> {actionData.serverError}
                     </div>
                   )}
                 <div className="hidden items-center gap-5 justify-center sm:flex sm:flex-row sm:items-start order-2 sm:order-1">
                   <span className="text-gray-300 text-sm font-black uppercase tracking-widest italic">Van már fiókod?</span>
-                  <Link to="/login" className="text-sm text-gray-200 rounded-full bg-gray-600 px-2 py-1 font-bold uppercase italic hover:text-white flex items-center">
+                  <Link to="/login" className=" text-xs  md:text-sm text-gray-200 rounded-full bg-gray-600 px-3 py-1 font-bold uppercase italic hover:text-white flex items-center">
                     Lépj be itt <HiArrowRight className="ml-1 h-3 w-3" />
                   </Link>
                 </div>

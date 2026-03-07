@@ -100,6 +100,7 @@ describe('User oldali frontend folyamatok tesztjei', () => {
     cy.get('select[name="appointmentDate"]').select("22");
     cy.get('textarea[name="message"]').type("Összetörtem a hátsó kerekét a biciklimnek és kiszakadtak a küllői, kellene egy új hátsó kerék illetve egy féktárcsa is");
     cy.contains('button[type="submit"]', "Foglalás beküldése").click();
+    cy.url().should('not.include', `/appointment`);
   });
   it("Jelszó visszaállító email kiküldésének.", () => {
      const tempUser = `User12345`;
@@ -116,4 +117,4 @@ describe('User oldali frontend folyamatok tesztjei', () => {
     cy.get('nav [data-testid="flowbite-navbar-toggle"]').click();
     cy.contains('div', 'Szerviz').should('be.visible');
   });
-})
+});

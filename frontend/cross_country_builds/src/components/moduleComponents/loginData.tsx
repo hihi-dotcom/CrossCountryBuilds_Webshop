@@ -1,12 +1,32 @@
 import { Label, TextInput, Button, Card } from "flowbite-react";
 import { HiUser, HiLockClosed, HiArrowRight, HiExclamationCircle } from "react-icons/hi";
-import { Link, Form, useActionData, useNavigation } from "react-router-dom";
+import { Link, Form, useActionData, useNavigate, useNavigation } from "react-router-dom";
+import { useEffect } from "react";
 
 
 export default function LoginModule() {
   const actionData = useActionData() as any;
-  const navigation = useNavigation();
-  const isSubmitting = navigation.state === "submitting";
+  const navigation = useNavigate();
+
+  const navigating = useNavigation();
+  const isSubmitting = navigating.state === "submitting";
+
+  useEffect(() => {
+    if(actionData){
+      if(actionData.success){
+        const targetPage = actionData.userData?.role === 'admin' ? "/admin" : "/";
+
+        navigation(targetPage, {
+          state: {
+            toastMsg: actionData.message,
+            toastStatus: actionData.status
+          }
+        })
+      }
+    }
+    
+    
+  }, [actionData,navigation])
 
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center px-2 sm:px-4 py-8 md:py-12">

@@ -1,12 +1,14 @@
 import { Label, TextInput, Button, Card } from "flowbite-react";
-import { HiMail, HiArrowLeft, HiExclamationCircle, HiPaperAirplane } from "react-icons/hi";
+import { HiMail, HiArrowLeft, HiExclamationCircle, HiPaperAirplane, HiCheck,} from "react-icons/hi";
 import { Link, Form, useActionData, useNavigation } from "react-router-dom";
-import BackToWebShopButton from "../buttonComponents/backtoWebshopButton";
+
 
 export default function GetNewPasswordModule() {
   const actionData = useActionData() as any;
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+
+
 
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center px-4 py-12">
@@ -51,6 +53,12 @@ export default function GetNewPasswordModule() {
                 <HiExclamationCircle className="h-4 w-4" /> {actionData.serverError}
               </p>
             )}
+            {actionData?.message && (
+              <p className="text-green-500 text-sm font-black uppercase italic ml-1 tracking-tighter flex justify-center gap-1">
+                <HiCheck className="h-4 w-4" /> {actionData.message}
+              </p>
+            )}
+          
           </div>
           <div className="flex flex-col gap-4 mt-2">
             <Button 
