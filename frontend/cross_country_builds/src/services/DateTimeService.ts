@@ -2,7 +2,6 @@ import AuthService from "./AuthService";
 import type BookCreds from "../models/models_for_services/datetime_models";
 import type FinalizeCreds from "../models/models_for_services/datetime_models";
 import type FreeDate from "../models/models_for_services/datetime_models";
-const API_URL = "http://localhost:3000/api";
 class DateTimeService{
     async gettingFreeDates(){
         const resp = await AuthService._request("freeappointments");

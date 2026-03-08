@@ -90,7 +90,7 @@ export default function NavbarComponent() {
               {!isOrderFlow && (
                 user ? (
                   <div className="flex items-center gap-2">
-                    <span className="hidden lg:inline-flex text-sm font-medium text-white">{user.username}</span>
+                    <span className="hidden lg:inline-flex text-base font-medium text-white">{user.username}</span>
                     <Form method="post" action="/logout">
                       <Button color="failure" size="xs" type="submit" pill className="p-1 dark:text-white">
                         <HiLogout className="h-8 w-8" />

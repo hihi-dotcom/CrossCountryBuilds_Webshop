@@ -1,10 +1,25 @@
-import { Form, useActionData, useLoaderData } from "react-router-dom";
+import { Form, useActionData, useLoaderData, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import SelectforDatetime from "../htmlselectComponents/selectforDateTime";
 import BackToWebShopButton from "../buttonComponents/backtoWebshopButton";
 
 export default function AppointmentModule() {
     const freedates = useLoaderData() as any[] || [];
     const actionData = useActionData();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if(actionData){
+            if(actionData.success){
+                navigate("/", {
+                    state: {
+                        toastMsg: actionData.message,
+                        toastStatus: actionData.status
+                    }
+                })
+            }
+        }
+    }, [actionData, navigate])
 
     return (
         <div className="max-w-6xl mx-auto px-4 py-8 md:py-12 min-h-screen font-sans text-slate-800">
@@ -78,8 +93,6 @@ export default function AppointmentModule() {
                             )}
                         </div>
                     </div>
-
-                    {/* Oldalsáv: Fontos infó és Beküldés */}
                     <div className="space-y-6">
                         <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-xl relative overflow-hidden">
                             <div className="relative z-10">
@@ -93,7 +106,6 @@ export default function AppointmentModule() {
                                     <p className="text-sm text-slate-400 italic text-right">Üdvözlettel: A csapat</p>
                                 </div>
                             </div>
-                            {/* Dekoratív elem */}
                             <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-red-500/10 rounded-full blur-3xl"></div>
                         </div>
 

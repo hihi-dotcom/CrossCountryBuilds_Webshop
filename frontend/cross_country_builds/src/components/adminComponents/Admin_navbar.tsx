@@ -1,8 +1,9 @@
 import { Navbar, NavbarBrand, NavbarCollapse, NavbarLink, NavbarToggle } from "flowbite-react";
-import { useLocation, Link, Form } from "react-router-dom";
+import { useLocation, Link, Form, useRouteLoaderData } from "react-router-dom";
 
 export default function AdminNavbar() {
   const location = useLocation();
+  const user = useRouteLoaderData("admin");
   const currentPath = location.pathname.toLowerCase();
   const isProductEditing = currentPath.startsWith("/admin/products/") && currentPath !== "/admin/products";
   const isAppointmentFinalizing = currentPath.startsWith("/admin/appointments/") && currentPath !== "/admin/dates";
@@ -22,6 +23,13 @@ export default function AdminNavbar() {
       </NavbarBrand>
 
       <div className="flex md:order-2">
+        {user && (
+          <>
+            <div className="flex items-center gap-2">
+              <span className="hidden lg:inline-flex text-base font-medium text-white">{user.username}</span>
+            </div>
+          </>
+        )}
         {!isProductEditing && !isAppointmentFinalizing && (
           <>
               <Form method="POST" action="/logout">
@@ -46,6 +54,7 @@ export default function AdminNavbar() {
               {link.label}
             </NavbarLink>
           ))}
+          
       </NavbarCollapse>
     </Navbar>
   );

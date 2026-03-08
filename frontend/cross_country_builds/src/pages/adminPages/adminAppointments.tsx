@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Form, useLoaderData, useActionData, Link } from "react-router-dom";
 import { FaCheck } from "react-icons/fa6";
+import { HiCheck } from "react-icons/hi";
 
 export default function AppointmentDashboard(){
     const initAppointments = useLoaderData();
@@ -67,6 +68,11 @@ export default function AppointmentDashboard(){
                                     <p className="text-red-500 text-sm font-bold">
                                         {actionData.errors.appointmentDate[0]}
                                     </p>
+                                )}
+                                {actionData?.message && (
+                                              <p className="text-green-500 text-sm font-black uppercase italic ml-1 tracking-tighter flex justify-center gap-1">
+                                                <HiCheck className="h-4 w-4" /> {actionData.message}
+                                              </p>
                                 )}
                                 <button type="submit" className=" text-lg bg-[#08415c] text-white px-3 py-2 rounded-lg    hover:font-bold">Hozzáadás!</button>
                             </div>

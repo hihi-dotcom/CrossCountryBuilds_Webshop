@@ -79,6 +79,7 @@ class AuthService {
                 return {
                     ok: true, 
                     data,
+                    username: data.name,
                     message: data.message,
                     
                 };

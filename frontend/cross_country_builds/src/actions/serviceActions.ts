@@ -24,7 +24,11 @@ export async function serviceDateTimeAction({request}: {request:Request}) {
             }
         }
 
-        return redirect("/");
+        return{
+            success:response.ok,
+            message: response.message,
+            status:200,
+        };
     }
     catch(error:any){
         return{
@@ -46,8 +50,11 @@ export async function createEmptyAppointmentAction({request}: {request: Request}
     }
     
     try {
-        await DateTimeService.createFreeService(result.data);
-        return { success: true }; 
+        const response =  await DateTimeService.createFreeService(result.data);
+        return {
+            success: response.ok,
+            message: response.message
+        }; 
     } catch(error: any) {
         
         return {
