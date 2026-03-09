@@ -3,7 +3,7 @@ export default interface ProductCreds{
     category: string,
     maker: string,
     description: string,
-    pic: File,
     price: number;
-    num_of_products: number
+    stock_number: number
+    image: string
 }

@@ -14,26 +14,9 @@ export default function OrdersDashboard(){
          const [error, setError] = useState("");
          const [selectedOrderItems, setSelectedOrderItems] = useState<any[] | null>(null);
          const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
-        /*  const [orders, setOrders] = useState([
-            {
-            id:1,
-            u_id: 2,
-           d_method: "házhoz szállítás",
-            p_method: "utánvét készpénzzel",
-            total_amount: 500000,
-            items:[
-                {
-                    p_name: "bicikli",
-                    p_price: 350000
-                }
-            ],
-            status: "kész"
-            
-            }
-        ]);*/
 
         async function handleUpdateStatus(id:number, newStatus: string) {
-        if (newStatus === "") return; // Biztonsági ellenőrzés
+        if (newStatus === "") return; 
 
         setLoadingId(id);
         setError("");
@@ -160,7 +143,7 @@ export default function OrdersDashboard(){
                                                </button>
                                             </td>
                                             <td className="py-4 px-2">
-                                                <select value={s.status} disabled={isLoading} onChange={(e) => handleUpdateStatus(s.id, e.target.value)} >
+                                                <select value={s.status} data-testid="orderStatus" disabled={isLoading} onChange={(e) => handleUpdateStatus(s.id, e.target.value)} >
                                                     <option value="pending">Feldolgozás alatt</option>
                                                     <option value="kész">Kész!</option>
                                                 </select>

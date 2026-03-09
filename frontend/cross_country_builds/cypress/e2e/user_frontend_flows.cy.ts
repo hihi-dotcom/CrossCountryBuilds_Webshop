@@ -5,17 +5,18 @@ describe('User oldali frontend folyamatok tesztjei', () => {
  
   it('Regisztráció majd belépés', () => {
     const tempUser = `User12345`;
-    /*
-      Mivel egyszer sikeresen lefutott a regisztráció, ezt többször nem szükséges megismételni.
+
+      //Mivel egyszer sikeresen lefutott a regisztráció, ezt többször nem szükséges megismételni.
+      /*
       cy.visit(`/signup`);
       cy.get('input[name="username"]').type(tempUser);
       cy.get('input[name="email"]').type(`${tempUser}@test.hu`);
       cy.get('input[name="password"]').type('Password456!');
       cy.get('input[name="confirmPassword"]').type('Password456!');
       cy.get('button[type="submit"]').click();
-
-      cy.url().should('include', `/login`);
-    */
+      */
+      //cy.url().should('include', `/login`);
+  
       //Bejelentkezés
       cy.visit('/login');
       cy.get('input[name="username"]').type(tempUser);
@@ -97,7 +98,7 @@ describe('User oldali frontend folyamatok tesztjei', () => {
     cy.contains('button', 'Bejelentkezés').click();
     cy.url().should('not.include', `/login`);
     cy.contains('Szerviz').click();
-    cy.get('select[name="appointmentDate"]').select("22");
+    cy.get('select[name="appointmentDate"]').select("24");
     cy.get('textarea[name="message"]').type("Összetörtem a hátsó kerekét a biciklimnek és kiszakadtak a küllői, kellene egy új hátsó kerék illetve egy féktárcsa is");
     cy.contains('button[type="submit"]', "Foglalás beküldése").click();
     cy.url().should('not.include', `/appointment`);
@@ -108,7 +109,7 @@ describe('User oldali frontend folyamatok tesztjei', () => {
       cy.contains('a',"Elfelejtettem a jelszavam").click();
       cy.get('input[type="email"]').type(`${tempUser}@test.hu`);
       cy.contains('button', 'Link küldése').click();
-      cy.url().should('include', '/login');
+      cy.contains('p', 'Az E-mail küldés sikeres volt!');
   });
 
   it("Mobilos reszponzívitás letesztelése", () => {

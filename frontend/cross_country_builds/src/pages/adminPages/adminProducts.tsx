@@ -135,7 +135,7 @@ export default function ProductDashboard(){
                                             </td>
                                             <td className="py-4 px-2 text-center text-gray-600">{product.category}</td>
                                             <td className="py-4 px-2 text-center font-bold">
-                                                <span>
+                                                <span data-testid="stock_number">
                                                     {product.stock_number} 
                                                 </span>
                                             </td>

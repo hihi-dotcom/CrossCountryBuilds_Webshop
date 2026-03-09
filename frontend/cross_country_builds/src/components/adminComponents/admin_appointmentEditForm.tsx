@@ -1,8 +1,8 @@
 import { Button, TextInput, Alert } from "flowbite-react";
-import { Form } from "react-router-dom";
+import { Form, useActionData } from "react-router-dom";
 
 export function EditAppointmentForm({appointment}:any){
-
+const actionData = useActionData();
   return(
     <>
         <div className="flex min-h-screen items-center justify-center p-4">
@@ -28,10 +28,10 @@ export function EditAppointmentForm({appointment}:any){
             <TextInput id="bringback_date" type="datetime-local" name="bringback_date"   shadow className="w-full" placeholder="pl: 50"  defaultValue={appointment.bringback_date ? appointment.bringback_date.substring(0, 16) : ""}/>
           </div>
 
-          {appointment?.message && (
+          {actionData?.message && (
             <>
               <Alert color="failure" className="mb-2">
-                <span className="font-medium">Hiba történt:</span> {appointment.message}
+                <span className="font-medium">Hiba történt:</span> {actionData.message}
               </Alert>
             </>
           )}

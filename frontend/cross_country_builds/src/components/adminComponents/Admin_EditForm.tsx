@@ -1,7 +1,8 @@
 import { Button, Label, TextInput, Alert } from "flowbite-react";
-import { Form } from "react-router-dom";
+import { Form, useActionData } from "react-router-dom";
 
 export function EditForm({product}:any) {
+  const actionData = useActionData();
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       
@@ -43,13 +44,13 @@ export function EditForm({product}:any) {
           <TextInput id="stock_number" type="number" name="stock_number"   shadow className="w-full" placeholder="pl: 50"  defaultValue={product ? product.stock_number : ''} min={0} max={150}/>
         </div>
 
-        {product?.message && (
-          <>
-            <Alert color="failure" className="mb-2">
-              <span className="font-medium">Hiba történt:</span> {product.message}
-            </Alert>
-          </>
-        )}
+          {actionData?.message && (
+            <>
+              <Alert color="failure" className="mb-2">
+                <span className="font-medium">Hiba történt:</span> {actionData.message}
+              </Alert>
+            </>
+          )}
 
         <Button type="submit" className="w-full">
             Mentés

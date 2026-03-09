@@ -18,7 +18,7 @@ export default function OrderDataModule() {
   const submit = useSubmit();
   const isSubmitting = navigation.state === "submitting";
   const [sameAddress, setSameAddress] = useState(true);
-  const emailref = useRef<HTMLInputElement | null>(null);
+  
   const passwordref = useRef<HTMLInputElement | null>(null);
   const handleSubmit = (event: any) => {
     event.preventDefault();

@@ -11,7 +11,7 @@ class DateTimeService{
         return respData;
     };
 
-    async bookAServiceDate(id: number, data:any){
+    async bookAServiceDate(id: number, data:{appointmentDate:string, description:string}){
    
         const response = await AuthService._request(`appointment?id=${id}`,{
             method: "PATCH",

@@ -37,7 +37,7 @@ export default function UsersDashboard(){
                         <div className="flex flex-row">
                             <div id="kereso-mezo" className="w-full py-3  px-1 text-lg">
                                 <label htmlFor="productname" className="text-base">Adj meg felhasználónevet: </label>
-                                <input type="text" name="productname" id="productname" className="text-black border-black border-2 bg-white rounded-xl px-2 h-10" placeholder="a felhasználónév" onChange={handleSearchforUser} ref={UsernameRef}/>
+                                <input type="text" name="productname" id="productname" className="text-black border-black border-2 bg-white rounded-xl px-2 h-10 w-full" placeholder="a felhasználónév" onChange={handleSearchforUser} ref={UsernameRef}/>
                             </div>
                             <div id="kereses-gomb" className=" flex items-center justify-center">
                                 <button type="submit" onClick={handleSearchforUser} className=" text-lg bg-[#08415c] text-white px-2 py-2 rounded-lg    hover:font-bold">Keresés!</button>
