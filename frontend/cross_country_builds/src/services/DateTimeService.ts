@@ -1,7 +1,9 @@
 import AuthService from "./AuthService";
-import type BookCreds from "../models/models_for_services/datetime_models";
-import type FinalizeCreds from "../models/models_for_services/datetime_models";
-import type FreeDate from "../models/models_for_services/datetime_models";
+import { DateTimeBookRespDTO } from "../dtos/DateTimeBookRespDTO";
+import { DateTimeFinalizeRespDTO } from "../dtos/DateTimeFinalizeRespDTO";
+import { DateTimeFreeServiceRespDTO } from "../dtos/DateTimeFreeServiceRespDTO";
+import { DateTimeDeleteServiceRespDTO } from "../dtos/DateTimeDeleteServiceRespDTO";
+import DateTime from "../models/datetime";
 class DateTimeService{
     async gettingFreeDates(){
         const resp = await AuthService._request("freeappointments");
@@ -11,7 +13,7 @@ class DateTimeService{
         return respData;
     };
 
-    async bookAServiceDate(id: number, data:{appointmentDate:string, description:string}){
+    async bookAServiceDate(id: number, data:{appointmentDate:string, problem_description:string}):Promise<DateTimeBookRespDTO>{
    
         const response = await AuthService._request(`appointment?id=${id}`,{
             method: "PATCH",
@@ -27,7 +29,7 @@ class DateTimeService{
         };
     };
 
-    async finalizeService(id:number, data:{service_id:string, price:number, bringBackDate: string}){
+    async finalizeService(id:number, data:{service_id:string, price:number, bringBackDate: string}):Promise<DateTimeFinalizeRespDTO>{
         const response = await AuthService._request(`finalize?id=${id}`, {
             method: "PATCH",
             body: JSON.stringify(data)
@@ -41,7 +43,7 @@ class DateTimeService{
         }
     };
 
-    async createFreeService(data:{appointmentDate:string}){
+    async createFreeService(data:{appointmentDate:string}):Promise<DateTimeFreeServiceRespDTO>{
         const response = await AuthService._request(`newappointment`, {
             method: "POST",
             body: JSON.stringify(data)
@@ -55,7 +57,7 @@ class DateTimeService{
         }
     };
 
-    async deleteService(id:number){
+    async deleteService(id:number):Promise<DateTimeDeleteServiceRespDTO>{
         const response = await AuthService._request(`appointment?id=${id}`, {
             method: "DELETE"
         });
@@ -68,7 +70,7 @@ class DateTimeService{
         };
     };
 
-    async getAppointmentsforAdmin(){
+    async getAppointmentsforAdmin():Promise<DateTime[] | []>{
         const response = await AuthService._request(`admin/appointments`, {
             method: "GET"
         });
@@ -80,7 +82,7 @@ class DateTimeService{
     }
 
     
-    async getAppointmentById(id: number) {
+    async getAppointmentById(id: number):Promise<DateTime | null>{
         const response = await AuthService._request(`admin/appointment?id=${id}`);
         const data = await response.json();
         

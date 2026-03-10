@@ -15,7 +15,7 @@ export async function serviceDateTimeAction({request}: {request:Request}) {
     try{
         const response = await DateTimeService.bookAServiceDate(appointmentId,{
             appointmentDate: result.data.appointmentDate,
-            description: result.data.message
+            problem_description: result.data.problem_description
         });
 
         if(!response.ok){

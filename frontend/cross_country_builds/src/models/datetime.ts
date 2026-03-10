@@ -1,7 +1,8 @@
 export default interface DateTime{
-    bring_date: number;
-    pickup_date: number; 
-    problem_des: string;
-    repair_name: string;
+    customer_name?:string,
+    service_date?: Date,
+    problem_description?: string,
+    service_price?: number,
+    bringback_date?: Date
 
 }

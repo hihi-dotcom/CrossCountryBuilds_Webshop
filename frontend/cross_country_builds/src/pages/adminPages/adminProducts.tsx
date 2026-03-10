@@ -1,18 +1,21 @@
 import TrashIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import PenIcon from "@mui/icons-material/Edit";
-import { Form, useLoaderData, Link } from "react-router-dom";
+import { HiCheck } from "react-icons/hi";
+import { Form, useLoaderData, useActionData, Link } from "react-router-dom";
 import { useState, useRef } from "react";
 import ProductService from "../../services/ProductService";
 import type Product from "../../models/product";
 import DeleteModal from "../../components/modalComponents/adminModalComponents/AreyouSureDeleteModal";
 
 export default function ProductDashboard(){
+    const actionData = useActionData();
     const initProducts = useLoaderData();
     const [products, setProducts] = useState<Product[]>(initProducts);
     const [error, setError] = useState("");
     const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+    const [deleteTargetName, setDeleteTargetName] = useState<string | null>(null);
 
-    async function handleDeleteProduct(id:number){
+    async function handleDeleteProduct(id:number, productname:string){
         try{
             const deleteResult = await ProductService.deleteProductById(id);
             if(deleteResult.ok){
@@ -42,13 +45,17 @@ export default function ProductDashboard(){
     }
     return(
         <>
-            <DeleteModal isOpen={deleteTargetId !== null} 
-                onClose={() => setDeleteTargetId(null)}>
+            <DeleteModal isOpen={deleteTargetId !== null } 
+                onClose={() => {
+                    setDeleteTargetId(null);
+                    setDeleteTargetName(null);
+                    }}>
                 <h2 className="text-2xl font-bold">Biztosan törölni akarod ezt a terméket?</h2>
+                <p className=" text-lg opacity-90">{deleteTargetName}</p>
                 <p className=" text-lg opacity-90"> Ez a művelet végleges, nem vonható vissza.</p>
                 <div className="flex gap-4">
                     <button className="bg-red-600 hover:bg-red-800 text-white  hover:font-bold rounded-xl transition-colors py-3 px-4 "
-                    onClick={() => deleteTargetId && handleDeleteProduct(deleteTargetId)}>
+                    onClick={() => deleteTargetId && handleDeleteProduct(deleteTargetId, deleteTargetName!)}>
                         Igen, töröld!
                     </button>
                 </div>
@@ -99,6 +106,14 @@ export default function ProductDashboard(){
                                  <label htmlFor="prodstock">Hány darab van ebből a termékből?</label>
                                 <input type="number" name="stock_number" id="prodstock" className="text-black border-black border-2 bg-white rounded-xl px-3 h-10 w-full placeholder:text-black" placeholder="a termék darabszáma"/>
                             </div>
+                            {actionData?.message && (
+                                <>
+                                    <p className="text-green-500 text-sm font-black uppercase italic ml-1 tracking-tighter flex justify-center gap-1">
+                                        <HiCheck className="h-4 w-4" /> {actionData.message}
+                                    </p>
+                                </>
+                               
+                            )}
                              <div id="hozzaadas-gomb" className=" flex items-center justify-center">
                                 <button type="submit" className=" text-lg bg-[#08415c] text-white px-2 py-2 rounded-lg    hover:font-bold">Hozzáad!</button>
                             </div>
@@ -144,7 +159,10 @@ export default function ProductDashboard(){
                                             </td>
                                             <td className="py-3 px-2 text-center flex flex-col md:flex-row">
                                             <div className="flex flex-col md:flex-row justify-content-end items-center gap-2"> 
-                                                <button className="flex items-center justify-right gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95" onClick={() => setDeleteTargetId(product.id)}>
+                                                <button className="flex items-center justify-right gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95" onClick={() => {
+                                                    setDeleteTargetId(product.id);
+                                                    setDeleteTargetName(product.name);
+                                                    }}>
                                                     <TrashIcon sx={{ fontSize: 18 }} />
                                                     <span className="md:hidden lg:inline">Törlés</span>
                                                 </button>

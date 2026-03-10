@@ -1,9 +1,10 @@
 import type { ForgotCreds,NewPassCreds } from "../models/models_for_services/password_models";
-
+import type { GetNewPasswordRespDTO } from "../dtos/GetNewPasswordRespDTO";
+import { CreateNewPasswordRespDTO } from "../dtos/CreatePasswordRespDTO";
 
 class PasswordService{
 
-    async forgotPass(data:ForgotCreds){
+    async forgotPass(data:ForgotCreds):Promise<GetNewPasswordRespDTO>{
         const response = await fetch("http://localhost:3000/api/getnewpass", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -18,7 +19,7 @@ class PasswordService{
         };
     };
 
-    async createNewPass(token:string, data:NewPassCreds) {
+    async createNewPass(token:string, data:NewPassCreds):Promise<CreateNewPasswordRespDTO>{
          const response = await fetch("http://localhost:3000/api/createnewpass", {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },

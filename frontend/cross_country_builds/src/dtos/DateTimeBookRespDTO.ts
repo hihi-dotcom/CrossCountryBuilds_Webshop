@@ -1,3 +1,4 @@
 export interface DateTimeBookRespDTO{
-    state: string;
+   ok:boolean,
+   message:string
 }

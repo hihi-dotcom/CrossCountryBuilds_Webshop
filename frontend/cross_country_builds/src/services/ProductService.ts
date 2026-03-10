@@ -1,5 +1,6 @@
 import AuthService from "./AuthService";
 import type ProductCreds from "../models/models_for_services/product_models";
+import Product from "../models/product";
 
 const API_URL = "http://localhost:3000/api";
 
@@ -50,7 +51,7 @@ class ProductService {
         return respD;
     }
 
-    async createNewProduct(Indata:any, isJson:boolean = false) {
+    async createNewProduct(Indata:Product, isJson:boolean = false) {
         const fetchOptions: any = {
             method: "POST",
             body: isJson ? JSON.stringify(Indata) : Indata
@@ -88,7 +89,7 @@ class ProductService {
         };
     };
 
-    async updateProductbyId(id:number, data:any){
+    async updateProductbyId(id:number, data:Product){
         const response = await AuthService._request(`admin/products?id=${id}`,{
             method: "PATCH",
             body: JSON.stringify(data)

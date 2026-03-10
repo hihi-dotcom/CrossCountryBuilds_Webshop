@@ -119,13 +119,13 @@ export default function SignUpModule() {
                   )}
                 </div>
               </div>
-
-              <div className=" flex sm:flex-row items-center justify-between gap-4 pt-2">
-                {actionData?.serverError && (
+                  {actionData?.serverError && (
                     <div className="mt-2 text-red-500 flex items-center gap-2 text-xs  font-bold uppercase italic">
                       <HiExclamationCircle /> {actionData.serverError}
                     </div>
                   )}
+              <div className=" flex sm:flex-row items-center justify-between gap-4 pt-2">
+
                 <div className="hidden items-center gap-5 justify-center sm:flex sm:flex-row sm:items-start order-2 sm:order-1">
                   <span className="text-gray-300 text-sm font-black uppercase tracking-widest italic">Van már fiókod?</span>
                   <Link to="/login" className=" text-xs  md:text-sm text-gray-200 rounded-full bg-gray-600 px-3 py-1 font-bold uppercase italic hover:text-white flex items-center">

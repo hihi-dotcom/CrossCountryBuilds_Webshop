@@ -1,5 +1,7 @@
 import { redirect } from "react-router-dom";
 import type { RegistrationCreds, LoginCreds } from "../models/models_for_services/auth_models";
+import { LogInRespDTO } from "../dtos/LoginRespDTO";
+import { RegistrationRespDTO } from "../dtos/RegistrationStateDTO";
 
 const API_url: string = `http://localhost:3000/api/`;
 
@@ -46,7 +48,7 @@ class AuthService {
         
     }
 
-    async registration({username, email, password, confirmPassword}:RegistrationCreds){
+    async registration({username, email, password, confirmPassword}:RegistrationCreds):Promise<RegistrationRespDTO>{
         const response = await this._request('signup', {
             method: "POST",
             body: JSON.stringify({username, email, password, confirmPassword}),
@@ -66,7 +68,7 @@ class AuthService {
         };
     }
 
-    async login({username, password}:LoginCreds){
+    async login({username, password}:LoginCreds):Promise<LogInRespDTO>{
         const response = await this._request('login', {
             method: "POST",
             body: JSON.stringify({username, password})

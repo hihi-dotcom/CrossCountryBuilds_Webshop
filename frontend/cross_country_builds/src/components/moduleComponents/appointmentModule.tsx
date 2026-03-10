@@ -81,14 +81,14 @@ export default function AppointmentModule() {
                             </div>
                             
                             <textarea 
-                                id="message" 
-                                name="message" 
+                                id="problem_description" 
+                                name="problem_description" 
                                 rows={5} 
                                 className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none placeholder:text-slate-400" 
-                                placeholder="Pl.: Defektet kaptam, vagy furcsa hangot ad a középcsapágy..."
+                                placeholder="Pl.: Defektet kaptam, vagy furcsa hangot ad a középcsapágy...(típus: Merida Dual Thrust)"
                             ></textarea>
                             
-{actionData?.errors?.message && actionData.errors.message[0] && (
+                            {actionData?.errors?.problem_description && (
                                 <p className="mt-3 text-red-500 text-sm font-medium">{actionData.errors.message[0]}</p>
                             )}
                         </div>
@@ -101,6 +101,9 @@ export default function AppointmentModule() {
                                 </h2>
                                 <p className="text-slate-300 leading-relaxed mb-6">
                                     A javítás várható befejezéséről és a kerékpár átvételének időpontjáról minden esetben <strong>e-mailben</strong> küldünk értesítést.
+                                </p>
+                                <p className="text-slate-300 leading-relaxed mb-6">
+                                   Kérjük a hiba leírásában add meg a kerékpárod <strong>pontos típusát</strong> ! 
                                 </p>
                                 <div className="pt-4 border-t border-slate-700">
                                     <p className="text-sm text-slate-400 italic text-right">Üdvözlettel: A csapat</p>

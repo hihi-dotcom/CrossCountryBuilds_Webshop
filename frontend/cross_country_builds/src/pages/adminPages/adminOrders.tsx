@@ -14,6 +14,7 @@ export default function OrdersDashboard(){
          const [error, setError] = useState("");
          const [selectedOrderItems, setSelectedOrderItems] = useState<any[] | null>(null);
          const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+         const [selectedOrderId, setselectedOrderId] = useState<number | null>(null);
 
         async function handleUpdateStatus(id:number, newStatus: string) {
         if (newStatus === "") return; 
@@ -62,10 +63,13 @@ export default function OrdersDashboard(){
         <>
             <AdminProductModal
                 isOpen={selectedOrderItems !== null} 
-                onClose={() => setSelectedOrderItems(null)}
+                onClose={() => {
+                    setSelectedOrderItems(null)
+                     setselectedOrderId(null);
+                }}
             >
                 <div className="w-full">
-                    <h3 className="text-xl font-bold mb-6 border-b pb-2">Megrendelt termékek</h3>
+                    <h3 className="text-xl font-bold mb-6 border-b pb-2">#{selectedOrderId} Megrendelt termékek</h3>
                    <div className="space-y-2">
                         {selectedOrderItems?.map((item: any) => (
                             <div key={item.id} className="grid grid-cols-12 gap-2 items-center p-4 bg-white/5 rounded-xl border border-black/5 shadow-sm">
@@ -86,7 +90,10 @@ export default function OrdersDashboard(){
                 </div>
             </AdminProductModal>
             <DeleteModal isOpen={deleteTargetId !== null} 
-                onClose={() => setDeleteTargetId(null)}>
+                onClose={() => {
+                        setDeleteTargetId(null);
+                       
+                    }}>
                     <>
                         <h2 className="text-2xl font-bold">
                             Biztosan törölni akarod, ezt a rendelést?
@@ -137,13 +144,16 @@ export default function OrdersDashboard(){
                                               <td className="py-4 px-2">{s.payment_Method}</td>
                                               <td className="py-4 px-2 font-semibold">{Number(s.total_amount).toLocaleString()} Ft</td>
                                             <td className="py-4 px-2">
-                                               <button onClick={() => setSelectedOrderItems(s.items)}  className={s.status === "kész" ? "bg-blue-600 text-white rounded-xl py-2 px-3  flex flex-col md:flex-row items-center gap-1 transition-colors" :"bg-blue-600 hover:bg-blue-800 text-white hover:font-bold py-2 px-3  flex flex-col md:flex-row items-center gap-1 transition-colors rounded-xl"} disabled={s.status === "kész"}>
+                                               <button onClick={() => {
+                                                setSelectedOrderItems(s.items);
+                                                setselectedOrderId(s.u_id)
+                                                }}  className={s.status === "kész" ? "bg-blue-600 text-white rounded-xl py-2 px-3  flex flex-col md:flex-row items-center gap-1 transition-colors" :"bg-blue-600 hover:bg-blue-800 text-white hover:font-bold py-2 px-3  flex flex-col md:flex-row items-center gap-1 transition-colors rounded-xl"} disabled={s.status === "kész"}>
                                                 <span>{s.items?.length || 0} termék</span>
                                                 <span className="text-sm">(megtekintése)</span>
                                                </button>
                                             </td>
                                             <td className="py-4 px-2">
-                                                <select value={s.status} data-testid="orderStatus" disabled={isLoading} onChange={(e) => handleUpdateStatus(s.id, e.target.value)} >
+                                                <select value={s.status} data-testid="orderStatus" disabled={isLoading || s.status === "kész"} onChange={(e) => handleUpdateStatus(s.id, e.target.value)} >
                                                     <option value="pending">Feldolgozás alatt</option>
                                                     <option value="kész">Kész!</option>
                                                 </select>
