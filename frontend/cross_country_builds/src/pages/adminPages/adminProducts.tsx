@@ -15,6 +15,13 @@ export default function ProductDashboard(){
     const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
     const [deleteTargetName, setDeleteTargetName] = useState<string | null>(null);
 
+     const termekKategoriak = [
+        { value: "kerékpárok", name: "Kerékpárok" },
+        { value: "kiegészítők", name: "Kiegészítők" },
+        { value: "Eszközök", name: "Eszközök" },
+        { value: "ruházat", name: "Ruházat" }
+    ];
+
     async function handleDeleteProduct(id:number, productname:string){
         try{
             const deleteResult = await ProductService.deleteProductById(id);
@@ -40,7 +47,7 @@ export default function ProductDashboard(){
             return;
         }
 
-        const filteredProducts = initProducts.filter((product:Product) => product.name.includes(searchedProduct));
+        const filteredProducts = initProducts.filter((product:Product) => product.name!.includes(searchedProduct));
         setProducts(filteredProducts);
     }
     return(
@@ -82,9 +89,13 @@ export default function ProductDashboard(){
                                 <label htmlFor="prodname">Add meg a termék nevét:</label>
                                 <input type="text" name="name" id="prodname" className="text-black border-black border-2 bg-white rounded-xl px-3 h-10 w-full placeholder:text-black" placeholder="a termék neve"/>
                             </div>
-                            <div>
+                            <div className=" flex flex-col">
                                 <label htmlFor="prodcat">Add meg a kategóriát:</label>
-                                <input type="text" name="category" id="prodcat" className="text-black border-black border-2 bg-white rounded-xl px-3 h-10 w-full placeholder:text-black" placeholder="a termék kategóriája"/>
+                                <select name="category" id="prodcat" defaultValue={"kerékpárok"} className="text-black border-black border-2 bg-white rounded-xl px-3 h-10 w-full placeholder:text-black">
+                                    {termekKategoriak.map((kat) => (
+                                        <option key={kat.value} value={kat.value}>{kat.name}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div>
                                 <label htmlFor="prodmaker">Add meg a termék gyártóját:</label>
@@ -155,13 +166,13 @@ export default function ProductDashboard(){
                                                 </span>
                                             </td>
                                             <td className="py-4 px-2 text-center font-medium">
-                                               {product.price.toLocaleString()} Ft
+                                               {product.price!.toLocaleString()} Ft
                                             </td>
                                             <td className="py-3 px-2 text-center flex flex-col md:flex-row">
                                             <div className="flex flex-col md:flex-row justify-content-end items-center gap-2"> 
                                                 <button className="flex items-center justify-right gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95" onClick={() => {
-                                                    setDeleteTargetId(product.id);
-                                                    setDeleteTargetName(product.name);
+                                                    setDeleteTargetId(product.id!);
+                                                    setDeleteTargetName(product.name!);
                                                     }}>
                                                     <TrashIcon sx={{ fontSize: 18 }} />
                                                     <span className="md:hidden lg:inline">Törlés</span>

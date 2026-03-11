@@ -18,7 +18,7 @@ class UserService{
         };
     };
 
-    async deleteUserbyEmail(email: string){
+    async deleteUserbyEmail(email: string):Promise<string>{
         const response = await fetch(`http://localhost:3000/user?${email}`, {
             method: "DELETE",
             headers: {

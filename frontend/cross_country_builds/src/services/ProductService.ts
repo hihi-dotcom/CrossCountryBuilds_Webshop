@@ -4,12 +4,13 @@ import { GetProductsRespDTO } from "../dtos/GetProductsRespDTO";
 import { CreateNewProductRespDTO } from "../dtos/CreateNewProductRespDTO";
 import { DeleteProductRespDTO } from "../dtos/DeleteProductRespDTO";
 import { UpdateProductRespDTO } from "../dtos/UpdateProductRespDTO";
+import Filters from "../models/filters";
 
 const API_URL = "http://localhost:3000/api";
 
 class ProductService {
 
-    async getProducts(limit: number = 15, offset: number = 0, filters:any = {}):Promise<GetProductsRespDTO>{
+    async getProducts(limit: number = 15, offset: number = 0, filters:Filters = {}):Promise<GetProductsRespDTO>{
         const params = new URLSearchParams({
             limit: limit.toString(),
             offset: offset.toString(),
