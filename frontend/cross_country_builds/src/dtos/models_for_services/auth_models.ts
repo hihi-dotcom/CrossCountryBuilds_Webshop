@@ -1,11 +1,11 @@
-export interface RegistrationCreds{
+export interface RegistrationDTO{
     username: string,
     email: string,
     password: string,
     confirmPassword: string
 }
 
-export interface LoginCreds{
+export interface LoginDTO{
     username: string,
     password: string
 }

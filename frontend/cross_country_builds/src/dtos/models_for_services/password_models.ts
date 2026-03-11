@@ -1,9 +1,9 @@
-export interface ForgotCreds{
+export interface ForgotDTO{
     newpassword: string
 }
 
 
-export interface NewPassCreds{
+export interface NewPassDTO{
     newjelszo:string,
     newjelszo2: string
 }

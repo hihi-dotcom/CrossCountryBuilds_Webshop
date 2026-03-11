@@ -1,8 +1,10 @@
+import { DeleteUserRespDTO } from "../dtos/DeleteUserRespDTO";
+import Guest from "../models/guest";
 import AuthService from "./AuthService";
 
 
 class UserService{
-    async deleteUserbyId(id: number){
+    async deleteUserbyId(id: number):Promise<DeleteUserRespDTO>{
         const response = await AuthService._request(`user?id=${id}`,{
             method: "DELETE",
             
@@ -29,7 +31,7 @@ class UserService{
 
    
 
-    async getNormalUsers() {
+    async getNormalUsers():Promise<Guest[] | []>{
         const response = await AuthService._request('admin/users');
         const responseData = await response.json();
         if (!response.ok) {

@@ -5,7 +5,7 @@ import { DateTimeFreeServiceRespDTO } from "../dtos/DateTimeFreeServiceRespDTO";
 import { DateTimeDeleteServiceRespDTO } from "../dtos/DateTimeDeleteServiceRespDTO";
 import DateTime from "../models/datetime";
 class DateTimeService{
-    async gettingFreeDates(){
+    async gettingFreeDates():Promise<DateTime[]>{
         const resp = await AuthService._request("freeappointments");
 
         const respData = await resp.json();

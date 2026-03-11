@@ -1,4 +1,4 @@
-import type CartItem from "../cartItem"
+import type CartItem from "../../models/cartItem"
 
 
 export interface OrderCreds{
@@ -12,6 +12,6 @@ export interface OrderCreds{
     total: number
 }
 
-export interface UpdateStatCreds{
+export interface UpdateStatDTO{
     status: string
 }

@@ -1,12 +1,15 @@
 import AuthService from "./AuthService";
-import type ProductCreds from "../models/models_for_services/product_models";
 import Product from "../models/product";
+import { GetProductsRespDTO } from "../dtos/GetProductsRespDTO";
+import { CreateNewProductRespDTO } from "../dtos/CreateNewProductRespDTO";
+import { DeleteProductRespDTO } from "../dtos/DeleteProductRespDTO";
+import { UpdateProductRespDTO } from "../dtos/UpdateProductRespDTO";
 
 const API_URL = "http://localhost:3000/api";
 
 class ProductService {
 
-    async getProducts(limit: number = 15, offset: number = 0, filters:any = {}) {
+    async getProducts(limit: number = 15, offset: number = 0, filters:any = {}):Promise<GetProductsRespDTO>{
         const params = new URLSearchParams({
             limit: limit.toString(),
             offset: offset.toString(),
@@ -32,7 +35,7 @@ class ProductService {
     }
 
 
-    async getProductById(id: number) {
+    async getProductById(id: number):Promise<Product | null>{
         const response = await fetch(`${API_URL}/product?id=${id}`);
         const data = await response.json();
         
@@ -42,7 +45,7 @@ class ProductService {
 
 
 
-    async getAdminProducts() {
+    async getAdminProducts():Promise<Product[] | []>{
         const response = await AuthService._request("admin/products");
         const respD = await response.json();
         if (!response.ok){
@@ -51,7 +54,7 @@ class ProductService {
         return respD;
     }
 
-    async createNewProduct(Indata:Product, isJson:boolean = false) {
+    async createNewProduct(Indata:Product, isJson:boolean = false):Promise<CreateNewProductRespDTO>{
         const fetchOptions: any = {
             method: "POST",
             body: isJson ? JSON.stringify(Indata) : Indata
@@ -76,7 +79,7 @@ class ProductService {
         };
     }
 
-    async deleteProductById(id: number) {
+    async deleteProductById(id: number):Promise<DeleteProductRespDTO>{
         const response = await AuthService._request(`product?id=${id}`, {
             method: "DELETE"
         });
@@ -89,7 +92,7 @@ class ProductService {
         };
     };
 
-    async updateProductbyId(id:number, data:Product){
+    async updateProductbyId(id:number, data:Product):Promise<UpdateProductRespDTO>{
         const response = await AuthService._request(`admin/products?id=${id}`,{
             method: "PATCH",
             body: JSON.stringify(data)

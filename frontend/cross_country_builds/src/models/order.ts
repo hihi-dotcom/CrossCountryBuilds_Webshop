@@ -1,9 +1,21 @@
 import type Product from "./product";
 
 export default interface Order{
-    id: number;
-    ship_method: string;
-    pay_method: string;
-    sel_products: Product[];
-    order_status: string;
+    u_id?: number;
+    deliveryAddr?:{
+        zipCode: string,
+        cityName:string,
+        streetName:string,
+        houseNumber:number
+    },
+    billingAddr?:{
+        zipCode: string,
+        cityName:string,
+        streetName:string,
+        houseNumber:number
+    },
+    pMethod?: string,
+    dMethod?:string,
+    total_amount?: number,
+    products?: Product[]
 }
