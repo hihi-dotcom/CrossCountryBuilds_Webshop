@@ -30,8 +30,9 @@ export default function AppointmentModule() {
                 </h1>
                 <p className="text-lg text-slate-600 max-w-2xl">
                     Válaszd ki a számodra megfelelő időpontot, és írd meg röviden, miben segíthetünk. 
-                    Profi csapatunk várja kerékpárodat!
+                    Profi csapatunk várja kerékpárodat! <p className="italic text-slate-500">(Szervizünk kizárólag  kerékpárokat szervizel!)</p>
                 </p>
+
             </div>
 
             <Form method="post" className="space-y-8">
@@ -77,7 +78,7 @@ export default function AppointmentModule() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                 </div>
-                                <h2 className="text-2xl font-bold">Hiba leírása</h2>
+                                <h2 className="text-2xl font-bold">Hiba leírása</h2><br /><span className="italic text-gray-500">Ne felejtsd el beleírni a kerékpár típusát is!</span>
                             </div>
                             
                             <textarea 
@@ -93,7 +94,7 @@ export default function AppointmentModule() {
                             )}
                         </div>
                     </div>
-                    <div className="space-y-6">
+                    <div className="space-y-8">
                         <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-xl relative overflow-hidden">
                             <div className="relative z-10">
                                 <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 text-red-400">
@@ -102,9 +103,7 @@ export default function AppointmentModule() {
                                 <p className="text-slate-300 leading-relaxed mb-6">
                                     A javítás várható befejezéséről és a kerékpár átvételének időpontjáról minden esetben <strong>e-mailben</strong> küldünk értesítést.
                                 </p>
-                                <p className="text-slate-300 leading-relaxed mb-6">
-                                   Kérjük a hiba leírásában add meg a kerékpárod <strong>pontos típusát</strong> ! 
-                                </p>
+                                
                                 <div className="pt-4 border-t border-slate-700">
                                     <p className="text-sm text-slate-400 italic text-right">Üdvözlettel: A csapat</p>
                                 </div>

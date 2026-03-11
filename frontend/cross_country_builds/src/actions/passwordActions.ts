@@ -54,6 +54,10 @@ export async function createPassAction({request}: {request: Request}){
         return {serverError: createPassResult.message}
     }
     else{
-        return redirect("/login?success=true");
+        return{
+            ok: createPassResult.ok,
+            message: createPassResult.message,
+            redirect: "/login?success=true"
+        };
     }
 }

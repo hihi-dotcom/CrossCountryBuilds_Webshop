@@ -1,8 +1,8 @@
 import TrashIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import PenIcon from "@mui/icons-material/Edit";
 import { HiCheck } from "react-icons/hi";
-import { Form, useLoaderData, useActionData, Link } from "react-router-dom";
-import { useState, useRef } from "react";
+import { Form, useLoaderData, useActionData,useNavigate, Link } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
 import ProductService from "../../services/ProductService";
 import type Product from "../../models/product";
 import DeleteModal from "../../components/modalComponents/adminModalComponents/AreyouSureDeleteModal";
@@ -10,10 +10,12 @@ import DeleteModal from "../../components/modalComponents/adminModalComponents/A
 export default function ProductDashboard() {
   const actionData = useActionData();
   const initProducts = useLoaderData();
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>(initProducts);
   const [error, setError] = useState("");
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
   const [deleteTargetName, setDeleteTargetName] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const termekKategoriak = [
     { value: "kerékpárok", name: "Kerékpárok" },
@@ -21,6 +23,13 @@ export default function ProductDashboard() {
     { value: "Eszközök", name: "Eszközök" },
     { value: "ruházat", name: "Ruházat" },
   ];
+
+  useEffect(() => {
+    if (actionData?.ok) {
+      formRef.current?.reset();
+      navigate("/admin/products", { replace: true });
+    }
+  }, [actionData, navigate]);
 
   async function handleDeleteProduct(id: number, productname: string) {
     try {
@@ -102,6 +111,7 @@ export default function ProductDashboard() {
                   ref={productNameRef}
                   onChange={handleSearchforProduct}
                 />
+
               </div>
               <div
                 id="kereses-gomb"
@@ -126,6 +136,7 @@ export default function ProductDashboard() {
               method="post"
               className="py-4 flex flex-col gap-4"
               encType="multipart/form-data"
+              ref={formRef}
             >
               <div>
                 <label htmlFor="prodname">Add meg a termék nevét:</label>
@@ -136,6 +147,9 @@ export default function ProductDashboard() {
                   className="text-black border-black border-2 bg-white rounded-xl px-3 h-10 w-full placeholder:text-black"
                   placeholder="a termék neve"
                 />
+                {actionData?.errors?.name && (
+                    <span className="text-red-500 text-[10px] font-bold italic ml-1 uppercase">{actionData.errors.name[0]}</span>
+                  )}
               </div>
               <div className=" flex flex-col">
                 <label htmlFor="prodcat">Add meg a kategóriát:</label>
@@ -151,6 +165,9 @@ export default function ProductDashboard() {
                     </option>
                   ))}
                 </select>
+                  {actionData?.errors?.category && (
+                    <span className="text-red-500 text-[10px] font-bold italic ml-1 uppercase">{actionData.errors.category[0]}</span>
+                  )}
               </div>
               <div>
                 <label htmlFor="prodmaker">Add meg a termék gyártóját:</label>
@@ -161,6 +178,9 @@ export default function ProductDashboard() {
                   className="text-black border-black border-2 bg-white rounded-xl px-3 h-10 w-full placeholder:text-black"
                   placeholder="a termék gyártója"
                 />
+                {actionData?.errors?.maker && (
+                    <span className="text-red-500 text-[10px] font-bold italic ml-1 uppercase">{actionData.errors.maker[0]}</span>
+                  )}
               </div>
               <div>
                 <label htmlFor="proddesc">Add meg a termék leírását:</label>
@@ -171,6 +191,9 @@ export default function ProductDashboard() {
                   className="text-black border-black border-2 bg-white rounded-xl px-3 h-10 w-full placeholder:text-black"
                   placeholder="a termék leírása"
                 />
+                {actionData?.errors?.description && (
+                    <span className="text-red-500 text-[10px] font-bold italic ml-1 uppercase">{actionData.errors.description[0]}</span>
+                  )}
               </div>
               <div>
                 <label htmlFor="prodpic">Add meg a termék képét:</label>
@@ -180,6 +203,9 @@ export default function ProductDashboard() {
                   id="prodpic"
                   className="text-black border-black border-2 bg-white rounded-xl px-3 h-fit w-full placeholder:text-black"
                 />
+                {actionData?.errors?.image && (
+                    <span className="text-red-500 text-[10px] font-bold italic ml-1 uppercase">{actionData.errors.image[0]}</span>
+                  )}
               </div>
               <div>
                 <label htmlFor="prodprice">Add meg a termék árát:</label>
@@ -190,6 +216,9 @@ export default function ProductDashboard() {
                   className="text-black border-black border-2 bg-white rounded-xl px-3 h-10 w-full placeholder:text-black"
                   placeholder="a termék ára"
                 />
+                  {actionData?.errors?.price && (
+                    <span className="text-red-500 text-[10px] font-bold italic ml-1 uppercase">{actionData.errors.price[0]}</span>
+                  )}
               </div>
               <div>
                 <label htmlFor="prodstock">
@@ -202,6 +231,9 @@ export default function ProductDashboard() {
                   className="text-black border-black border-2 bg-white rounded-xl px-3 h-10 w-full placeholder:text-black"
                   placeholder="a termék darabszáma"
                 />
+                  {actionData?.errors?.stock_number && (
+                    <span className="text-red-500 text-[10px] font-bold italic ml-1 uppercase">{actionData.errors.stock_number[0]}</span>
+                  )}
               </div>
               {actionData?.message && (
                 <>

@@ -6,7 +6,7 @@ import Order from "../models/order";
 import AuthService from "./AuthService";
 
 class OrderService{
-    async MakingOrder(order:Order):Promise<MakingOrderRespDTO>{
+    async MakingOrder(order:any):Promise<MakingOrderRespDTO>{
         const response = await AuthService._request(`order`, {
             method: "POST",
             body: JSON.stringify(order)

@@ -55,7 +55,7 @@ class ProductService {
         return respD;
     }
 
-    async createNewProduct(Indata:Product, isJson:boolean = false):Promise<CreateNewProductRespDTO>{
+    async createNewProduct(Indata:any, isJson:boolean = false):Promise<CreateNewProductRespDTO>{
         const fetchOptions: any = {
             method: "POST",
             body: isJson ? JSON.stringify(Indata) : Indata

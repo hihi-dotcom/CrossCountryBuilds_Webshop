@@ -1,8 +1,16 @@
 import { redirect } from "react-router-dom";
 import ProductService from "../services/ProductService";
+import { ProductScheme } from "../components/validationSchemes/ProductScheme";
 
 export async function createProductAction({request}: {request: Request}){
     const formD = await request.formData();
+    const data = Object.fromEntries(formD);
+    const result = ProductScheme.safeParse(data);
+    if(!result.success){
+        return {
+            errors: result.error.flatten().fieldErrors
+        };
+    };
 
     const useJsonFormat = true;
 
@@ -34,7 +42,10 @@ export async function createProductAction({request}: {request: Request}){
         if(!ProductResult.ok){
             return {serverError: ProductResult.message || "Hiba történt a termék feltöltése közben!"}
         }
-        return redirect("/admin/products");
+        return {
+            ok:ProductResult.ok,
+            message: ProductResult.message,
+        };
     }
     catch(error:any){
         return {serverError: error.message || "Hiba a termék feltöltése közben! "};

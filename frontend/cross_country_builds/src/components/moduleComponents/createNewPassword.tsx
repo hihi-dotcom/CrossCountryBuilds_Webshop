@@ -1,11 +1,20 @@
 import { Label, TextInput, Button, Card } from "flowbite-react";
-import { HiLockClosed, HiCheckCircle, HiExclamationCircle } from "react-icons/hi";
-import { Form, useActionData, useNavigation } from "react-router-dom";
+import { HiLockClosed, HiCheckCircle,HiCheck, HiExclamationCircle } from "react-icons/hi";
+import { Form, useActionData, useNavigation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function CreateNewPasswordModule() {
   const actionData = useActionData() as any;
   const navigation = useNavigation();
+  const navigate = useNavigate();
   const isSubmitting = navigation.state === "submitting";
+    useEffect(() => {
+      if (actionData?.message) {
+        setTimeout(() => {
+          navigate(actionData?.redirect);
+        }, 5000); 
+      }
+    }, [actionData]);
 
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center px-2 sm:px-2 py-5 md:py-8">
@@ -84,6 +93,11 @@ export default function CreateNewPasswordModule() {
 
          
               <div className="flex justify-center md:justify-end pt-2">
+                {actionData?.message && (
+                              <p className="text-green-500 text-sm font-black uppercase italic ml-1 tracking-tighter flex justify-center gap-1">
+                                <HiCheck className="h-4 w-4" /> {actionData.message}
+                              </p>
+                )}
                 <Button 
                   type="submit" 
                   disabled={isSubmitting}
