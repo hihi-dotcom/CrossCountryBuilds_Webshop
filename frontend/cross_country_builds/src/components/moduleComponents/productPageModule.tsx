@@ -117,8 +117,8 @@ export default function ProductModule() {
             </div>
           </div>
 
-          <div className="mt-4 sm:ml-auto bg-gray-500  px-2 py-1 rounded-full">
-            <Link to="/" className="inline-flex items-center text-white transition-colors uppercase font-black italic text-xs tracking-widest">
+          <div className="mt-4 w-fit bg-gray-500  px-2 py-1 rounded-full">
+            <Link to="/" className="inline-flex justify-center text-white transition-colors uppercase font-black italic text-sm tracking-widest">
               <HiArrowLeft className="mr-2 h-4 w-4" />
               Vissza a webshopba
             </Link>

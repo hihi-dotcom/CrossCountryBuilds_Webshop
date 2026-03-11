@@ -13,7 +13,6 @@ export default function OrderDataModule() {
   const [selectedShipping, setSelectedShipping] = useState<string | null>("");
   const userData = useRouteLoaderData("root") as { id: number; role: string } | null;
   const actionData = useActionData() as { error?: string, ServerError?: string, errors?: Record<string, string[]> };
-  console.log(actionData);
   const navigation = useNavigation();
   const submit = useSubmit();
   const isSubmitting = navigation.state === "submitting";
@@ -123,8 +122,13 @@ const paying_options = [
                 </div>
               </div>
               <AddressFields prefix="shipping" label="Szállítási cím"/>
-              
+                    {(actionData?.errors || actionData?.ServerError || actionData?.error) && (
+                      <Alert color="failure" icon={HiExclamationCircle} className="rounded-2xl text-base font-bold italic">
+                        {actionData.ServerError || actionData.error || "Kérjük, ellenőrizze a megadott adatokat!"}
+                      </Alert>
+                    )}
               <div className="mt-6 p-4 bg-gray-50 rounded-2xl flex items-center  gap-3 border border-gray-100">
+
                     <Checkbox 
                     id="sameAddress" 
                     checked={sameAddress} 
@@ -182,11 +186,7 @@ const paying_options = [
                 </div>
 
             
-                {(actionData?.errors || actionData?.ServerError || actionData?.error) && (
-                  <Alert color="failure" icon={HiExclamationCircle} className="rounded-2xl font-bold italic">
-                    {actionData.ServerError || actionData.error || "Kérjük, ellenőrizze a megadott adatokat!"}
-                  </Alert>
-                )}
+                
 
                 <div className="pt-4">
                   <OrderSendButton disabled={isSubmitting} />

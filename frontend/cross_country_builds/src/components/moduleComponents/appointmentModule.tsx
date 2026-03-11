@@ -30,7 +30,7 @@ export default function AppointmentModule() {
                 </h1>
                 <p className="text-lg text-slate-600 max-w-2xl">
                     Válaszd ki a számodra megfelelő időpontot, és írd meg röviden, miben segíthetünk. 
-                    Profi csapatunk várja kerékpárodat! <p className="italic text-slate-500">(Szervizünk kizárólag  kerékpárokat szervizel!)</p>
+                    Profi csapatunk várja kerékpárodat! <span className="italic text-slate-500">(Szervizünk kizárólag  kerékpárokat szervizel!)</span>
                 </p>
 
             </div>
