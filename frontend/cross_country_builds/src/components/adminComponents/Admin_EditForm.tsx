@@ -1,7 +1,14 @@
-import { Button, Label, TextInput, Alert } from "flowbite-react";
+import { Button, Label, TextInput, Alert, Select } from "flowbite-react";
 import { Form, useActionData } from "react-router-dom";
+import Product from "../../models/product";
 
 export function EditForm({product}:any) {
+       const termekKategoriak = [
+        { value: "kerékpárok", name: "Kerékpárok" },
+        { value: "kiegészítők", name: "Kiegészítők" },
+        { value: "Eszközök", name: "Eszközök" },
+        { value: "ruházat", name: "Ruházat" }
+    ];
   const actionData = useActionData();
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
@@ -22,7 +29,11 @@ export function EditForm({product}:any) {
           <div className="mb-2 block">
             <Label htmlFor="category">Módosítsd a termék kategóriát!</Label>
           </div>
-          <TextInput id="category" type="text" name="category" placeholder="kerékpárok..."   shadow className="w-full" defaultValue={product ? product.category : ''}/>
+          <Select name="category" id="prodcat" defaultValue={product ? product.category : ''} >
+              {termekKategoriak.map((kat) => (
+                  <option key={kat.value} value={kat.value}>{kat.name}</option>
+                ))}
+          </Select>
         </div>
 
         <div className="w-full">
