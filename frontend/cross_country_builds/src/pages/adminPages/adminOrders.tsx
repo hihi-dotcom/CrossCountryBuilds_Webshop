@@ -5,6 +5,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import OrderService from "../../services/OrderService";
 import AdminProductModal from "../../components/modalComponents/adminModalComponents/adminProductsModal";
 import DeleteModal from "../../components/modalComponents/adminModalComponents/AreyouSureDeleteModal";
+import Order from "../../models/order";
 
 export default function OrdersDashboard() {
   const initOrders = useLoaderData();
@@ -131,6 +132,7 @@ export default function OrdersDashboard() {
               <thead>
                 <tr className="border-b-2 border-gray-100 text-gray-500 text-sm uppercase">
                   <th className="py-3 px-2">Ügyfél azonosító</th>
+                  <th className="py-3 px-2">Szállítási cím</th>
                   <th className="py-3 px-2">Szállítási mód</th>
                   <th className="py-3 px-2">Fizetési mód</th>
                   <th className="py-3 px-2">Végösszeg (Ft)</th>
@@ -141,7 +143,7 @@ export default function OrdersDashboard() {
               </thead>
               <tbody className="divide-y px-2 divide-gray-100 text-base text-black">
                 {orders.map((s) => {
-                  const isLoading = loadingId === s.id;
+                  
                   return (
                     <>
                       <tr
@@ -152,6 +154,12 @@ export default function OrdersDashboard() {
                       >
                         <td className="py-4 px-2 font-medium w-fit">
                           #{s.u_id} {s.customer_name}
+                        </td>
+                        <td className="py-4 px-2 font-medium w-fit">
+                          <div className="flex flex-col text-sm">
+                            <span className="font-bold">{s.zip_code} {s.city_name}</span>
+                            <span className="text-gray-600">{s.address_detail}</span>
+                          </div>
                         </td>
                         <td className="py-4 px-2">{s.delivery_Method}</td>
                         <td className="py-4 px-2">{s.payment_Method}</td>

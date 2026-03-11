@@ -148,7 +148,7 @@ export default function ProductDashboard() {
                   placeholder="a termék neve"
                 />
                 {actionData?.errors?.name && (
-                    <span className="text-red-500 text-[10px] font-bold italic ml-1 uppercase">{actionData.errors.name[0]}</span>
+                    <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">{actionData.errors.name[0]}</span>
                   )}
               </div>
               <div className=" flex flex-col">
@@ -166,7 +166,7 @@ export default function ProductDashboard() {
                   ))}
                 </select>
                   {actionData?.errors?.category && (
-                    <span className="text-red-500 text-[10px] font-bold italic ml-1 uppercase">{actionData.errors.category[0]}</span>
+                    <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">{actionData.errors.category[0]}</span>
                   )}
               </div>
               <div>
@@ -179,7 +179,7 @@ export default function ProductDashboard() {
                   placeholder="a termék gyártója"
                 />
                 {actionData?.errors?.maker && (
-                    <span className="text-red-500 text-[10px] font-bold italic ml-1 uppercase">{actionData.errors.maker[0]}</span>
+                    <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">{actionData.errors.maker[0]}</span>
                   )}
               </div>
               <div>
@@ -192,7 +192,7 @@ export default function ProductDashboard() {
                   placeholder="a termék leírása"
                 />
                 {actionData?.errors?.description && (
-                    <span className="text-red-500 text-[10px] font-bold italic ml-1 uppercase">{actionData.errors.description[0]}</span>
+                    <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">{actionData.errors.description[0]}</span>
                   )}
               </div>
               <div>
@@ -204,7 +204,7 @@ export default function ProductDashboard() {
                   className="text-black border-black border-2 bg-white rounded-xl px-3 h-fit w-full placeholder:text-black"
                 />
                 {actionData?.errors?.image && (
-                    <span className="text-red-500 text-[10px] font-bold italic ml-1 uppercase">{actionData.errors.image[0]}</span>
+                    <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">{actionData.errors.image[0]}</span>
                   )}
               </div>
               <div>
@@ -217,7 +217,7 @@ export default function ProductDashboard() {
                   placeholder="a termék ára"
                 />
                   {actionData?.errors?.price && (
-                    <span className="text-red-500 text-[10px] font-bold italic ml-1 uppercase">{actionData.errors.price[0]}</span>
+                    <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">{actionData.errors.price[0]}</span>
                   )}
               </div>
               <div>
@@ -232,7 +232,7 @@ export default function ProductDashboard() {
                   placeholder="a termék darabszáma"
                 />
                   {actionData?.errors?.stock_number && (
-                    <span className="text-red-500 text-[10px] font-bold italic ml-1 uppercase">{actionData.errors.stock_number[0]}</span>
+                    <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">{actionData.errors.stock_number[0]}</span>
                   )}
               </div>
               {actionData?.message && (
