@@ -43,7 +43,7 @@ describe("Admin oldali frontend folyamatok letesztelése", () => {
         cy.contains("nav a", "Megrendelések").click();
         cy.url().should('include', `/admin/orders`);
 
-        cy.get('select[data-testid="orderStatus"]').first().select("kész");
+        cy.get('select[data-testid="orderStatus"]:not([disabled])').first().select("kész");
     });
     it("Szabad szervizidőpont hozzáadásának tesztelése", () => {
         cy.visit('/login');
@@ -84,8 +84,9 @@ describe("Admin oldali frontend folyamatok letesztelése", () => {
         cy.contains("nav a", "Termékek").click();
         cy.url().should('include', `/admin/products`);
         cy.contains('a', 'Szerkesztés').first().click();
+        cy.wait(1000);
         cy.get('input[name="stock_number"]').should("not.be.disabled").clear().type("30");
-        cy.contains("button", "Mentés");
+        cy.contains("button", "Mentés").click();
         cy.url().should('include', `/admin/products`);
         cy.get('span[data-testid="stock_number"]').first().should("have.text", "30");
     })
