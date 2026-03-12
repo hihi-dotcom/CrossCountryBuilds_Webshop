@@ -6,6 +6,7 @@ export default function UsersDashboard() {
   const initUsers = useLoaderData();
   const [users, setUsers] = useState<Guest[]>(initUsers);
   const [error, setError] = useState("");
+  const [SearchMessage, setSearchMessage] = useState<string | null>("");
 
   useEffect(() => {
     setUsers(initUsers);
@@ -18,13 +19,23 @@ export default function UsersDashboard() {
 
     if (!searchedUser) {
       setUsers(initUsers);
+      setSearchMessage(null);
       return;
     }
 
     const filteredUsers = initUsers.filter((user: any) =>
       user.username.includes(searchedUser),
     );
-    setUsers(filteredUsers);
+
+    if(filteredUsers.length === 0){
+      setUsers([]);
+      setSearchMessage("Nincs a keresésnek megfelelő felhasználó!");
+    }
+    else{
+      setSearchMessage(null);
+      setUsers(filteredUsers);
+    }
+    
   }
   return (
     <>
@@ -42,7 +53,7 @@ export default function UsersDashboard() {
                 </label>
                 <input
                   type="text"
-                  name="productname"
+                  name="username"
                   id="productname"
                   className="text-black border-black border-2 bg-white rounded-xl px-2 h-10 w-full"
                   placeholder="a felhasználónév"
@@ -77,6 +88,11 @@ export default function UsersDashboard() {
             {error && (
               <div className="text-red-500 bg-red-200 p-2 rounded">{error}</div>
             )}
+            {SearchMessage ? (
+              <p className="text-xl italic text-slate-500 mb-4">{SearchMessage}</p>
+            ) : users.length === 0 ? (
+              <p className="text-xl italic text-slate-500 mb-4">Nincsenek felhasználók a rendszerben!</p>
+            ) : null}
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b-2 border-gray-100 text-gray-500 text-sm uppercase">
@@ -86,7 +102,7 @@ export default function UsersDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-500 text-black text-base">
-                {users.map((user) => (
+                {users.length > 0 && users.map((user) => (
                   <tr
                     className="hover:bg-blue-50/50 transition-colors"
                     key={user.id}

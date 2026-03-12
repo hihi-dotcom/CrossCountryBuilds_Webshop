@@ -16,6 +16,7 @@ export default function ProductDashboard() {
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
   const [deleteTargetName, setDeleteTargetName] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const [SearchMessage, setSearchMessage] = useState<string | null>("");
 
   const termekKategoriak = [
     { value: "kerékpárok", name: "Kerékpárok" },
@@ -51,13 +52,22 @@ export default function ProductDashboard() {
 
     if (!searchedProduct) {
       setProducts(initProducts);
+      setSearchMessage(null);
       return;
     }
 
     const filteredProducts = initProducts.filter((product: Product) =>
       product.name!.includes(searchedProduct),
     );
-    setProducts(filteredProducts);
+    if(filteredProducts.length === 0){
+      setProducts([]);
+      setSearchMessage("Nincs a keresésnek megfelelő termék!")
+    }
+    else{
+      setSearchMessage(null);
+      setProducts(filteredProducts);
+    }
+    
   }
   return (
     <>
@@ -268,6 +278,11 @@ export default function ProductDashboard() {
             {error && (
               <div className="text-red-500 bg-red-200 p-2 rounded">{error}</div>
             )}
+            {SearchMessage ? (
+              <p className="text-xl italic text-slate-500 mb-4">{SearchMessage}</p>
+            ) : products.length === 0 ? (
+              <p className="text-xl italic text-slate-500 mb-4">Nincsenek termékek a rendszerben!</p>
+            ) : null}
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b-2 border-gray-100 text-gray-500 text-sm uppercase">
@@ -279,7 +294,7 @@ export default function ProductDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-500 text-black text-base">
-                {products.map((product) => (
+                {products.length > 0 && products.map((product) => (
                   <tr
                     className="hover:bg-blue-50/50 transition-colors"
                     key={product.id}
@@ -309,7 +324,7 @@ export default function ProductDashboard() {
                     </td>
                     <td className="py-3 px-2 text-center flex flex-col md:flex-row">
                       <div className="flex flex-col md:flex-row justify-content-end items-center gap-2">
-                        <button
+                        <button data-testid="delete-button"
                           className="flex items-center justify-right gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95"
                           onClick={() => {
                             setDeleteTargetId(product.id!);

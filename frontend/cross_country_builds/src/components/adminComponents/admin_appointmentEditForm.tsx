@@ -70,6 +70,11 @@ export function EditAppointmentForm({ appointment }: any) {
               min={0}
               max={100000000}
             />
+            {actionData?.errors?.service_price && (
+              <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">
+                {actionData.errors.name[0]}
+              </span>
+            )}
           </div>
           <div className="w-full">
             <TextInput
@@ -85,6 +90,11 @@ export function EditAppointmentForm({ appointment }: any) {
                   : ""
               }
             />
+            {actionData?.errors?.bringback_date && (
+              <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">
+                {actionData.errors.name[0]}
+              </span>
+            )}
           </div>
 
           {actionData?.message && (

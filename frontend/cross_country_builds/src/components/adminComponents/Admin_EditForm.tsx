@@ -10,6 +10,7 @@ export function EditForm({ product }: any) {
     { value: "ruházat", name: "Ruházat" },
   ];
   const actionData = useActionData();
+  console.log(actionData);
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <Form
@@ -33,6 +34,11 @@ export function EditForm({ product }: any) {
             className="w-full"
             defaultValue={product ? product.name : ""}
           />
+          {actionData?.errors?.name && (
+            <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">
+              {actionData.errors.name[0]}
+            </span>
+          )}
         </div>
 
         <div className="w-full">
@@ -50,6 +56,11 @@ export function EditForm({ product }: any) {
               </option>
             ))}
           </Select>
+          {actionData?.errors?.category && (
+            <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">
+              {actionData.errors.category[0]}
+            </span>
+          )}
         </div>
 
         <div className="w-full">
@@ -65,6 +76,11 @@ export function EditForm({ product }: any) {
             className="w-full"
             defaultValue={product ? product.maker : ""}
           />
+          {actionData?.errors?.maker && (
+            <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">
+              {actionData.errors.maker[0]}
+            </span>
+          )}
         </div>
         <div className="w-full">
           <div className="mb-2 block">
@@ -81,6 +97,11 @@ export function EditForm({ product }: any) {
             min={0}
             max={100000000}
           />
+          {actionData?.errors?.price && (
+            <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">
+              {actionData.errors.price[0]}
+            </span>
+          )}
         </div>
         <div className="w-full">
           <div className="mb-2 block">
@@ -97,6 +118,9 @@ export function EditForm({ product }: any) {
             min={0}
             max={150}
           />
+          {actionData?.errors?.stock_number && (
+                    <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">{actionData.errors.stock_number[0]}</span>
+          )}
         </div>
 
         {actionData?.message && (

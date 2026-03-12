@@ -9,7 +9,7 @@ export default function AppointmentDashboard() {
   console.log(initAppointments);
   const actionData = useActionData();
   const timeRef = useRef<HTMLInputElement>(null);
-
+  const [SearchMessage, setSearchMessage] = useState<string | null>("");
   const [error, setError] = useState("");
   const [services, setServices] = useState(initAppointments);
 
@@ -24,13 +24,23 @@ export default function AppointmentDashboard() {
 
     if (!searchedName) {
       setServices(initAppointments);
+      setSearchMessage(null);
       return;
     }
 
-    const filteredProducts = initAppointments.filter((datetime: any) =>
+    const filteredAppointments = initAppointments.filter((datetime: any) =>
       datetime.customer_name?.includes(searchedName),
     );
-    setServices(filteredProducts);
+
+    if(filteredAppointments.length === 0){
+      setServices([]);
+      setSearchMessage("Nincs a keresésnek megfelelő szervizidőpont!");
+    }
+    else{
+      setSearchMessage(null);
+      setServices(filteredAppointments);
+    }
+    
   }
   useEffect(() => {
     if (actionData?.message && timeRef.current) {
@@ -56,7 +66,7 @@ export default function AppointmentDashboard() {
                 </label>
                 <input
                   type="text"
-                  name="productname"
+                  name="service-user"
                   id="productname"
                   className="text-black border-black border-2 bg-white rounded-xl px-2 h-10 w-full"
                   placeholder="a felhasználónév"
@@ -134,12 +144,11 @@ export default function AppointmentDashboard() {
             </div>
           </div>
           <div className="overflow-x-auto">
-            {services.length === 0 ? (
-              <>
-                <div className="flex justify-center items-center italic text-2xl">
-                  Jelenleg nincs szerviz!
-                </div>
-              </>
+            {SearchMessage ? (
+              <p className="text-xl italic text-slate-500 mb-4">{SearchMessage}</p>
+            ) : services.length === 0 ? (
+              <p className="text-xl italic text-slate-500 mb-4">Nincsenek termékek a rendszerben!</p>
+            
             ) : (
               <>
                 {error && (
@@ -159,7 +168,7 @@ export default function AppointmentDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 text-base">
-                    {services.map((s: any) => (
+                    {services.length > 0 &&services.map((s: any) => (
                       <tr
                         key={s.id}
                         className={

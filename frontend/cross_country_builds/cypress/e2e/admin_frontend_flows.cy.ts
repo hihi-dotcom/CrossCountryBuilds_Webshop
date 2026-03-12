@@ -30,7 +30,7 @@ describe("Admin oldali frontend folyamatok letesztelése", () => {
         cy.contains('button', 'Bejelentkezés').click();
         cy.url().should('include', `/admin`);
 
-        cy.get('input[name="productname"]').type("adamczirjak");
+        cy.get('input[name="username"]').type("adamczirjak");
         cy.contains("adamczirjak").should('be.visible');
     });
     it("Megrendelés lezárása az admin felületen", () => {
@@ -69,7 +69,7 @@ describe("Admin oldali frontend folyamatok letesztelése", () => {
         cy.url().should('include', `/admin/dates`);
 
         cy.contains('a', 'Kész!').first().click();
-        cy.get('input[name="bringback_date"]').type('2026-03-30T14:30');
+        cy.get('input[name="bringback_date"]').type('2026-03-30T15:30');
         cy.contains("button", "Mentés").click();
         cy.url().should('include', `/admin/dates`);
     });
@@ -89,6 +89,87 @@ describe("Admin oldali frontend folyamatok letesztelése", () => {
         cy.contains("button", "Mentés").click();
         cy.url().should('include', `/admin/products`);
         cy.get('span[data-testid="stock_number"]').first().should("have.text", "30");
-    })
+    });
 
+    it("Termék törlésének tesztelése", () => {
+        cy.visit('/login');
+        cy.get('input[name="username"]').type("haha");
+        cy.get('input[name="password"]').type('Tiktok123');
+        cy.contains('button', 'Bejelentkezés').click();
+        cy.url().should('include', `/admin`);
+
+        cy.contains("nav a", "Termékek").click();
+        cy.url().should('include', `/admin/products`);
+        cy.get('table tbody tr').last().find('button[data-testid="delete-button"]').click();
+
+        cy.get('dialog').should('be.visible').within(() => {
+            cy.contains("button", "Igen, töröld!").click();
+        });
+        cy.url().should('include', `/admin/products`);
+    });
+
+    it("Keresés termékre, de nincs ilyen termék", () => {
+        cy.visit('/login');
+        cy.get('input[name="username"]').type("haha");
+        cy.get('input[name="password"]').type('Tiktok123');
+        cy.contains('button', 'Bejelentkezés').click();
+        cy.url().should('include', `/admin`);
+
+        cy.contains("nav a", "Termékek").click();
+        cy.url().should('include', `/admin/products`);
+         cy.get('input[name="productname"]').type("Csepel rakéta");
+        cy.contains("Nincs a keresésnek megfelelő termék!").should('be.visible');
+    });
+    it("Keresés felhasználóra, de nincs ilyen felhasználó", () => {
+        cy.visit('/login');
+        cy.get('input[name="username"]').type("haha");
+        cy.get('input[name="password"]').type('Tiktok123');
+        cy.contains('button', 'Bejelentkezés').click();
+        cy.url().should('include', `/admin`);
+         cy.get('input[name="username"]').type("Magyar Péter");
+        cy.contains("Nincs a keresésnek megfelelő felhasználó!").should('be.visible');
+    });
+    it("Keresés szervizidőpontra, de nincs ilyen szervizidőpont", () => {
+        cy.visit('/login');
+        cy.get('input[name="username"]').type("haha");
+        cy.get('input[name="password"]').type('Tiktok123');
+        cy.contains('button', 'Bejelentkezés').click();
+        cy.url().should('include', `/admin`);
+
+        cy.contains("nav a", "Szerviz").click();
+        cy.url().should('include', `/admin/dates`);
+         cy.get('input[name="service-user"]').type("Vicc Elek");
+        cy.contains("Nincs a keresésnek megfelelő szervizidőpont!").should('be.visible');
+    });
+
+    it("Szabad szervizidőpont hozzáadásának tesztelése", () => {
+        cy.visit('/login');
+        cy.get('input[name="username"]').type("haha");
+        cy.get('input[name="password"]').type('Tiktok123');
+        cy.contains('button', 'Bejelentkezés').click();
+        cy.url().should('include', `/admin`);
+
+        cy.contains("nav a", "Szerviz").click();
+        cy.url().should('include', `/admin/dates`);
+        cy.contains('button', "Hozzáadás").click();
+        cy.contains("p", "A dátum megadása kötelező!")
+        
+    });
+
+        it("Termék készleten lévő mennyiségének változtatásának tesztje", () => {
+        cy.visit('/login');
+        cy.get('input[name="username"]').type("haha");
+        cy.get('input[name="password"]').type('Tiktok123');
+        cy.contains('button', 'Bejelentkezés').click();
+        cy.url().should('include', `/admin`);
+
+        cy.contains("nav a", "Termékek").click();
+        cy.url().should('include', `/admin/products`);
+        cy.contains('a', 'Szerkesztés').first().click();
+        cy.wait(1000);
+        cy.get('input[name="maker"]').should("not.be.disabled").clear();
+        cy.contains("button", "Mentés").click();
+        cy.contains("span", "A gyártó megadása kötelező").should("be.visible");
+       
+    });
 });

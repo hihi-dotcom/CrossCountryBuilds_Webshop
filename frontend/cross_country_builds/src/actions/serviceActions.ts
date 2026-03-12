@@ -1,4 +1,5 @@
-import dateSchema, { AppointmentSchema } from "../components/validationSchemes/dateScheme";
+import dateSchema, { AppointmentScheme } from "../components/validationSchemes/dateScheme";
+import { EditAppointmentScheme } from "../components/validationSchemes/EditAppointmentScheme";
 import DateTimeService from "../services/DateTimeService";
 import { redirect } from "react-router-dom";
 
@@ -44,7 +45,7 @@ export async function createEmptyAppointmentAction({request}: {request: Request}
     const formData = await request.formData();
     const data = Object.fromEntries(formData);
 
-    const result = AppointmentSchema.safeParse(data);
+    const result = AppointmentScheme.safeParse(data);
     if(!result.success){
         return { errors: result.error.flatten().fieldErrors };
     }
@@ -92,12 +93,17 @@ export async function appointmentLoaderById({params}:any){
 };
 
 export async function UpdateAppointment({request, params}:any){
-    const data = await request.formData();
+    const formdata = await request.formData();
+    const data  =Object.fromEntries(formdata);
     const AppointmentId = params.id
+    const result = EditAppointmentScheme.safeParse(data);
+        if(!result.success){
+            return { errors: result.error.flatten().fieldErrors };
+        }
     const DatetimeData = {
-        service_id: data.get("service_id") || AppointmentId,
-        price: data.get("service_price"),
-        bringBackDate: data.get("bringback_date"),
+        service_id:formdata.get("service_id") || AppointmentId,
+        price: formdata.get("service_price"),
+        bringBackDate: formdata.get("bringback_date"),
     };
     
     const productId = params.id;

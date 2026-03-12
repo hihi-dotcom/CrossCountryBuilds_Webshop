@@ -1,7 +1,7 @@
 import { redirect } from "react-router-dom";
 import ProductService from "../services/ProductService";
 import { ProductScheme } from "../components/validationSchemes/ProductScheme";
-
+import { EditProductScheme } from "../components/validationSchemes/EditProductScheme";
 export async function createProductAction({request}: {request: Request}){
     const formD = await request.formData();
     const data = Object.fromEntries(formD);
@@ -64,19 +64,17 @@ export async function productLoader({params}:any){
 };
 
 export async function UpdateProduct({request, params}:any){
-    const data = await request.formData();
-
-    const ProductData = {
-        name: data.get("name"),
-        category: data.get("category"),
-        maker: data.get("maker"),
-        price: data.get("price"),
-        stock_number: data.get("stock_number")
-    };
+    const formdata = await request.formData();
+    const data = Object.fromEntries(formdata);
+    const result = EditProductScheme.safeParse(data);
+    if(!result.success){
+        return {errors: result.error.flatten().fieldErrors};
+    }
+   
     
     const productId = params.id;
     try{
-        const response = await ProductService.updateProductbyId(Number(productId), ProductData);
+        const response = await ProductService.updateProductbyId(Number(productId),result.data);
         
         if(!response.ok){
            return {message: response.message || "A termék módosítása közben szerverhiba történt."};
