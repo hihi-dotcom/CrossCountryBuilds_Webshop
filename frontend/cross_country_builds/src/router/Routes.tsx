@@ -40,6 +40,7 @@ import { createEmptyAppointmentAction } from "../actions/serviceActions";
 import CartGuard from "../pages/protects/CartGuard";
 import { EditProductPage } from "../pages/adminPages/AdminProductEdit";
 import {appointmentLoaderById} from "../actions/serviceActions";
+import { adminLoader } from "../pages/protects/adminLoader";
 
 const rootLoader = async () => {
     return await AuthService.gettingCurrentUser();
@@ -100,7 +101,7 @@ const routes = [
         path: "/admin",
         id: "admin",
         element: <ProtectRouteAdmin />,
-        loader: rootLoader, 
+        loader: adminLoader, 
         errorElement: <AdminErrorPage />,
         children: [
             { 

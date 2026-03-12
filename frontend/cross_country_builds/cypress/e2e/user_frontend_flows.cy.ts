@@ -118,4 +118,9 @@ describe('User oldali frontend folyamatok tesztjei', () => {
     cy.get('nav [data-testid="flowbite-navbar-toggle"]').click();
     cy.contains('div', 'Szerviz').should('be.visible');
   });
+
+  it("Jogosultság nélküli védelem tesztelése az admin oldalak esetében", () => {
+    cy.visit("/admin", {failOnStatusCode:false});
+    cy.url().should("include", "/login");
+  });
 });
