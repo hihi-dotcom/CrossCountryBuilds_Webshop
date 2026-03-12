@@ -98,8 +98,8 @@ describe('User oldali frontend folyamatok tesztjei', () => {
     cy.contains('button', 'Bejelentkezés').click();
     cy.url().should('not.include', `/login`);
     cy.contains('Szerviz').click();
-    cy.get('select[name="appointmentDate"]').select("24");
-    cy.get('textarea[name="message"]').type("Összetörtem a hátsó kerekét a biciklimnek és kiszakadtak a küllői, kellene egy új hátsó kerék illetve egy féktárcsa is");
+    cy.get('select[name="appointmentDate"]').select("72");
+    cy.get('textarea[name="problem_description"]').type("Összetörtem a hátsó kerekét a biciklimnek és kiszakadtak a küllői, kellene egy új hátsó kerék illetve egy féktárcsa is");
     cy.contains('button[type="submit"]', "Foglalás beküldése").click();
     cy.url().should('not.include', `/appointment`);
   });

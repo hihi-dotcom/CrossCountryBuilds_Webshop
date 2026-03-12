@@ -69,9 +69,10 @@ describe("Admin oldali frontend folyamatok letesztelése", () => {
         cy.url().should('include', `/admin/dates`);
 
         cy.contains('a', 'Kész!').first().click();
+        cy.get('input[name="service_price"]').type('55000');
         cy.get('input[name="bringback_date"]').type('2026-03-30T15:30');
         cy.contains("button", "Mentés").click();
-        cy.url().should('include', `/admin/dates`);
+       cy.url().should('include', `/admin/dates`);
     });
 
     it("Termék készleten lévő mennyiségének változtatásának tesztje", () => {
@@ -156,7 +157,7 @@ describe("Admin oldali frontend folyamatok letesztelése", () => {
         
     });
 
-        it("Termék készleten lévő mennyiségének változtatásának tesztje", () => {
+    it("Termék készleten lévő mennyiségének változtatásának tesztje", () => {
         cy.visit('/login');
         cy.get('input[name="username"]').type("haha");
         cy.get('input[name="password"]').type('Tiktok123');
@@ -171,5 +172,20 @@ describe("Admin oldali frontend folyamatok letesztelése", () => {
         cy.contains("button", "Mentés").click();
         cy.contains("span", "A gyártó megadása kötelező").should("be.visible");
        
+    });
+
+    it("Szerviz lezárásának tesztelése adathiánnyal", () => {
+        cy.visit('/login');
+        cy.get('input[name="username"]').type("haha");
+        cy.get('input[name="password"]').type('Tiktok123');
+        cy.contains('button', 'Bejelentkezés').click();
+        cy.url().should('include', `/admin`);
+        cy.contains("nav a", "Szerviz").click();
+        cy.url().should('include', `/admin/dates`);
+
+        cy.contains('a', 'Kész!').first().click();
+        cy.get('input[name="bringback_date"]').clear();
+        cy.contains("button", "Mentés").click();
+        cy.contains("span", "Dátum megadása kötelező!").should("be.visible");
     });
 });
