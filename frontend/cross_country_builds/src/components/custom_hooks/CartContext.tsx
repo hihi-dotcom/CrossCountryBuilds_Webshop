@@ -34,13 +34,13 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({children}) 
                     {...item, quantity: item.quantity + quantity} : item);
             }
             const newItem: CartItem = {
-                id: product.id,
-                name: product.name,
-                category: product.category,
-                price: product.price,
+                id: product.id ?? 0,
+                name: product.name ?? '',
+                category: product.category ?? '',
+                price: product.price ?? 0,
                 maker: product.maker,
                 quantity: quantity,
-                picUrl: product.picUrl
+                picUrl: product.picUrl ?? ''
             };
             return [...prev, newItem];
         })

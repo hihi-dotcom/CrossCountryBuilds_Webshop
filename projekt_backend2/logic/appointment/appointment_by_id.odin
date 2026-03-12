@@ -49,11 +49,7 @@ appointment_by_id_respond :: proc (conn: ^http.Conn) {
         appointments[i].service_name = table["service_name"]
         appointments[i].service_price = table["service_price"]
         appointments[i].bringback_date = table["bringback_date"]
-        if table["bringback_date"] != "" {
-            appointments[i].status = "kész"
-        } else {
-            appointments[i].status = "folyamatban"
-        }
+        appointments[i].status = table["status"]
     }
 
     body_bytes, _ := json.marshal(appointments)

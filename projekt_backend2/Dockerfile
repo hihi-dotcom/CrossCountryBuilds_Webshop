@@ -25,6 +25,17 @@ WORKDIR /build
 
 COPY . .
 
+# Build and run tests (if tests directory exists)
+RUN if [ -d "tests" ]; then \
+        cd tests && odin build . -out:../test_runner 2>&1 && cd ..; \
+        if [ -f "./test_runner" ]; then \
+            echo "Running business logic tests..."; \
+            ./test_runner; \
+            echo "Tests completed"; \
+        fi \
+    fi
+
+# Build the main application
 RUN odin build . -out:./backend
 
 FROM debian:bookworm-slim

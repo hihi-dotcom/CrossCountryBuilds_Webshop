@@ -1,18 +1,18 @@
 package appointment
 
+import "core:encoding/json"
+import "core:fmt"
 import "../../http"
 import "../../http/util"
 import mw "../../http/middleware"
 import "../../pool"
 import "../../pool/pool_mw"
 import "../../logic/auth"
-import "core:encoding/json"
-import "core:fmt"
 
 
 @(private = "file")
 BookBody :: struct {
-    description: string,
+    problem_description: string,
 }
 
 @(private = "file")
@@ -61,13 +61,13 @@ appointment_book_query :: proc (conn: ^http.Conn) {
         return
     }
 
-    if bookBody.description == "" {
+    if bookBody.problem_description == "" {
         util.reset(conn, 400, "Missing parameter.")
         return
     }
 
     pool_mw.query(conn, appointment_book_respond, "appoint_appointment",
-        {fmt.aprint(qp["id"]), fmt.aprint(payload.id), bookBody.description})
+        {fmt.aprint(qp["id"]), fmt.aprint(payload.id), bookBody.problem_description})
 }
 
 @(private = "file")

@@ -90,7 +90,7 @@ export default function AppointmentModule() {
                             ></textarea>
                             
                             {actionData?.errors?.problem_description && (
-                                <p className="mt-3 text-red-500 text-sm font-medium">{actionData.errors.message[0]}</p>
+                                <p className="mt-3 text-red-500 text-sm font-medium">{actionData.errors.problem_description[0]}</p>
                             )}
                         </div>
                     </div>

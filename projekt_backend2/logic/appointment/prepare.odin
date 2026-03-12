@@ -12,7 +12,8 @@ prepare :: proc () {
     pool.prepare("appoint_appointment", `
         UPDATE Service_DateTimes
         SET user_id = $2,
-        problem_description = $3
+        problem_description = $3,
+        status = 'folyamatban'
         WHERE id = $1`,
     {.Int4, .Int4, .Text})
 
@@ -20,12 +21,13 @@ prepare :: proc () {
         UPDATE Service_DateTimes
         SET service_name = $2,
         service_price = $3,
-        bringback_date = $4
+        bringback_date = $4,
+        status = 'kész'
         WHERE id = $1`,
     {.Int4, .Varchar, .Int4, .Timestamp})
 
     pool.prepare("appointment_all", `
-        SELECT s.id, s.service_date, s.user_id, s.problem_description, s.service_name, s.service_price, s.bringback_date, u.username
+        SELECT s.id, s.service_date, s.user_id, s.problem_description, s.service_name, s.service_price, s.bringback_date, s.status, u.username
         FROM Service_DateTimes s
         LEFT JOIN Users u ON s.user_id = u.id
         ORDER BY s.service_date DESC`
@@ -44,7 +46,7 @@ prepare :: proc () {
     {.Timestamp})
 
     pool.prepare("appointment_by_id", `
-        SELECT s.id, s.service_date, s.user_id, s.problem_description, s.service_name, s.service_price, s.bringback_date, u.username
+        SELECT s.id, s.service_date, s.user_id, s.problem_description, s.service_name, s.service_price, s.bringback_date, s.status, u.username
         FROM Service_DateTimes s
         LEFT JOIN Users u ON s.user_id = u.id
         WHERE s.id = $1`,

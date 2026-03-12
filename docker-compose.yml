@@ -52,6 +52,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - frontend_dist:/var/www/frontend/dist:ro
       - uploads:/var/www/uploads:ro
+      - ./projekt_backend2/product_images:/var/www/product_images:ro
     depends_on:
       - backend
       - frontend

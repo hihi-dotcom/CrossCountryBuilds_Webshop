@@ -15,6 +15,13 @@
         reverse_proxy backend:3001
     }
 
+    # Product images -> serve from product_images volume
+    handle /product_images/* {
+        uri strip_prefix /product_images
+        root * /var/www/product_images
+        file_server
+    }
+
     # Uploaded images -> serve from uploads volume
     handle /uploads/* {
         uri strip_prefix /uploads

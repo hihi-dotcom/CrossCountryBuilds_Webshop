@@ -16,7 +16,7 @@ export function Item({ product, OnCart }: ProductProps) {
           alt={product.name}
           className="max-h-full max-w-full object-contain"
         />
-        {product.stock_number <= 5 && (
+        {(product.stock_number ?? 0) <= 5 && (
           <div className="absolute top-4 right-4 z-10">
             <Badge color="warning" className="rounded-full px-3 py-1 text-[10px] font-bold shadow-md border-none">
                ⚠️ Csak {product.stock_number} maradt!
@@ -44,7 +44,7 @@ export function Item({ product, OnCart }: ProductProps) {
         <div className="mt-auto">
           <div className="flex items-baseline gap-1 mb-5">
             <span className="text-white text-3xl font-black tracking-tighter">
-              {product.price.toLocaleString()}
+              {(product.price ?? 0).toLocaleString()}
             </span>
             <span className="text-gray-400 text-sm font-medium italic">Ft</span>
           </div>
