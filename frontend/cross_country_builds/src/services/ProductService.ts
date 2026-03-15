@@ -1,10 +1,10 @@
-import AuthService from "./AuthService";
 import Product from "../models/product";
 import { GetProductsRespDTO } from "../dtos/GetProductsRespDTO";
 import { CreateNewProductRespDTO } from "../dtos/CreateNewProductRespDTO";
 import { DeleteProductRespDTO } from "../dtos/DeleteProductRespDTO";
 import { UpdateProductRespDTO } from "../dtos/UpdateProductRespDTO";
 import Filters from "../models/filters";
+import {requestHandler} from "./utils/auth";
 
 const API_URL = "http://localhost:3000/api";
 
@@ -47,7 +47,7 @@ class ProductService {
 
 
     async getAdminProducts():Promise<Product[] | []>{
-        const response = await AuthService._request("admin/products");
+        const response = await requestHandler("admin/products");
         const respD = await response.json();
         if (!response.ok){
             throw new Error(respD.message || "Hiba a termékek lekérésekor! ");
@@ -66,7 +66,7 @@ class ProductService {
                     "Content-Type": "application/json"
                 }
         }
-        const response = await AuthService._request("product", fetchOptions);
+        const response = await requestHandler("product", fetchOptions);
 
         const data = await response.json();
 
@@ -81,7 +81,7 @@ class ProductService {
     }
 
     async deleteProductById(id: number):Promise<DeleteProductRespDTO>{
-        const response = await AuthService._request(`product?id=${id}`, {
+        const response = await requestHandler(`product?id=${id}`, {
             method: "DELETE"
         });
 
@@ -94,7 +94,7 @@ class ProductService {
     };
 
     async updateProductbyId(id:number, data:Product):Promise<UpdateProductRespDTO>{
-        const response = await AuthService._request(`admin/products?id=${id}`,{
+        const response = await requestHandler(`admin/products?id=${id}`,{
             method: "PATCH",
             body: JSON.stringify(data)
         });

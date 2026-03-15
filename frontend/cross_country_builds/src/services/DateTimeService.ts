@@ -1,12 +1,12 @@
-import AuthService from "./AuthService";
 import { DateTimeBookRespDTO } from "../dtos/DateTimeBookRespDTO";
 import { DateTimeFinalizeRespDTO } from "../dtos/DateTimeFinalizeRespDTO";
 import { DateTimeFreeServiceRespDTO } from "../dtos/DateTimeFreeServiceRespDTO";
 import { DateTimeDeleteServiceRespDTO } from "../dtos/DateTimeDeleteServiceRespDTO";
+import {requestHandler} from "./utils/auth";
 import DateTime from "../models/datetime";
 class DateTimeService{
     async gettingFreeDates():Promise<DateTime[]>{
-        const resp = await AuthService._request("freeappointments");
+        const resp = await requestHandler("freeappointments");
 
         const respData = await resp.json();
 
@@ -15,7 +15,7 @@ class DateTimeService{
 
     async bookAServiceDate(id: number, data:{appointmentDate:string, problem_description:string}):Promise<DateTimeBookRespDTO>{
    
-        const response = await AuthService._request(`appointment?id=${id}`,{
+        const response = await requestHandler(`appointment?id=${id}`,{
             method: "PATCH",
 
             body: JSON.stringify(data)
@@ -30,7 +30,7 @@ class DateTimeService{
     };
 
     async finalizeService(id:number, data:{service_id:string, price:number, bringBackDate: string}):Promise<DateTimeFinalizeRespDTO>{
-        const response = await AuthService._request(`finalize?id=${id}`, {
+        const response = await requestHandler(`finalize?id=${id}`, {
             method: "PATCH",
             body: JSON.stringify(data)
         });
@@ -44,7 +44,7 @@ class DateTimeService{
     };
 
     async createFreeService(data:{appointmentDate:string}):Promise<DateTimeFreeServiceRespDTO>{
-        const response = await AuthService._request(`newappointment`, {
+        const response = await requestHandler(`newappointment`, {
             method: "POST",
             body: JSON.stringify(data)
         });
@@ -58,7 +58,7 @@ class DateTimeService{
     };
 
     async deleteService(id:number):Promise<DateTimeDeleteServiceRespDTO>{
-        const response = await AuthService._request(`appointment?id=${id}`, {
+        const response = await requestHandler(`appointment?id=${id}`, {
             method: "DELETE"
         });
 
@@ -71,7 +71,7 @@ class DateTimeService{
     };
 
     async getAppointmentsforAdmin():Promise<DateTime[] | []>{
-        const response = await AuthService._request(`admin/appointments`, {
+        const response = await requestHandler(`admin/appointments`, {
             method: "GET"
         });
         const respD = await response.json();
@@ -83,7 +83,7 @@ class DateTimeService{
 
     
     async getAppointmentById(id: number):Promise<DateTime | null>{
-        const response = await AuthService._request(`admin/appointment?id=${id}`);
+        const response = await requestHandler(`admin/appointment?id=${id}`);
         const data = await response.json();
         
         

@@ -2,54 +2,16 @@ import { redirect } from "react-router-dom";
 import type { RegistrationDTO, LoginDTO } from "../dtos/models_for_services/auth_models";
 import { LogInRespDTO } from "../dtos/LoginRespDTO";
 import { RegistrationRespDTO } from "../dtos/RegistrationRespDTO";
+import {requestHandler, setToken, getToken, removeToken} from "./utils/auth";
 
 const API_url: string = `http://localhost:3000/api/`;
 
 class AuthService {
 
-    private getToken(): string | null {
-        return localStorage.getItem("token");
-    };
-
-    private removeToken(){
-        localStorage.removeItem("token");
-    };
-    private setToken(token:string): void{
-        localStorage.setItem("token", token);
-    }
-    async _request(endpoint: string, options : RequestInit = {}){
-        const url =`${API_url}${endpoint}`;
-        const token = this.getToken();
-
-        const headers: Record<string, string> = { ...options.headers as Record<string, string> };
-
-        if(!(options.body instanceof FormData)){
-            headers['Content-Type'] = 'application/json';
-        }
-
-        if(token){
-            headers['Authorization'] = `Bearer ${token}`
-        }
-
-        const response = await fetch(url, {
-            ...options,
-            headers
-        });
-
-        if(response.status === 401){
-            this.removeToken();
-            if(!window.location.pathname.includes('/login')){
-                window.location.href = '/login?expired=true'
-            }
-        };
-
-        return response;
-
-        
-    }
+  
 
     async registration({username, email, password, confirmPassword}:RegistrationDTO):Promise<RegistrationRespDTO>{
-        const response = await this._request('signup', {
+        const response = await requestHandler('signup', {
             method: "POST",
             body: JSON.stringify({username, email, password, confirmPassword}),
         });
@@ -69,7 +31,7 @@ class AuthService {
     }
 
     async login({username, password}:LoginDTO):Promise<LogInRespDTO>{
-        const response = await this._request('login', {
+        const response = await requestHandler('login', {
             method: "POST",
             body: JSON.stringify({username, password})
         });
@@ -77,7 +39,7 @@ class AuthService {
         if(response.ok){
             
             if(data.token){
-                this.setToken(data.token);
+                setToken(data.token);
                 return {
                     ok: true, 
                     data,
@@ -95,12 +57,12 @@ class AuthService {
 
     async logout(){
         try{        
-            await this._request('logout', {
+            await requestHandler('logout', {
                 method: "POST"
             })
         }
         finally{
-            this.removeToken();
+            removeToken();
             localStorage.removeItem('bike-cart');
         }
 
@@ -108,12 +70,12 @@ class AuthService {
 
     async gettingCurrentUser(){
 
-        if(!this.getToken()){
+        if(!getToken()){
             return null;
         }
 
         try{
-            const response =  await this._request('user', {
+            const response =  await requestHandler('user', {
                 method: "GET"
             })
 

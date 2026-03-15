@@ -98,7 +98,7 @@ describe('User oldali frontend folyamatok tesztjei', () => {
     cy.contains('button', 'Bejelentkezés').click();
     cy.url().should('not.include', `/login`);
     cy.contains('Szerviz').click();
-    cy.get('select[name="appointmentDate"]').select("72");
+    cy.get('select[name="appointmentDate"]').select("75");
     cy.get('textarea[name="problem_description"]').type("Összetörtem a hátsó kerekét a biciklimnek és kiszakadtak a küllői, kellene egy új hátsó kerék illetve egy féktárcsa is");
     cy.contains('button[type="submit"]', "Foglalás beküldése").click();
     cy.url().should('not.include', `/appointment`);
@@ -123,4 +123,15 @@ describe('User oldali frontend folyamatok tesztjei', () => {
     cy.visit("/admin", {failOnStatusCode:false});
     cy.url().should("include", "/login");
   });
+
+  it("Bejelentkezett munkamenet védelmének tesztelése", () => {
+      const tempUser = `User12345`;
+      cy.visit('/login');
+      cy.get('input[name="username"]').type(tempUser);
+      cy.get('input[name="password"]').type('Password456!');
+      cy.contains('button', 'Bejelentkezés').click();
+      cy.url().should('not.include', `/login`);
+      cy.visit('/login');
+      cy.url().should('include', `/`);
+  })
 });

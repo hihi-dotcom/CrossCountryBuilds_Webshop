@@ -3,11 +3,11 @@ import { MakingOrderRespDTO } from "../dtos/MakingOrderRespDTO";
 import type {UpdateStatDTO}  from "../dtos/models_for_services/order_models"
 import { UpdateOrderStatRespDTO } from "../dtos/UpdateOrderStatRespDTO";
 import Order from "../models/order";
-import AuthService from "./AuthService";
+import {requestHandler} from "./utils/auth";
 
 class OrderService{
     async MakingOrder(order:any):Promise<MakingOrderRespDTO>{
-        const response = await AuthService._request(`order`, {
+        const response = await requestHandler(`order`, {
             method: "POST",
             body: JSON.stringify(order)
         });
@@ -22,7 +22,7 @@ class OrderService{
     };
 
     async UpdateOrderStat(id: number,data:UpdateStatDTO):Promise<UpdateOrderStatRespDTO>{
-        const response = await AuthService._request(`order?id=${id}`, {
+        const response = await requestHandler(`order?id=${id}`, {
             method: "PATCH",
             body: JSON.stringify(data)
         });
@@ -37,7 +37,7 @@ class OrderService{
 
     async deleteOrderbyId(id: number):Promise<DeleteOrderRespDTO>{
 
-        const response = await AuthService._request(`order?id=${id}`, {
+        const response = await requestHandler(`order?id=${id}`, {
             method: "DELETE"
         });
       
@@ -50,7 +50,7 @@ class OrderService{
     };
 
     async getOrdersforAdmin():Promise<Order[]>{
-        const response = await AuthService._request(`admin/orders`, {
+        const response = await requestHandler(`admin/orders`, {
             method: "GET"
         });
         const responseData = await response.json()

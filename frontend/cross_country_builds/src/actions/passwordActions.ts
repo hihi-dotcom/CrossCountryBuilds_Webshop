@@ -3,7 +3,7 @@ import createNewPassScheme from "../components/validationSchemes/createNewPassSc
 import getPassEmailScheme from "../components/validationSchemes/getPasswordEmailScheme";
 
 import PasswordService from "../services/PasswordService";
-import { redirect } from "react-router-dom";
+
 
 export async function getPassEmailAction({request}: {request: Request}) {
     const fData = await request.formData();
