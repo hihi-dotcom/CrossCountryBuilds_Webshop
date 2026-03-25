@@ -40,7 +40,8 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({children}) 
                 price: product.price ?? 0,
                 maker: product.maker,
                 quantity: quantity,
-                picUrl: product.picUrl ?? ''
+                picUrl: product.picUrl ?? '',
+                stock_number: product.stock_number ?? 0
             };
             return [...prev, newItem];
         })

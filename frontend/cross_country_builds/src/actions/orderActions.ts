@@ -1,4 +1,5 @@
- import orderDataScheme from "../components/validationSchemes/orderDataScheme";
+ import { success } from "zod";
+import orderDataScheme from "../components/validationSchemes/orderDataScheme";
 import OrderService from "../services/OrderService";
 import { redirect } from "react-router-dom";
 
@@ -53,7 +54,7 @@ const orderObj = {
             }
         }
         localStorage.removeItem('bike-cart');
-        return redirect("/orderend");
+        return {success: true};
     }
     catch(error:any){
         return {ServerError: error.message || "Váratlan hiba történt a rendelés leadásakor! "}
