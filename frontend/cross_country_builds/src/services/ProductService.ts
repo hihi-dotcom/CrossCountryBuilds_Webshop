@@ -29,7 +29,7 @@ class ProductService {
      
         return {
             ok: response.ok,
-            products: data.product || [], 
+            products: data.products || [], 
             total: data.total || 0,
             hasMore: data.hasMore
         };
