@@ -1,0 +1,324 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0" version="29.6.6" pages="4">
+  <diagram id="login" name="1. POST /api/login">
+    <mxGraphModel dx="1005" dy="543" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title1" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;" value="&lt;b&gt;Sequence: POST /api/login&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="300" x="400" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="client1" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Client" vertex="1">
+          <mxGeometry height="550" width="100" x="80" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="server1" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#d5e8d4;strokeColor=#82b366;" value="HTTP Server&#xa;(main.odin)" vertex="1">
+          <mxGeometry height="550" width="100" x="250" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mw1" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#fff2cc;strokeColor=#d6b656;" value="Middleware&#xa;(application_json)" vertex="1">
+          <mxGeometry height="550" width="100" x="420" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="mw1" style="endArrow=block;html=1;rounded=0;strokeColor=#009900;endFill=1;dashed=1;exitX=0;exitY=0.7;entryX=1;entryY=0.7;" value="200 {token, message, role}">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="219.5" y="340" as="sourcePoint" />
+            <mxPoint x="-290.07142857142867" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="auth1" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Auth Logic&#xa;(login.odin)" vertex="1">
+          <mxGeometry height="550" width="100" x="590" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="pool1" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#f8cecc;strokeColor=#b85450;" value="DB Pool" vertex="1">
+          <mxGeometry height="550" width="100" x="760" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="token1" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#f5f5f5;strokeColor=#666666;" value="Token&#xa;Module" vertex="1">
+          <mxGeometry height="550" width="100" x="930" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.1;entryX=0;entryY=0.1;" value="POST /api/login {username, password}">
+          <mxGeometry relative="1" x="-0.0556" y="10" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="129.92857142857133" y="130" as="sourcePoint" />
+            <mxPoint x="299.5" y="130" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="server1" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.15;entryX=0;entryY=0.15;" target="mw1" value="application_json(handler)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="mw1" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.2;entryX=0;entryY=0.2;" target="auth1" value="login_query(conn)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="auth1" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.3;entryX=0;entryY=0.3;" target="pool1" value="query(get_user_id_role...)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="pool1" style="endArrow=block;html=1;rounded=0;strokeColor=#FF0000;endFill=1;dashed=1;exitX=0;exitY=0.35;entryX=1;entryY=0.35;" target="auth1" value="user data or empty">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="auth1" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.45;entryX=0;entryY=0.45;" target="token1" value="sign(payload, 5h)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="token1" style="endArrow=block;html=1;rounded=0;strokeColor=#009900;endFill=1;dashed=1;exitX=0;exitY=0.55;entryX=1;entryY=0.55;" target="auth1" value="JWT token">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="order" name="2. POST /api/order">
+    <mxGraphModel dx="1466" dy="792" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title2" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;" value="&lt;b&gt;Sequence: POST /api/order (Order Creation with Transaction)&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="500" x="350" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="client2" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Client" vertex="1">
+          <mxGeometry height="780" width="80" x="40" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="server2" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#d5e8d4;strokeColor=#82b366;" value="HTTP Server" vertex="1">
+          <mxGeometry height="780" width="80" x="160" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="authmw2" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#fff2cc;strokeColor=#d6b656;" value="Auth Check&#xa;Middleware" vertex="1">
+          <mxGeometry height="780" width="80" x="280" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="jsonmw2" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#fff2cc;strokeColor=#d6b656;" value="JSON&#xa;Middleware" vertex="1">
+          <mxGeometry height="780" width="80" x="400" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_19" edge="1" parent="jsonmw2" style="endArrow=block;html=1;rounded=0;strokeColor=#009900;endFill=1;dashed=1;exitX=0;exitY=0.75;entryX=1;entryY=0.75;" value="200 {message, orderId}">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="159.78999999999996" y="570" as="sourcePoint" />
+            <mxPoint x="-319.78142857142865" y="570" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="order2" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Order Logic&#xa;(order_create)" vertex="1">
+          <mxGeometry height="780" width="80" x="520" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MSbvN901HXet6FVLaXKt-1" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="610" y="610" />
+              <mxPoint x="610" y="610" />
+            </Array>
+            <mxPoint x="679.5" y="610.0285714285715" as="sourcePoint" />
+            <mxPoint x="559.9285714285713" y="610.0285714285715" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MSbvN901HXet6FVLaXKt-2" connectable="0" parent="MSbvN901HXet6FVLaXKt-1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&lt;div&gt;Success&lt;/div&gt;" vertex="1">
+          <mxGeometry relative="1" x="0.1744" as="geometry">
+            <mxPoint x="11" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pool2" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#f8cecc;strokeColor=#b85450;" value="DB Pool&#xa;(Transaction)" vertex="1">
+          <mxGeometry height="780" width="80" x="640" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="db2" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#f5f5f5;strokeColor=#666666;" value="Database" vertex="1">
+          <mxGeometry height="780" width="80" x="760" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_18" edge="1" parent="db2" style="endArrow=block;html=1;rounded=0;strokeColor=#009900;endFill=1;dashed=1;exitX=0;exitY=0.67;entryX=1;entryY=0.67;" value="Transaction committed">
+          <mxGeometry relative="1" x="-0.0058" y="-10" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="39.5" y="530.0000000000001" as="sourcePoint" />
+            <mxPoint x="-80.18965517241395" y="530.0000000000001" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2_8" edge="1" parent="db2" source="db2" style="endArrow=block;html=1;rounded=0;strokeColor=#009900;endFill=1;dashed=1;exitX=0;exitY=0.34;entryX=1;entryY=0.34;" target="pool2" value="OK">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_1" edge="1" parent="1" source="client2" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.08;entryX=0;entryY=0.08;" target="server2" value="POST /api/order {order data}">
+          <mxGeometry relative="1" x="0.0058" y="12" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2_2" edge="1" parent="1" source="server2" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.12;entryX=0;entryY=0.12;" target="authmw2" value="check_mw()">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_3" edge="1" parent="1" source="authmw2" style="endArrow=block;html=1;rounded=0;strokeColor=#009900;endFill=1;dashed=1;exitX=0;exitY=0.16;entryX=1;entryY=0.16;" target="server2" value="payload {id, role}">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_4" edge="1" parent="1" source="server2" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.2;entryX=0;entryY=0.2;" target="jsonmw2" value="application_json()">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_5" edge="1" parent="1" source="jsonmw2" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.24;entryX=0;entryY=0.24;" target="order2" value="order_create_start()">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_6" edge="1" parent="1" source="order2" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.3;entryX=0;entryY=0.3;" target="pool2" value="pin(order_begin) BEGIN TRANSACTION">
+          <mxGeometry relative="1" x="0.0034" y="14" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2_7" edge="1" parent="1" source="pool2" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.32;entryX=0;entryY=0.32;" target="db2" value="BEGIN">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="710" y="310" />
+              <mxPoint x="770" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2_9" edge="1" parent="1" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.36;entryX=0;entryY=0.36;" value="insert billing address">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="560.2185714285713" y="340.80000000000007" as="sourcePoint" />
+            <mxPoint x="799.79" y="340.80000000000007" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2_10" edge="1" parent="1" source="db2" style="endArrow=block;html=1;rounded=0;strokeColor=#009900;endFill=1;dashed=1;exitX=0;exitY=0.38;entryX=1;entryY=0.38;" target="order2" value="address_id">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_11" edge="1" parent="1" source="order2" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.4;entryX=0;entryY=0.4;" target="db2" value="insert delivery address">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_12" edge="1" parent="1" style="endArrow=block;html=1;rounded=0;strokeColor=#009900;endFill=1;dashed=1;exitX=0;exitY=0.42;entryX=1;entryY=0.42;" value="address_id">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="799.79" y="387.6" as="sourcePoint" />
+            <mxPoint x="560.2185714285713" y="387.6" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2_13" edge="1" parent="1" source="order2" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.44;entryX=0;entryY=0.44;" target="db2" value="insert order (user_id, addresses)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_14" edge="1" parent="1" source="db2" style="endArrow=block;html=1;rounded=0;strokeColor=#009900;endFill=1;dashed=1;exitX=0;exitY=0.46;entryX=1;entryY=0.46;" target="order2" value="order_id">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_15" edge="1" parent="1" source="order2" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.55;entryX=0;entryY=0.55;" target="db2" value="order_products (id, amount, price) UPDATE stock">
+          <mxGeometry relative="1" x="0.0024" y="9" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2_16" edge="1" parent="1" source="db2" style="endArrow=block;html=1;rounded=0;strokeColor=#009900;endFill=1;dashed=1;exitX=0;exitY=0.57;entryX=1;entryY=0.57;" target="order2" value="affected rows">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_17" edge="1" parent="1" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.65;entryX=0;entryY=0.65;" value="COMMIT">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="560.2185714285713" y="560" as="sourcePoint" />
+            <mxPoint x="799.79" y="560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="appointment" name="3. PATCH /api/appointment">
+    <mxGraphModel dx="1213" dy="655" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title3" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;" value="&lt;b&gt;Sequence: PATCH /api/appointment (Book or Finalize)&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="400" x="300" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="client3" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Client" vertex="1">
+          <mxGeometry height="650" width="80" x="60" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="server3" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#d5e8d4;strokeColor=#82b366;" value="HTTP Server" vertex="1">
+          <mxGeometry height="650" width="80" x="200" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="authmw3" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#fff2cc;strokeColor=#d6b656;" value="Auth Check" vertex="1">
+          <mxGeometry height="650" width="80" x="340" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="appt3" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Appointment&#xa;Logic" vertex="1">
+          <mxGeometry height="650" width="80" x="480" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="pool3" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#f8cecc;strokeColor=#b85450;" value="DB Pool" vertex="1">
+          <mxGeometry height="650" width="80" x="620" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="db3" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#f5f5f5;strokeColor=#666666;" value="Database" vertex="1">
+          <mxGeometry height="650" width="80" x="760" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e3_1" edge="1" parent="1" source="client3" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.1;entryX=0;entryY=0.1;" target="server3" value="PATCH /api/appointment?id=X">
+          <mxGeometry relative="1" x="0.0049" y="15" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3_2" edge="1" parent="1" source="server3" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.15;entryX=0;entryY=0.15;" target="authmw3" value="check_mw()">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3_3" edge="1" parent="1" source="authmw3" style="endArrow=block;html=1;rounded=0;strokeColor=#009900;endFill=1;dashed=1;exitX=0;exitY=0.2;entryX=1;entryY=0.2;" target="appt3" value="payload {id, role}">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3_4a" edge="1" parent="1" source="appt3" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.35;entryX=0;entryY=0.35;" target="db3" value="finalize_appointment (service_id, price, bringback_date)">
+          <mxGeometry relative="1" x="0.0017" y="18" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3_5a" edge="1" parent="1" source="db3" style="endArrow=block;html=1;rounded=0;strokeColor=#009900;endFill=1;dashed=1;exitX=0;exitY=0.37;entryX=1;entryY=0.37;" target="appt3" value="updated appointment">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3_4b" edge="1" parent="1" source="appt3" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.45;entryX=0;entryY=0.45;" target="db3" value="appoint_appointment (id, user_id, problem_description)">
+          <mxGeometry relative="1" x="0.0017" y="13" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3_5b" edge="1" parent="1" source="db3" style="endArrow=block;html=1;rounded=0;strokeColor=#009900;endFill=1;dashed=1;exitX=0;exitY=0.47;entryX=1;entryY=0.47;" target="appt3" value="booked appointment">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3_6" edge="1" parent="1" source="appt3" style="endArrow=block;html=1;rounded=0;strokeColor=#009900;endFill=1;dashed=1;exitX=0;exitY=0.6;entryX=1;entryY=0.6;" target="client3" value="200 {message}">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="product" name="4. POST /api/product">
+    <mxGraphModel dx="2105" dy="543" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="750" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title4" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;" value="&lt;b&gt;Sequence: POST /api/product (Admin Add Product)&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="400" x="300" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="admin4" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Admin&#xa;Client" vertex="1">
+          <mxGeometry height="600" width="80" x="60" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="server4" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#d5e8d4;strokeColor=#82b366;" value="HTTP Server" vertex="1">
+          <mxGeometry height="600" width="80" x="200" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="authmw4" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#fff2cc;strokeColor=#d6b656;" value="Auth/Admin&#xa;Middleware" vertex="1">
+          <mxGeometry height="600" width="80" x="340" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="jsonmw4" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#fff2cc;strokeColor=#d6b656;" value="JSON&#xa;Middleware" vertex="1">
+          <mxGeometry height="600" width="80" x="480" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e4_11" edge="1" parent="jsonmw4" style="endArrow=block;html=1;rounded=0;strokeColor=#009900;endFill=1;dashed=1;exitX=0;exitY=0.6;entryX=1;entryY=0.6;" value="200 {ok, message, id}">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="179.78999999999996" y="330" as="sourcePoint" />
+            <mxPoint x="-379.7814285714284" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="prod4" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Product&#xa;Logic" vertex="1">
+          <mxGeometry height="600" width="80" x="620" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="fs4" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#f5f5f5;strokeColor=#666666;" value="File&#xa;System" vertex="1">
+          <mxGeometry height="600" width="80" x="760" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="pool4" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#f8cecc;strokeColor=#b85450;" value="DB Pool" vertex="1">
+          <mxGeometry height="600" width="80" x="900" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e4_1" edge="1" parent="1" source="admin4" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.1;entryX=0;entryY=0.1;" target="server4" value="POST /api/product {name, category, maker, description, price, stock, image}">
+          <mxGeometry relative="1" x="0.006" y="10" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4_2" edge="1" parent="1" source="server4" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.15;entryX=0;entryY=0.15;" target="authmw4" value="check_admin_mw()">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4_3" edge="1" parent="1" source="authmw4" style="endArrow=block;html=1;rounded=0;strokeColor=#009900;endFill=1;dashed=1;exitX=0;exitY=0.2;entryX=1;entryY=0.2;" target="server4" value="payload {id, role=&#39;admin&#39;}">
+          <mxGeometry relative="1" x="-0.006" y="-10" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4_4" edge="1" parent="1" source="server4" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.25;entryX=0;entryY=0.25;" target="jsonmw4" value="application_json()">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4_5" edge="1" parent="1" source="jsonmw4" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.28;entryX=0;entryY=0.28;" target="prod4" value="product_adder()">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4_6" edge="1" parent="1" source="prod4" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.35;entryX=0;entryY=0.35;" target="fs4" value="save_image(base64)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4_8" edge="1" parent="1" source="fs4" style="endArrow=block;html=1;rounded=0;strokeColor=#009900;endFill=1;dashed=1;exitX=0;exitY=0.42;entryX=1;entryY=0.42;" target="prod4" value="filename/url_path">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4_9" edge="1" parent="1" source="prod4" style="endArrow=block;html=1;rounded=0;endFill=1;exitX=1;exitY=0.48;entryX=0;entryY=0.48;" target="pool4" value="query(product_add)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4_10" edge="1" parent="1" style="endArrow=block;html=1;rounded=0;strokeColor=#009900;endFill=1;dashed=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" value="product_id">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="939.79" y="370" as="sourcePoint" />
+            <mxPoint x="660.2185714285715" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
