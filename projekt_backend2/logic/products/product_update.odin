@@ -35,13 +35,13 @@ product_update_start :: proc (conn: ^http.Conn) {
     qp := cast(^util.QueryParameter)conn.user_data[util.QueryParameter]
 
     if qp["id"] == "" {
-        util.stop(conn, 400, "Missing id parameter.")
+        util.reset(conn, 400, "Missing id parameter.")
         return
     }
 
     input := new(ProductUpdate)
     if json.unmarshal(body^, input) != nil {
-        util.stop(conn, 400, "Invalid JSON format.")
+        util.reset(conn, 400, "Invalid JSON format.")
         return
     }
 
@@ -54,8 +54,14 @@ product_update_finish :: proc (conn: ^http.Conn) {
     result := cast(pool.Result)conn.user_data[pool.Result]
 
     status, _ := pool.status(result)
-    if status != .CommandOK {
+    if status != .TuplesOK {
         util.reset(conn, 500, "Failed to update product.")
+        return
+    }
+
+    tables := pool.unmarshal(result)
+    if len(tables) == 0 {
+        util.reset(conn, 404, "Product not found.")
         return
     }
 

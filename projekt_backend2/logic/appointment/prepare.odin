@@ -14,7 +14,8 @@ prepare :: proc () {
         SET user_id = $2,
         problem_description = $3,
         status = 'folyamatban'
-        WHERE id = $1`,
+        WHERE id = $1 AND user_id IS NULL
+        RETURNING id`,
     {.Int4, .Int4, .Text})
 
     pool.prepare("finalize_appointment", `
@@ -23,7 +24,8 @@ prepare :: proc () {
         service_price = $3,
         bringback_date = $4,
         status = 'kész'
-        WHERE id = $1`,
+        WHERE id = $1
+        RETURNING id`,
     {.Int4, .Varchar, .Int4, .Timestamp})
 
     pool.prepare("appointment_all", `

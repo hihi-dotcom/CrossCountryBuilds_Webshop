@@ -35,7 +35,7 @@ user_return :: proc (conn: ^http.Conn) {
     status, errMs := pool.status(result)
     if status != .TuplesOK {
         log.error(errMs)
-        util.stop(conn, 500, "Internal server error.")
+        util.reset(conn, 500, "Internal server error.")
         return
     }
 

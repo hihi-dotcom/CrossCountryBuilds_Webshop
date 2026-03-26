@@ -8,7 +8,7 @@ import "../../pool/pool_mw"
 
 product_by_id :: proc (conn: ^http.Conn, params: util.QueryParameter) {
     if params["id"] == "" {
-        util.stop(conn, 400, "Missing parameter")
+        util.reset(conn, 400, "Missing parameter")
         return
     }
 
@@ -21,28 +21,33 @@ product_by_id_result :: proc (conn: ^http.Conn) {
 
     status, _ := pool.status(result)
     if status != .TuplesOK {
-        util.stop(conn, 500, "Unable to get product.")
+        util.reset(conn, 500, "Unable to get product.")
         return
     }
 
     tables := pool.unmarshal(result)
 
-    product: []Product
-    product = make([]Product, len(tables))
-    for table, i in tables {
-       product[i].category = table["category"]
-       product[i].description = table["description"]
-       product[i].maker = table["manufacturer"]
-       product[i].name = table["name"]
-       product[i].picUrl = table["pic_url"]
-       product[i].price = table["price"]
-       product[i].stock_number = table["stock"]
-       product[i].id = table["id"]
+    if len(tables) == 0 {
+        util.reset(conn, 404, "Product not found")
+        return
+    }
+
+    table := tables[0]
+    
+    product := Product{
+        description = table["description"],
+        category = table["category"],
+        maker = table["manufacturer"],
+        name = table["name"],
+        picUrl = table["pic_url"],
+        price = table["price"],
+        stock_number = table["stock"],
+        id = table["id"],
     }
 
     response_body, marshalErr := json.marshal(product)
     if marshalErr != nil {
-        util.stop(conn, 500, "Result marshalation was unsuccesful.")
+        util.reset(conn, 500, "Result marshalation was unsuccesful.")
         return
     }
 

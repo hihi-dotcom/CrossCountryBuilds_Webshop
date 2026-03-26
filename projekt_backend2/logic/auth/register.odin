@@ -10,7 +10,6 @@ import "../../token"
 import "core:encoding/json"
 import "core:strconv"
 import "core:time"
-
 import "core:log"
 import "core:fmt"
 
@@ -27,7 +26,6 @@ Token :: struct {
     token: string
 }
 
-
 register :: proc (conn: ^http.Conn) {
     mw.application_json(conn, register_start_query)
 }
@@ -38,7 +36,7 @@ register_start_query :: proc (conn: ^http.Conn) {
 
     as := new(BodyAs)
     if json.unmarshal(body^, as) != nil {
-        util.stop(conn, 400, "Body is not parsable as json.")
+        util.reset(conn, 400, "Body is not parsable as json.")
         return
     }
 
@@ -70,16 +68,12 @@ register_is_good :: proc (conn: ^http.Conn) {
         return
     }
 
-    new_user := pool.unmarshal(result)
-
-    new_token := token.sign(fmt.aprint(new_user[0]["id"], "$", new_user[0]["role"], sep = ""), 5 * time.Hour)
-
     util.static_send(conn.soc, util.Response{
         status = 200,
         header = {
             "content-type:application/json"
         },
-        body = fmt.aprint(`{"ok":true,"message":"Registration successful","token":"`, new_token, `","redirect":"/login"}`)
+        body = fmt.aprint(`{"message":"Registration successful","redirect":"/login"}`)
     })
     http.reset_conn(conn)
 }

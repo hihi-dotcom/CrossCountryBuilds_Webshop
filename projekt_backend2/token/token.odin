@@ -45,13 +45,11 @@ sign :: proc (payload: string, valid_for: time.Duration, secret: string = SECRET
 }
 
 verify :: proc (tokenn: string, secret: string = SECRET) -> (payload: string, authentic: bool) {
-    // Handle empty token
     if len(tokenn) == 0 do return
     
     secret_bytes := transmute([]u8)secret
     token_bytes := transmute([]u8)tokenn
     
-    // Check token is long enough
     if len(tokenn) < TAG_B64_LENGTH + 1 do return
 
     if tokenn[len(tokenn) - TAG_B64_LENGTH - 1] != '|' do return

@@ -18,7 +18,7 @@ product_responseformulator :: proc (conn: ^http.Conn) {
     
     status, _ := pool.status(result)
     if status != .TuplesOK {
-        util.stop(conn, 500, "Internal server error.")
+        util.reset(conn, 500, "Internal server error.")
         return
     }
 

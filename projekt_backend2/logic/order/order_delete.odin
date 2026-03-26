@@ -30,7 +30,7 @@ order_delete_delete :: proc (conn: ^http.Conn) {
     qp := cast(^util.QueryParameter)conn.user_data[util.QueryParameter]
 
     if qp["id"] == "" {
-        util.stop(conn, 400, "Missing parameters.")
+        util.reset(conn, 400, "Missing parameters.")
         return
     }
 
@@ -42,8 +42,14 @@ order_delete_delete_delete :: proc (conn: ^http.Conn) {
     result := cast(pool.Result)conn.user_data[pool.Result]
 
     status, _ := pool.status(result)
-    if status != .CommandOK {
+    if status != .TuplesOK {
         util.reset(conn, 500, "Failed to delete order.")
+        return
+    }
+
+    tables := pool.unmarshal(result)
+    if len(tables) == 0 {
+        util.reset(conn, 404, "Order not found.")
         return
     }
 

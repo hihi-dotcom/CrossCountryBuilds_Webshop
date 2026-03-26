@@ -11,7 +11,7 @@ import "core:fmt"
 
 user_delete :: proc (conn: ^http.Conn, params: util.QueryParameter) {
     if params["id"] == "" {
-        util.stop(conn, 400, "Missing parameter")
+        util.reset(conn, 400, "Missing parameter")
         return
     }
     qp := new(util.QueryParameter)
@@ -28,8 +28,14 @@ user_delete_responder :: proc (conn: ^http.Conn) {
     result := cast(pool.Result)conn.user_data[pool.Result]
 
     status, _ := pool.status(result)
-    if status != .CommandOK {
-        util.stop(conn, 500, "Failed to delete user.")
+    if status != .TuplesOK {
+        util.reset(conn, 500, "Failed to delete user.")
+        return
+    }
+
+    tables := pool.unmarshal(result)
+    if len(tables) == 0 {
+        util.reset(conn, 404, "User not found.")
         return
     }
 

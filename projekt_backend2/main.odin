@@ -16,8 +16,7 @@ import "logic/auth"
 
 main :: proc () {
     token.SECRET = token.create_secret()
-    upload_dir := os.get_env_alloc("UPLOAD_DIR")
-    if len(upload_dir) == 0 { upload_dir = "../uploads" }
+    upload_dir := "../uploads"
     products.UPLOAD_DIR = upload_dir
     logic.prepare()
 
@@ -49,7 +48,7 @@ main :: proc () {
                     case "/api/newappointment":
                         appointment.appointment_new(conn)
                     case:
-                        util.stop(conn, 404, "Not Found")
+                        util.reset(conn, 404, "Not Found")
                 }
             case "GET":
                 switch path {
@@ -65,14 +64,14 @@ main :: proc () {
                         products.products_all(conn)
                     case "/api/admin/users":
                         user.user_all(conn)
-                    case "/api/freeappointments":
+                    case "/api/admin/freeappointments":
                         appointment.appointment_get_free(conn)
                     case "/api/admin/appointments":
                         appointment.appointment_all(conn)
                     case "/api/admin/appointment":
                         appointment.appointment_by_id(conn, params)
                     case:
-                        util.stop(conn, 404, "Not Found")
+                        util.reset(conn, 404, "Not Found")
                 }
             case "PATCH":
                 switch path {
@@ -80,12 +79,12 @@ main :: proc () {
                         order.order_status(conn, params)
                     case "/api/appointment":
                         appointment.appointment_book(conn, params)
-                    case "/api/finalize":
+                    case "/api/admin/finalize":
                         appointment.finalize(conn, params)
                     case "/api/admin/products":
                         products.product_update(conn, params)
                     case:
-                        util.stop(conn, 404, "Not Found")
+                        util.reset(conn, 404, "Not Found")
                 }
             case "DELETE":
                 switch path {
@@ -98,10 +97,10 @@ main :: proc () {
                     case "/api/appointment":
                         appointment.appointment_delete(conn, params)
                     case:
-                        util.stop(conn, 404, "Not Found")
+                        util.reset(conn, 404, "Not Found")
                 }
             case:
-                util.stop(conn, 405, "Method Not Allowed")
+                util.reset(conn, 405, "Method Not Allowed")
         }
     })
 }

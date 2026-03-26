@@ -19,8 +19,10 @@ BodyAs :: struct {
 }
 
 @(private = "file")
-Token :: struct {
-    token: string
+Response :: struct {
+    token: string,
+    message: string,
+    role: string
 }
 
 login :: proc (conn: ^http.Conn) {
@@ -33,12 +35,12 @@ login_query :: proc (conn: ^http.Conn) {
 
     as := new(BodyAs)
     if json.unmarshal(body, as) != nil {
-        util.stop(conn, 400, "Invalid JSON format.")
+        util.reset(conn, 400, "Invalid JSON format.")
         return
     }
 
     if as.password == "" || as.username == "" {
-        util.stop(conn, 400, "Missing paramter.")
+        util.reset(conn, 400, "Missing parameter.")
         return
     }
     conn.user_data[BodyAs] = as
@@ -52,7 +54,7 @@ login_verify :: proc (conn: ^http.Conn) {
     
     status, errMsg := pool.status(resutl)
     if status != .TuplesOK {
-        util.stop(conn, 500, "Internal server error. 1")
+        util.reset(conn, 500, "Internal server error. 1")
         return
     }
 
@@ -72,7 +74,7 @@ login_verify :: proc (conn: ^http.Conn) {
         return 
     } (data) 
     if !ok  {
-        util.stop(conn, 500, "Internal server error. 2")
+        util.reset(conn, 500, "Internal server error. 2")
         return
     }
 
@@ -82,9 +84,13 @@ login_verify :: proc (conn: ^http.Conn) {
     }
 
     token := token.sign(fmt.aprint(id, "$", role, sep = ""), 5 * time.Hour)
-    resopnse_body, marshal_err := json.marshal(Token{token=token})
+    resopnse_body, marshal_err := json.marshal(Response{
+        token=token,
+        message="Sikeres bejelentkezés!",
+        role=role
+    })
     if marshal_err != nil {
-        util.stop(conn, 500, "Marshal error.")
+        util.reset(conn, 500, "Marshal error.")
         return
     }
 

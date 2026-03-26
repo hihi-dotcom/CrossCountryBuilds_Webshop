@@ -6,7 +6,7 @@ import "core:log"
 import vmem "core:mem/virtual"
 
 @(private)
-TICK :: 100 * time.Millisecond
+TICK :: 5 * time.Millisecond
 @(private)
 TIMEOUT :: 5 * time.Second
 @(private)
@@ -77,13 +77,9 @@ reset_conn :: proc (conn: ^Conn) {
     old_soc := conn.soc
     old_source := conn.source
 
-    tmp: [HEADER_SIZE]u8
-    leftover_length := copy_leftover_header_data(conn, tmp[:])
-
     vmem.arena_destroy(&conn.arena)
 
     init_conn(conn, old_soc, old_source)
-    conn.header_data.written_till += copy(conn.header_data.buf, tmp[:leftover_length])
 }
 
 copy_leftover_header_data :: proc (conn: ^Conn, dst: []u8) -> int {

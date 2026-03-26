@@ -48,24 +48,16 @@ appointment_new_respond :: proc (conn: ^http.Conn) {
 
     status, _ := pool.status(result)
     if status != .TuplesOK {
-        util.stop(conn, 500, "Failed to create appointment.")
+        util.reset(conn, 500, "Failed to create appointment.")
         return
     }
-
-    table := pool.unmarshal(result)
-
-    jr := JsonResponse{
-        id = table[0]["id"],
-    }
-
-    body_bytes, _ := json.marshal(jr)
 
     util.static_send(conn.soc, {
         status = 200,
         header = {
             "content-type:application/json"
         },
-        body = string(body_bytes)
+        body = `{"message": "Sikeres felvétel."}`
     })
     http.reset_conn(conn)
 }

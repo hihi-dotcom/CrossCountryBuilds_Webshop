@@ -42,12 +42,19 @@ prepare :: proc () {
     {.Int4})
 
     pool.prepare("product_delete", `
-        DELETE FROM products WHERE id = $1`,
+        DELETE FROM products WHERE id = $1
+        RETURNING id`,
     {.Int4})
 
     pool.prepare("product_update", `
         UPDATE products
-        SET name = $1, category = $2, manufacturer = $3, price = $4, stock = $5, description = $6
-        WHERE id = $7`,
+        SET name = COALESCE(NULLIF($1, ''), name),
+            category = COALESCE(NULLIF($2, ''), category),
+            manufacturer = COALESCE(NULLIF($3, ''), manufacturer),
+            price = CASE WHEN $4 = 0 THEN price ELSE $4 END,
+            stock = CASE WHEN $5 = 0 THEN stock ELSE $5 END,
+            description = COALESCE(NULLIF($6, ''), description)
+        WHERE id = $7
+        RETURNING id`,
     {.Varchar, .Varchar, .Varchar, .Int4, .Int4, .Text, .Int4})
 }

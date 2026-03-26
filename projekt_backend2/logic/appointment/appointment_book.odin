@@ -18,13 +18,13 @@ BookBody :: struct {
 @(private = "file")
 FinalizeBody :: struct {
     service_id: string,
-    price: int,
-    bringBackDate: string,
+    service_price: int,
+    bringback_date: string,
 }
 
 appointment_book :: proc (conn: ^http.Conn, params: util.QueryParameter) {
     if params["id"] == "" {
-        util.stop(conn, 400, "Missing parameter.")
+        util.reset(conn, 400, "Missing parameter.")
         return
     }
     qp := new(util.QueryParameter)
@@ -43,7 +43,7 @@ appointment_book_query :: proc (conn: ^http.Conn) {
     body := cast(mw.StaticBody)conn.user_data[mw.StaticBody]
 
     finalizeBody := new(FinalizeBody)
-    if json.unmarshal(body^, finalizeBody) == nil && finalizeBody.price > 0 {
+    if json.unmarshal(body^, finalizeBody) == nil && finalizeBody.service_price > 0 {
         // SECURITY: Only admins can finalize appointments (set price, service, bringback date)
         if payload.role != "admin" {
             util.reset(conn, 403, "Only administrators can finalize appointments.")
@@ -51,7 +51,7 @@ appointment_book_query :: proc (conn: ^http.Conn) {
         }
         conn.user_data[^FinalizeBody] = finalizeBody
         pool_mw.query(conn, appointment_finalize_respond, "finalize_appointment",
-            {fmt.aprint(qp["id"]), finalizeBody.service_id, fmt.aprint(finalizeBody.price), finalizeBody.bringBackDate})
+            {fmt.aprint(qp["id"]), finalizeBody.service_id, fmt.aprint(finalizeBody.service_price), finalizeBody.bringback_date})
         return
     }
 
@@ -75,8 +75,14 @@ appointment_book_respond :: proc (conn: ^http.Conn) {
     result := cast(pool.Result)conn.user_data[pool.Result]
 
     status, _ := pool.status(result)
-    if status != .CommandOK {
-        util.stop(conn, 500, "Failed to update appointment.")
+    if status != .TuplesOK {
+        util.reset(conn, 500, "Failed to update appointment.")
+        return
+    }
+
+    tables := pool.unmarshal(result)
+    if len(tables) == 0 {
+        util.reset(conn, 400, "Az időpont már nem elérhető.")
         return
     }
 
@@ -95,8 +101,14 @@ appointment_finalize_respond :: proc (conn: ^http.Conn) {
     result := cast(pool.Result)conn.user_data[pool.Result]
 
     status, _ := pool.status(result)
-    if status != .CommandOK {
-        util.stop(conn, 500, "Failed to finalize appointment.")
+    if status != .TuplesOK {
+        util.reset(conn, 500, "Failed to finalize appointment.")
+        return
+    }
+
+    tables := pool.unmarshal(result)
+    if len(tables) == 0 {
+        util.reset(conn, 404, "Appointment not found.")
         return
     }
 

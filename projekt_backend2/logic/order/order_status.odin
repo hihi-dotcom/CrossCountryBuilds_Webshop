@@ -39,11 +39,11 @@ order_start_update :: proc (conn: ^http.Conn) {
 
     as := new(BodyAs)
     if json.unmarshal(body^, as) != nil {
-        util.stop(conn, 400, "Invalid JSON format.")
+        util.reset(conn, 400, "Invalid JSON format.")
         return
     }
     if as.status == "" || qp["id"] == "" {
-        util.stop(conn, 400, "Missing parameters.")
+        util.reset(conn, 400, "Missing parameters.")
         return
     }
 
@@ -55,8 +55,14 @@ order_status_finish :: proc (conn: ^http.Conn) {
     result := cast(pool.Result)conn.user_data[pool.Result]
 
     status, _ := pool.status(result)
-    if status != .CommandOK {
+    if status != .TuplesOK {
         util.reset(conn, 500, "Failed to update status.")
+        return
+    }
+
+    tables := pool.unmarshal(result)
+    if len(tables) == 0 {
+        util.reset(conn, 404, "Order not found.")
         return
     }
 

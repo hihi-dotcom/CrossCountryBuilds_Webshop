@@ -29,7 +29,7 @@ user_all_responder :: proc (conn: ^http.Conn) {
 
     status, _ := pool.status(result)
     if status != .TuplesOK {
-        util.stop(conn, 500, "Failed to get users.")
+        util.reset(conn, 500, "Failed to get users.")
         return
     }
 

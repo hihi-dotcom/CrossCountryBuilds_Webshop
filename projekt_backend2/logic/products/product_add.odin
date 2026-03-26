@@ -46,7 +46,7 @@ product_adder :: proc (conn: ^http.Conn) {
 
     input: ProductInput
     if json.unmarshal(body^, &input) != nil {
-        util.stop(conn, 400, "Json parsing failed")
+        util.reset(conn, 400, "Json parsing failed")
         return
     }
 
@@ -54,7 +54,7 @@ product_adder :: proc (conn: ^http.Conn) {
     if len(input.image) > 0 {
         result := save_image(input.image)
         if !result.success {
-            util.stop(conn, 400, result.error)
+            util.reset(conn, 400, result.error)
             return
         }
         url_path = result.url_path
@@ -70,7 +70,7 @@ product_adder_check :: proc (conn: ^http.Conn) {
 
     status, _ := pool.status(resutl)
     if status != .TuplesOK {
-        util.stop(conn, 500, "Internal server error.")
+        util.reset(conn, 500, "Internal server error.")
         return
     }
 

@@ -8,7 +8,7 @@ import "../auth"
 
 appointment_delete :: proc (conn: ^http.Conn, params: util.QueryParameter) {
     if params["id"] == "" {
-        util.stop(conn, 400, "Missing parameter.")
+        util.reset(conn, 400, "Missing parameter.")
         return
     }
     qp := new(util.QueryParameter)
@@ -30,7 +30,13 @@ appointment_delete_respond :: proc (conn: ^http.Conn) {
 
     status, _ := pool.status(result)
     if status != .TuplesOK {
-        util.stop(conn, 500, "Failed to delete appointment.")
+        util.reset(conn, 500, "Failed to delete appointment.")
+        return
+    }
+
+    tables := pool.unmarshal(result)
+    if len(tables) == 0 {
+        util.reset(conn, 404, "Appointment doesn't exist.")
         return
     }
 

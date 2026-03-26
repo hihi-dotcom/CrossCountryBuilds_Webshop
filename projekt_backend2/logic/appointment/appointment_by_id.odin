@@ -9,7 +9,7 @@ import "../auth"
 
 appointment_by_id :: proc (conn: ^http.Conn, params: util.QueryParameter) {
     if params["id"] == "" {
-        util.stop(conn, 400, "Missing parameter")
+        util.reset(conn, 400, "Missing parameter")
         return
     }
 
@@ -32,11 +32,15 @@ appointment_by_id_respond :: proc (conn: ^http.Conn) {
 
     status, _ := pool.status(result)
     if status != .TuplesOK {
-        util.stop(conn, 500, "Internal server error.")
+        util.reset(conn, 500, "Internal server error.")
         return
     }
 
     tables := pool.unmarshal(result)
+    if len(tables) == 0 {
+        util.reset(conn, 404, "Appointment not found.")
+        return
+    }
 
     appointments := make([]Appointment, len(tables))
     for table, i in tables {

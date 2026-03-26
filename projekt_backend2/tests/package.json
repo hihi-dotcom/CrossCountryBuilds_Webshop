@@ -1,0 +1,17 @@
+{
+  "name": "crosscountrybuilds-api-tests",
+  "version": "1.0.0",
+  "description": "API endpoint tests for CrossCountryBuilds webshop",
+  "scripts": {
+    "test": "jest --runInBand",
+    "test:verbose": "jest --runInBand --verbose",
+    "test:watch": "jest --watch --runInBand"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

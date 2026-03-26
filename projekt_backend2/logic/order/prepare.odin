@@ -40,12 +40,14 @@ prepare :: proc () {
         UPDATE Orders  
         SET status = $1
         WHERE id = $2
+        RETURNING id
     `, {.Varchar, .Int4})
 
     pool.prepare("order_delete",`
         DELETE FROM Orders
         WHERE id = $1
-    `, {.Int4})
+        RETURNING id`,
+    {.Int4})
 
     pool.prepare("order_all", `
         SELECT COALESCE(json_agg(order_obj), '[]'::json) AS orders
@@ -77,7 +79,8 @@ prepare :: proc () {
                 DISTINCT jsonb_build_object(
                     'id', p.id,
                     'p_name', p.name,
-                    'p_price', op.sell_price
+                    'p_price', op.sell_price,
+                    'quantity', op.quantity
                 )
                 ) FILTER (WHERE op.id IS NOT NULL),
                 '[]'::json

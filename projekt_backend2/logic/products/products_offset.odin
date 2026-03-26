@@ -35,7 +35,7 @@ Product :: struct {
 
 @(private = "file")
 ResponseFromat :: struct {
-    product: []Product,
+    products: []Product,
     total: int,
     hasMore: bool
 }
@@ -44,14 +44,14 @@ products_range :: proc (conn: ^http.Conn, params: util.QueryParameter) {
     limit_string, limitOk := params["limit"]
     offset_string, offsetOk := params["offset"]
     if !limitOk || !offsetOk {
-        util.stop(conn, 400, "Missing parameter.")
+        util.reset(conn, 400, "Missing parameter.")
         return
     }
 
     limit, limitParseOk := strconv.parse_int(limit_string, 10)
     offset, offsetParseOk := strconv.parse_int(offset_string, 10)
     if !limitParseOk || !offsetParseOk {
-        util.stop(conn, 400, "Parameter is not number.")
+        util.reset(conn, 400, "Parameter is not number.")
         return
     }
 
@@ -84,7 +84,7 @@ products_more_query :: proc (conn: ^http.Conn) {
 
     status, _ := pool.status(resutl)
     if status != .TuplesOK {
-        util.stop(conn, 500, "Internal server error.")
+        util.reset(conn, 500, "Internal server error.")
         return
     }
 
@@ -117,7 +117,7 @@ products_no_more_query :: proc (conn: ^http.Conn) {
 
     status, _ := pool.status(resutl)
     if status != .TuplesOK {
-        util.stop(conn, 500, "Internal server error.")
+        util.reset(conn, 500, "Internal server error.")
         return
     }
 
@@ -125,7 +125,7 @@ products_no_more_query :: proc (conn: ^http.Conn) {
     count, _ := strconv.parse_int(tables[0]["num"])
 
     rp := ResponseFromat{
-        product = products^,
+        products = products^,
         hasMore = len(products) + offset^ < count,
         total = count
     }

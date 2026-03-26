@@ -5,6 +5,7 @@ import "../../http"
 import "../../http/util"
 import "../../pool"
 import "../../pool/pool_mw"
+import "../auth"
 
 @(private = "file")
 ResponseFromat :: struct {
@@ -13,7 +14,9 @@ ResponseFromat :: struct {
 }
 
 appointment_get_free :: proc (conn: ^http.Conn) {
-    pool_mw.query(conn, appointment_get_free_responder, "appointment_get_free")
+    auth.check_admin_mw(conn, proc (conn: ^http.Conn) {
+        pool_mw.query(conn, appointment_get_free_responder, "appointment_get_free")
+    })
 }
 
 @(private = "file")
@@ -22,7 +25,7 @@ appointment_get_free_responder :: proc (conn: ^http.Conn) {
 
     status, _ := pool.status(result)
     if status != .TuplesOK {
-        util.stop(conn, 500, "Getting appointments failed.")
+        util.reset(conn, 500, "Getting appointments failed.")
         return
     }
 

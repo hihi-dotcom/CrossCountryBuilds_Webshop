@@ -14,7 +14,7 @@ product_delete :: proc (conn: ^http.Conn, params: util.QueryParameter) {
     conn.user_data[util.QueryParameter] = qp
 
     if qp["id"] == "" {
-        util.stop(conn, 400, "Missing parameter.")
+        util.reset(conn, 400, "Missing parameter.")
         return
     }
 
@@ -31,8 +31,14 @@ product_delete_confirm :: proc (conn: ^http.Conn) {
     result := cast(pool.Result)conn.user_data[pool.Result]
 
     status, _ := pool.status(result)
-    if status != .CommandOK {
-        util.stop(conn, 500, "Could not delete product.")
+    if status != .TuplesOK {
+        util.reset(conn, 500, "Could not delete product.")
+        return
+    }
+
+    tables := pool.unmarshal(result)
+    if len(tables) == 0 {
+        util.reset(conn, 404, "Product not found.")
         return
     }
 
