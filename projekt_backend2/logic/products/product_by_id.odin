@@ -5,6 +5,7 @@ import "../../http"
 import "../../http/util"
 import "core:encoding/json"
 import "../../pool/pool_mw"
+import "core:strconv"
 
 product_by_id :: proc (conn: ^http.Conn, params: util.QueryParameter) {
     if params["id"] == "" {
@@ -34,14 +35,16 @@ product_by_id_result :: proc (conn: ^http.Conn) {
 
     table := tables[0]
     
+    price, _ := strconv.parse_int(table["price"]) 
+    stock_number, _ := strconv.parse_int(table["stock"]) 
     product := Product{
         description = table["description"],
         category = table["category"],
         maker = table["manufacturer"],
         name = table["name"],
         picUrl = table["pic_url"],
-        price = table["price"],
-        stock_number = table["stock"],
+        price = price,
+        stock_number = stock_number,
         id = table["id"],
     }
 

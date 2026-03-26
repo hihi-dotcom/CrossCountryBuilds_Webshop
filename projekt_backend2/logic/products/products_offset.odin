@@ -27,8 +27,8 @@ Product :: struct {
     name: string,
     category: string,
     maker: string,
-    price: string,
-    stock_number: string,
+    price: int,
+    stock_number: int,
     picUrl: string,
     description: string
 }
@@ -93,14 +93,16 @@ products_more_query :: proc (conn: ^http.Conn) {
     products := new([]Product)
     products^ = make([]Product, len(tables))
     for table, i in tables {
-       products[i].category = table["category"]
-       products[i].description = table["description"]
-       products[i].maker = table["manufacturer"]
-       products[i].name = table["name"]
-       products[i].picUrl = table["pic_url"]
-       products[i].price = table["price"]
-       products[i].stock_number = table["stock"]
-       products[i].id = table["id"]
+        price, _ := strconv.parse_int(table["price"]) 
+        stock_number, _ := strconv.parse_int(table["stock"]) 
+        products[i].category = table["category"]
+        products[i].description = table["description"]
+        products[i].maker = table["manufacturer"]
+        products[i].name = table["name"]
+        products[i].picUrl = table["pic_url"]
+        products[i].price = price
+        products[i].stock_number = stock_number
+        products[i].id = table["id"]
     }
     conn.user_data[^[]Product] = products
 

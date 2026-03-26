@@ -6,6 +6,7 @@ import "../../http/util"
 import "core:encoding/json"
 import "../../pool/pool_mw"
 import "../auth"
+import "core:strconv"
 
 products_all :: proc (conn: ^http.Conn) {
     auth.check_admin_mw(conn, proc (conn: ^http.Conn) {
@@ -26,14 +27,16 @@ product_responseformulator :: proc (conn: ^http.Conn) {
 
     products := make([]Product, len(tables))
     for table, i in tables {
-       products[i].category = table["category"]
-       products[i].description = table["description"]
-       products[i].maker = table["manufacturer"]
-       products[i].name = table["name"]
-       products[i].picUrl = table["pic_url"]
-       products[i].price = table["price"]
-       products[i].stock_number = table["stock"]
-       products[i].id = table["id"]
+        price, _ := strconv.parse_int(table["price"]) 
+        stock_number, _ := strconv.parse_int(table["stock"]) 
+        products[i].category = table["category"]
+        products[i].description = table["description"]
+        products[i].maker = table["manufacturer"]
+        products[i].name = table["name"]
+        products[i].picUrl = table["pic_url"]
+        products[i].price = price
+        products[i].stock_number = stock_number
+        products[i].id = table["id"]
     }
 
     body_bytes, _ := json.marshal(products)
