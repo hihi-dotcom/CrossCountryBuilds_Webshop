@@ -23,7 +23,7 @@ export default function HomePage(){
         try{
             const currentFilters = Object.fromEntries(searchParams.entries());
             const result = await ProductService.getProducts(LIMIT, currentOffset, currentFilters);
-
+            
             if(result.ok){
                 setTotal(result.total);
                 setHasMore(result.hasMore);
