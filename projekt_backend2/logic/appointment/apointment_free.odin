@@ -14,9 +14,8 @@ ResponseFromat :: struct {
 }
 
 appointment_get_free :: proc (conn: ^http.Conn) {
-    auth.check_admin_mw(conn, proc (conn: ^http.Conn) {
         pool_mw.query(conn, appointment_get_free_responder, "appointment_get_free")
-    })
+    
 }
 
 @(private = "file")

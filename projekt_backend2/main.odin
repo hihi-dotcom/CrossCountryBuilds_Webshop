@@ -64,7 +64,7 @@ main :: proc () {
                         products.products_all(conn)
                     case "/api/admin/users":
                         user.user_all(conn)
-                    case "/api/admin/freeappointments":
+                    case "/api/freeappointments":
                         appointment.appointment_get_free(conn)
                     case "/api/admin/appointments":
                         appointment.appointment_all(conn)

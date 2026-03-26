@@ -40,7 +40,7 @@ AddressJson :: struct {
 @(private = "file")
 ProductJson :: struct {
     id: string,
-    price: string,
+    price: int,
     amount: int
 }
 

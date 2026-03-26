@@ -8,18 +8,18 @@ export function Item({ product, OnCart }: ProductProps) {
   const { addToCart } = useCart();
 
   return (
-    <div className="w-full max-w-[18rem] justify-center bg-[#1e293b] rounded-[2rem] overflow-hidden shadow-2xl flex flex-col h-full border border-gray-800 transition-transform hover:scale-[1.02]">
+    <div className="w-full max-w-[18rem] justify-center bg-[#1e293b] rounded-4xl overflow-hidden shadow-2xl flex flex-col h-full border border-gray-800 transition-transform hover:scale-[1.02]">
 
       <div className="relative bg-white p-5 h-56 flex items-center justify-center">
         <img
-          src={`http://localhost:3000/uploads/${product.picUrl}`}
+          src={`http://localhost:3000/product_images/${product.picUrl}`}
           alt={product.name}
           className="max-h-full max-w-full object-contain"
         />
         {(product.stock_number ?? 0) <= 5 && (
           <div className="absolute top-4 right-4 z-10">
             <Badge color="warning" className="rounded-full px-3 py-1 text-[10px] font-bold shadow-md border-none">
-               ⚠️ Csak {product.stock_number} maradt!
+                Csak {product.stock_number} maradt!
             </Badge>
           </div>
         )}

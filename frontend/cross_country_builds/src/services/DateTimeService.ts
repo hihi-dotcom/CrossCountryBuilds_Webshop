@@ -29,10 +29,14 @@ class DateTimeService{
         };
     };
 
-    async finalizeService(id:number, data:{service_id:string, price:number, bringBackDate: string}):Promise<DateTimeFinalizeRespDTO>{
-        const response = await requestHandler(`finalize?id=${id}`, {
+    async finalizeService(id:number, data:{service_id:string, service_price:number, bringback_date: string}):Promise<DateTimeFinalizeRespDTO>{
+        const response = await requestHandler(`admin/finalize?id=${id}`, {
             method: "PATCH",
-            body: JSON.stringify(data)
+            body: JSON.stringify({
+                service_id: data.service_id,
+                service_price: data.service_price,
+                bringback_date: data.bringback_date
+            }),
         });
 
         const respData = await response.json();

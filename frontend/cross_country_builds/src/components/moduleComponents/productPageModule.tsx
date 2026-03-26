@@ -50,7 +50,7 @@ export default function ProductModule() {
         <div className="relative">
           <div className="overflow-hidden rounded-[2.5rem] bg-white shadow-2xl border-none">
             <img 
-              src={`http://localhost:3000/uploads/${product.picUrl}`} 
+              src={`http://localhost:3000/product_images/${product.picUrl}`} 
               alt={product.name} 
               className="w-full h-auto object-contain aspect-square p-8"
             />

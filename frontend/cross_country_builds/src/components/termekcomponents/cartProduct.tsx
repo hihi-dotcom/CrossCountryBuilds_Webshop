@@ -14,7 +14,7 @@ export default function CartProduct({ cartproduct }: CartProductProps) {
         
         <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
           <img 
-            src={`http://localhost:3000/uploads/${cartproduct.picUrl}`} 
+            src={`http://localhost:3000/product_images/${cartproduct.picUrl}`} 
             alt={cartproduct.name} 
             className="rounded-2xl w-24 h-24 object-cover bg-gray-50 p-2 shadow-inner"
           />

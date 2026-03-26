@@ -86,7 +86,7 @@ export async function appointmentLoaderById({params}:any){
 
     const response = await DateTimeService.getAppointmentById(parseInt(id));
     if(!response){
-        throw new Response("A termék nem található", {status: 404});
+        throw new Response("Az időpont nem található", {status: 404});
     };
 
     return response;
@@ -102,8 +102,8 @@ export async function UpdateAppointment({request, params}:any){
         }
     const DatetimeData = {
         service_id:formdata.get("service_id") || AppointmentId,
-        price: formdata.get("service_price"),
-        bringBackDate: formdata.get("bringback_date"),
+        service_price: parseInt(formdata.get("service_price")),
+        bringback_date: formdata.get("bringback_date").replace("T", " ") + ":00",
     };
     
     const productId = params.id;

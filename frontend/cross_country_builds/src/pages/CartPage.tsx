@@ -12,7 +12,7 @@ export default function CartPage() {
     <section className="min-h-screen py-12 px-4 md:px-12 bg-[#f9fafb]">
       <div className="max-w-5xl mx-auto">
         <BacktoTheWebShopSection>
-          <span className="text-white italic font-medium">Elfelejtettem valamit? Itt még visszatérhetsz.</span>
+          <span className="text-white italic font-medium">Elfelejtettél valamit? Itt még visszatérhetsz.</span>
         </BacktoTheWebShopSection>
 
         <div className="flex items-center gap-4 mt-10 mb-8">

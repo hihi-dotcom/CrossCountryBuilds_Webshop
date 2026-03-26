@@ -91,7 +91,7 @@ export default function OrderDataModule() {
       disabled: hasBicycle,
     },
     {
-      value: "kartya",
+      value: "futar-kartya",
       name: "futar-kartya",
       innerText: "futárunknak Paypal segítségével",
       disabled: hasBicycle,
@@ -104,14 +104,14 @@ export default function OrderDataModule() {
     }
 
     if (selectedShipping === "uzlet") {
-      return option.value.includes("uzlet") || option.name.includes("uzlet");
+      return option.value.includes("uzlet");
     }
     if (selectedShipping === "futar") {
-      return option.value.includes("futar") || option.name.includes("futar");
+      return option.value.includes("futar");
     }
     return true;
   });
-
+  console.log(actionData);
   return (
     <section className="bg-gray-50/50 min-h-screen py-12 px-4">
       <div className="max-w-6xl mx-auto">

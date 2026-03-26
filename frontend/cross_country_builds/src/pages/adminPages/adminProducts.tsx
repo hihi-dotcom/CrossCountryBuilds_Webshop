@@ -1,7 +1,13 @@
 import TrashIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import PenIcon from "@mui/icons-material/Edit";
 import { HiCheck } from "react-icons/hi";
-import { Form, useLoaderData, useActionData,useNavigate, Link } from "react-router-dom";
+import {
+  Form,
+  useLoaderData,
+  useActionData,
+  useNavigate,
+  Link,
+} from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import ProductService from "../../services/ProductService";
 import type Product from "../../models/product";
@@ -59,15 +65,13 @@ export default function ProductDashboard() {
     const filteredProducts = initProducts.filter((product: Product) =>
       product.name!.includes(searchedProduct),
     );
-    if(filteredProducts.length === 0){
+    if (filteredProducts.length === 0) {
       setProducts([]);
-      setSearchMessage("Nincs a keresésnek megfelelő termék!")
-    }
-    else{
+      setSearchMessage("Nincs a keresésnek megfelelő termék!");
+    } else {
       setSearchMessage(null);
       setProducts(filteredProducts);
     }
-    
   }
   return (
     <>
@@ -121,7 +125,6 @@ export default function ProductDashboard() {
                   ref={productNameRef}
                   onChange={handleSearchforProduct}
                 />
-
               </div>
               <div
                 id="kereses-gomb"
@@ -158,8 +161,10 @@ export default function ProductDashboard() {
                   placeholder="a termék neve"
                 />
                 {actionData?.errors?.name && (
-                    <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">{actionData.errors.name[0]}</span>
-                  )}
+                  <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">
+                    {actionData.errors.name[0]}
+                  </span>
+                )}
               </div>
               <div className=" flex flex-col">
                 <label htmlFor="prodcat">Add meg a kategóriát:</label>
@@ -175,9 +180,11 @@ export default function ProductDashboard() {
                     </option>
                   ))}
                 </select>
-                  {actionData?.errors?.category && (
-                    <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">{actionData.errors.category[0]}</span>
-                  )}
+                {actionData?.errors?.category && (
+                  <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">
+                    {actionData.errors.category[0]}
+                  </span>
+                )}
               </div>
               <div>
                 <label htmlFor="prodmaker">Add meg a termék gyártóját:</label>
@@ -189,8 +196,10 @@ export default function ProductDashboard() {
                   placeholder="a termék gyártója"
                 />
                 {actionData?.errors?.maker && (
-                    <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">{actionData.errors.maker[0]}</span>
-                  )}
+                  <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">
+                    {actionData.errors.maker[0]}
+                  </span>
+                )}
               </div>
               <div>
                 <label htmlFor="proddesc">Add meg a termék leírását:</label>
@@ -202,8 +211,10 @@ export default function ProductDashboard() {
                   placeholder="a termék leírása"
                 />
                 {actionData?.errors?.description && (
-                    <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">{actionData.errors.description[0]}</span>
-                  )}
+                  <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">
+                    {actionData.errors.description[0]}
+                  </span>
+                )}
               </div>
               <div>
                 <label htmlFor="prodpic">Add meg a termék képét:</label>
@@ -214,8 +225,10 @@ export default function ProductDashboard() {
                   className="text-black border-black border-2 bg-white rounded-xl px-3 h-fit w-full placeholder:text-black"
                 />
                 {actionData?.errors?.image && (
-                    <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">{actionData.errors.image[0]}</span>
-                  )}
+                  <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">
+                    {actionData.errors.image[0]}
+                  </span>
+                )}
               </div>
               <div>
                 <label htmlFor="prodprice">Add meg a termék árát:</label>
@@ -226,9 +239,11 @@ export default function ProductDashboard() {
                   className="text-black border-black border-2 bg-white rounded-xl px-3 h-10 w-full placeholder:text-black"
                   placeholder="a termék ára"
                 />
-                  {actionData?.errors?.price && (
-                    <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">{actionData.errors.price[0]}</span>
-                  )}
+                {actionData?.errors?.price && (
+                  <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">
+                    {actionData.errors.price[0]}
+                  </span>
+                )}
               </div>
               <div>
                 <label htmlFor="prodstock">
@@ -241,9 +256,11 @@ export default function ProductDashboard() {
                   className="text-black border-black border-2 bg-white rounded-xl px-3 h-10 w-full placeholder:text-black"
                   placeholder="a termék darabszáma"
                 />
-                  {actionData?.errors?.stock_number && (
-                    <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">{actionData.errors.stock_number[0]}</span>
-                  )}
+                {actionData?.errors?.stock_number && (
+                  <span className="text-red-500 text-xs font-bold italic ml-1 uppercase">
+                    {actionData.errors.stock_number[0]}
+                  </span>
+                )}
               </div>
               {actionData?.message && (
                 <>
@@ -279,9 +296,13 @@ export default function ProductDashboard() {
               <div className="text-red-500 bg-red-200 p-2 rounded">{error}</div>
             )}
             {SearchMessage ? (
-              <p className="text-xl italic text-slate-500 mb-4">{SearchMessage}</p>
+              <p className="text-xl italic text-slate-500 mb-4">
+                {SearchMessage}
+              </p>
             ) : products.length === 0 ? (
-              <p className="text-xl italic text-slate-500 mb-4">Nincsenek termékek a rendszerben!</p>
+              <p className="text-xl italic text-slate-500 mb-4">
+                Nincsenek termékek a rendszerben!
+              </p>
             ) : null}
             <table className="w-full text-left border-collapse">
               <thead>
@@ -294,59 +315,61 @@ export default function ProductDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-500 text-black text-base">
-                {products.length > 0 && products.map((product) => (
-                  <tr
-                    className="hover:bg-blue-50/50 transition-colors"
-                    key={product.id}
-                  >
-                    <td className="py-4 px-2">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={`http://localhost:3000/uploads/${product.picUrl}`}
-                          className=" hidden md:block w-10 h-10 rounded shadow-sm object-cover"
-                          alt=""
-                        />
-                        <span className="font-semibold text-gray-800">
-                          {product.name}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-2 text-center text-gray-600">
-                      {product.category}
-                    </td>
-                    <td className="py-4 px-2 text-center font-bold">
-                      <span data-testid="stock_number">
-                        {product.stock_number}
-                      </span>
-                    </td>
-                    <td className="py-4 px-2 text-center font-medium">
-                      {product.price!.toLocaleString()} Ft
-                    </td>
-                    <td className="py-3 px-2 text-center flex flex-col md:flex-row">
-                      <div className="flex flex-col md:flex-row justify-content-end items-center gap-2">
-                        <button data-testid="delete-button"
-                          className="flex items-center justify-right gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95"
-                          onClick={() => {
-                            setDeleteTargetId(product.id!);
-                            setDeleteTargetName(product.name!);
-                          }}
-                        >
-                          <TrashIcon sx={{ fontSize: 18 }} />
-                          <span className="md:hidden lg:inline">Törlés</span>
-                        </button>
-                        <Link
-                          to={`/admin/products/${product.id}`}
-                          className="flex flex-col md:flex-row  justify-center items-center gap-1 bg-blue-600 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95"
-                        >
-                          <PenIcon sx={{ fontSize: 18 }} />{" "}
-                          <span className="md:hidden lg:inline">
-                            Szerkesztés
+                {products.length > 0 &&
+                  products.map((product) => (
+                    <tr
+                      className="hover:bg-blue-50/50 transition-colors"
+                      key={product.id}
+                    >
+                      <td className="py-4 px-2">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={`http://localhost:3000/product_images/${product.picUrl}`}
+                            className=" hidden md:block w-10 h-10 rounded shadow-sm object-cover"
+                            alt=""
+                          />
+                          <span className="font-semibold text-gray-800">
+                            {product.name}
                           </span>
-                        </Link>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                        </div>
+                      </td>
+                      <td className="py-4 px-2 text-center text-gray-600">
+                        {product.category}
+                      </td>
+                      <td className="py-4 px-2 text-center font-bold">
+                        <span data-testid="stock_number">
+                          {product.stock_number}
+                        </span>
+                      </td>
+                      <td className="py-4 px-2 text-center font-medium">
+                        {product.price!.toLocaleString()} Ft
+                      </td>
+                      <td className="py-3 px-2 text-center flex flex-col md:flex-row">
+                        <div className="flex flex-col md:flex-row justify-content-end items-center gap-2">
+                          <button
+                            data-testid="delete-button"
+                            className="flex items-center justify-right gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95"
+                            onClick={() => {
+                              setDeleteTargetId(product.id!);
+                              setDeleteTargetName(product.name!);
+                            }}
+                          >
+                            <TrashIcon sx={{ fontSize: 18 }} />
+                            <span className="md:hidden lg:inline">Törlés</span>
+                          </button>
+                          <Link
+                            to={`/admin/products/${product.id}`}
+                            className="flex flex-col md:flex-row  justify-center items-center gap-1 bg-blue-600 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm w-full md:w-auto active:scale-95"
+                          >
+                            <PenIcon sx={{ fontSize: 18 }} />{" "}
+                            <span className="md:hidden lg:inline">
+                              Szerkesztés
+                            </span>
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>

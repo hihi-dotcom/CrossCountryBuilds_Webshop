@@ -40,8 +40,7 @@ class ProductService {
         const response = await fetch(`${API_URL}/product?id=${id}`);
         const data = await response.json();
         
-        
-        return data.length > 0 ? data[0] : null;
+        return data;
     }
 
 

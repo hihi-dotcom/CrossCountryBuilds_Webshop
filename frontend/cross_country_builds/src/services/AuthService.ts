@@ -13,7 +13,7 @@ class AuthService {
     async registration({username, email, password, confirmPassword}:RegistrationDTO):Promise<RegistrationRespDTO>{
         const response = await requestHandler('signup', {
             method: "POST",
-            body: JSON.stringify({username, email, password, confirmPassword}),
+            body: JSON.stringify({username: username.trim(), email: email.trim(), password: password.trim(), confirmPassword: confirmPassword.trim()}),
         });
             const data = await response.json();
         if(response.ok){
@@ -31,9 +31,10 @@ class AuthService {
     }
 
     async login({username, password}:LoginDTO):Promise<LogInRespDTO>{
+     
         const response = await requestHandler('login', {
             method: "POST",
-            body: JSON.stringify({username, password})
+            body: JSON.stringify({username: username.trim(), password: password.trim()})
         });
         const data = await response.json();
         if(response.ok){
