@@ -1,20 +1,36 @@
 import { useCart } from "../components/custom_hooks/CartContext";
 import BacktoTheWebShopSection from "../components/moduleComponents/backToTheWebshop";
-import { HiShoppingCart } from "react-icons/hi";
+import { HiShoppingCart, HiInformationCircle } from "react-icons/hi";
 import CartProducts from "../components/termekcomponents/cartProductSor";
 import RendelesEndButton from "../components/buttonComponents/rendelesVegeButton";
 import {Link} from "react-router-dom";
+import { Alert } from "flowbite-react";
 export default function CartPage() {
-  const { cartItems } = useCart();
+  const { cartItems, isCartValidated } = useCart();
   const hasItems = cartItems && cartItems.length > 0;
+  const problematicProducts = cartItems.filter(item => item.quantity > item.stock_number);
+  const problematicProductNames = problematicProducts.map(p => p.name).join(", ");
+  const moreThanInventory = cartItems.some(item => Number(item.quantity) > item.stock_number)
 
   return (
     <section className="min-h-screen py-12 px-4 md:px-12 bg-[#f9fafb]">
       <div className="max-w-5xl mx-auto">
+         {hasItems && moreThanInventory && (
+          <>
+            <Alert color="failure" icon={HiInformationCircle}>
+              <p className="mt-1 text-sm text-red-600">
+                 A következő termékekből nincs ennyi raktáron: <span className="font-medium underline">{problematicProductNames}</span>
+              </p>
+              <p className="mt-1 text-sm text-red-600">
+                  Kérjük, csökkentsd a mennyiséget, a továbblépéshez!
+              </p>
+            </Alert>
+          </>
+        )}
         <BacktoTheWebShopSection>
           <span className="text-white italic font-medium">Elfelejtettél valamit? Itt még visszatérhetsz.</span>
         </BacktoTheWebShopSection>
-
+       
         <div className="flex items-center gap-4 mt-10 mb-8">
           <HiShoppingCart className="text-blue-600 text-4xl" />
           <h2 className="text-4xl font-black text-gray-900 uppercase italic tracking-tighter">
@@ -36,7 +52,9 @@ export default function CartPage() {
         
         {hasItems && (
           <div className="flex justify-end mt-12 pt-8 border-t border-gray-200">
-            <RendelesEndButton />
+            <div className={moreThanInventory ? "opacity-50 cursor-not-allowed" : ""}>
+                  <RendelesEndButton disabled={moreThanInventory} />
+            </div>
           </div>
         )}
       </div>
