@@ -75,7 +75,7 @@ export default function OrderDataModule() {
     {
       value: "kartya",
       name: "kartya-uzlet",
-      innerText: "üzletben Paypal segítségével",
+      innerText: "üzletben bankkártya segítségével",
       disabled: false,
     },
     {
@@ -93,7 +93,7 @@ export default function OrderDataModule() {
     {
       value: "futar-kartya",
       name: "futar-kartya",
-      innerText: "futárunknak Paypal segítségével",
+      innerText: "futárunknak bankkártya segítségével",
       disabled: hasBicycle,
     },
   ];
