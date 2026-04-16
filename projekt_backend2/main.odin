@@ -16,7 +16,10 @@ import "logic/auth"
 
 main :: proc () {
     token.SECRET = token.create_secret()
-    upload_dir := "../uploads"
+    upload_dir := os.get_env("UPLOAD_DIR")
+    if upload_dir == "" {
+        upload_dir = "/app/product_images" 
+    }
     products.UPLOAD_DIR = upload_dir
     logic.prepare()
 

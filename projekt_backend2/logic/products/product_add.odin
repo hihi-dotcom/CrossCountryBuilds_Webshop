@@ -114,14 +114,13 @@ save_image :: proc (base64_data: string) -> ImageResult {
         return {success = false, error = "Invalid image data URL"}
     }
 
-    mime_type := base64_data[11:semicolon_idx]
+    mime_type := base64_data[5:semicolon_idx] 
     base64_content := base64_data[comma_idx+1:]
 
-    ext := ".bin"
-    if mime_type == "image/png" { ext = ".png" }
-    else if mime_type == "image/jpeg" { ext = ".jpg" }
-    else if mime_type == "image/gif" { ext = ".gif" }
-    else if mime_type == "image/webp" { ext = ".webp" }
+    ext := ".jpg"
+    if strings.contains(mime_type, "png")  { ext = ".png" }
+    else if strings.contains(mime_type, "webp") { ext = ".webp" }
+    else if strings.contains(mime_type, "gif")  { ext = ".gif" }
 
     timestamp := time.to_unix_nanoseconds(time.now())
     rand_buf: [8]u8

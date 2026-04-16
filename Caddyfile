@@ -16,8 +16,7 @@
     }
 
     # Product images -> serve from product_images volume
-    handle /product_images/* {
-        uri strip_prefix /product_images
+    handle_path /product_images/* {
         root * /var/www/product_images
         file_server
     }

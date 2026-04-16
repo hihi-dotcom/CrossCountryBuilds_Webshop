@@ -34,6 +34,9 @@ export default function ProductDashboard() {
   useEffect(() => {
     if (actionData?.ok) {
       formRef.current?.reset();
+      if(actionData.newProduct){
+        setProducts(prev => [actionData.newProduct, ...prev]);
+      }
       navigate("/admin/products", { replace: true });
     }
   }, [actionData, navigate]);
