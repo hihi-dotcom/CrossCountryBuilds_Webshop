@@ -9,6 +9,8 @@ import Order from "../../models/order";
 
 export default function OrdersDashboard() {
   const initOrders = useLoaderData();
+
+  
   const [orders, setOrders] = useState<any[]>(initOrders || []);
   const [loadingId, setLoadingId] = useState<number | null>(null);
   const [error, setError] = useState("");
@@ -17,7 +19,7 @@ export default function OrdersDashboard() {
   );
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
   const [selectedOrderId, setselectedOrderId] = useState<number | null>(null);
-
+  console.log(orders);
   async function handleUpdateStatus(id: number, newStatus: string) {
     if (newStatus === "") return;
 
@@ -157,12 +159,12 @@ export default function OrdersDashboard() {
                         </td>
                         <td className="py-4 px-2 font-medium w-fit">
                           <div className="flex flex-col text-sm">
-                            <span className="font-bold">{s.zip_code} {s.city_name}</span>
+                            <span className="font-bold">{s.Daddress}</span>
                             <span className="text-gray-600">{s.address_detail}</span>
                           </div>
                         </td>
-                        <td className="py-4 px-2">{s.delivery_Method}</td>
-                        <td className="py-4 px-2">{s.payment_Method}</td>
+                        <td className="py-4 px-2">{s.dMethod}</td>
+                        <td className="py-4 px-2">{s.pMethod}</td>
                         <td className="py-4 px-2 font-semibold">
                           {Number(s.total_amount).toLocaleString()} Ft
                         </td>
